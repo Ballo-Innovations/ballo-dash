@@ -12,7 +12,7 @@ import { appWithTranslation } from "next-i18next";
 import { AppProvider } from "@/contexts/AppContext";
 import { Toaster } from "react-hot-toast";
 import { useRouter } from "next/router";
-import Loading from "./pages/loading";
+import Loading from "@/components/PageLoading";
 import AppInitializer from "@/Common/AppInitializer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 

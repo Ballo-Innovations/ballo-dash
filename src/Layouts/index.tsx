@@ -1,18 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react/no-unescaped-entities */
-/* eslint-disable react/no-children-prop */
-/* eslint-disable @next/next/no-img-element */
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable react/display-name */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable prefer-const */
-/* eslint-disable no-console */
-import { ReactNode } from "react";
-import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { ReactNode, useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { createSelector } from "reselect";
 import {
   changeThemeLayout,
   changeThemeMode,
@@ -23,73 +11,34 @@ import {
   changeSidebarTheme,
   changeSidebarThemeCaptions,
 } from "../toolkit/themeLayouts/thunk";
+import type { AppDispatch, RootState } from "../toolkit";
 import RightCustomizer from "./RightCustomizer";
-import { createSelector } from "reselect";
 import Header from "./Header";
 import TopBar from "./Topbar";
-import Footer from "./Footer";
-import VerticalTab from "./Vertical-Tab";
-import HorizontalLayout from "./HorizontalLayout/Header";
-import Moduler from "./Moduler";
 import IntegrationManagementModal from "@/views/Dashboard/IntegrationManagementModal";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
+const selectLayoutProperties = createSelector(
+  (state: RootState) => state.Theme,
+  (layout) => ({
+    themeMode: layout.themeMode,
+    layoutTheme: layout.layoutTheme,
+    themePreset: layout.themePreset,
+    themeLayout: layout.themeLayout,
+    sidebarTheme: layout.sidebarTheme,
+    sidebarThemeCaptions: layout.sidebarThemeCaptions,
+  })
+);
+
+/**
+ * Application shell: vertical sidebar, top bar and theme customizer.
+ * The template's horizontal, tab and modular variants were removed (H-07).
+ */
 const Layout = ({ children }: LayoutProps) => {
-  const toogleSidebarHide = () => {
-    const sidebar = document.querySelector(".pc-sidebar .pc-menu-overlay");
-    const sidebarHideId = document.getElementById("pc-sidebar-hide");
-
-    if (sidebarHideId) {
-      sidebarHideId.classList.toggle("pc-sidebar-hide");
-    }
-  };
-  const toogleMobileSidebarHide = () => {
-    const sidebarHideId = document.getElementById(
-      "pc-sidebar-hide"
-    ) as HTMLDivElement | null;
-
-    if (sidebarHideId) {
-      sidebarHideId.classList.toggle("mob-sidebar-active");
-    }
-
-    // Create a new element
-    const newElement = document.createElement("div");
-    newElement.className = "pc-menu-overlay"; // Set the desired class name
-
-    // Insert the new element after the .navbar-wrapper
-    const navbarWrapper = document.querySelector(
-      ".navbar-wrapper"
-    ) as Element | null;
-    if (navbarWrapper) {
-      navbarWrapper.insertAdjacentElement("afterend", newElement);
-    }
-
-    // Add an event listener to remove the "mob-sidebar-active" class when the new element is clicked
-    newElement.addEventListener("click", function () {
-      if (sidebarHideId) {
-        sidebarHideId.classList.remove("mob-sidebar-active");
-        newElement.remove(); // Remove the new element when clicked
-      }
-    });
-  };
-
-  const dispatch = useDispatch<any>();
-
-  const selectLayoutProperties = createSelector(
-    (state: any) => state.Theme,
-    (layout) => ({
-      themeMode: layout.themeMode,
-      layoutTheme: layout.layoutTheme,
-      themePreset: layout.themePreset,
-      themeLayout: layout.themeLayout,
-      sidebarTheme: layout.sidebarTheme,
-      sidebarThemeCaptions: layout.sidebarThemeCaptions,
-    })
-  );
-  // Inside your component
+  const dispatch = useDispatch<AppDispatch>();
   const {
     themeMode,
     themePreset,
@@ -99,25 +48,13 @@ const Layout = ({ children }: LayoutProps) => {
     sidebarThemeCaptions,
   } = useSelector(selectLayoutProperties);
 
-  /*
-    layout settings
-    */
   useEffect(() => {
-    if (
-      themeMode ||
-      layoutTheme ||
-      themePreset ||
-      themeLayout ||
-      sidebarTheme ||
-      sidebarThemeCaptions
-    ) {
-      dispatch(changeThemeMode(themeMode));
-      dispatch(changeLayoutTheme(layoutTheme));
-      dispatch(changeThemePreset(themePreset));
-      dispatch(changeThemeLayout(themeLayout));
-      dispatch(changeSidebarTheme(sidebarTheme));
-      dispatch(changeSidebarThemeCaptions(sidebarThemeCaptions));
-    }
+    dispatch(changeThemeMode(themeMode));
+    dispatch(changeLayoutTheme(layoutTheme));
+    dispatch(changeThemePreset(themePreset));
+    dispatch(changeThemeLayout(themeLayout));
+    dispatch(changeSidebarTheme(sidebarTheme));
+    dispatch(changeSidebarThemeCaptions(sidebarThemeCaptions));
   }, [
     themeMode,
     layoutTheme,
@@ -128,90 +65,62 @@ const Layout = ({ children }: LayoutProps) => {
     dispatch,
   ]);
 
+  const toogleSidebarHide = useCallback(() => {
+    document.getElementById("pc-sidebar-hide")?.classList.toggle("pc-sidebar-hide");
+  }, []);
+
+  const toogleMobileSidebarHide = useCallback(() => {
+    const sidebar = document.getElementById("pc-sidebar-hide");
+    if (!sidebar) return;
+    sidebar.classList.toggle("mob-sidebar-active");
+
+    const overlay = document.createElement("div");
+    overlay.className = "pc-menu-overlay";
+    document.querySelector(".navbar-wrapper")?.insertAdjacentElement("afterend", overlay);
+    overlay.addEventListener("click", () => {
+      sidebar.classList.remove("mob-sidebar-active");
+      overlay.remove();
+    });
+  }, []);
+
   const [isLayoutWidth, setLayoutWidth] = useState(false);
-
-  const handleChangeLayoutWidth = (value: boolean) => {
-    setLayoutWidth(value);
-  };
-  const getLayoutWidth = isLayoutWidth ? "container" : "";
   const [showOffcanvas, setShowOffcanvas] = useState(false);
-  // console.log(isLanding);
-
-  const handleOffcanvasToggle = () => {
-    setShowOffcanvas(!showOffcanvas);
-  };
+  const handleOffcanvasToggle = () => setShowOffcanvas((open) => !open);
 
   return (
     <>
-      {layoutTheme === "vertical" ? (
-        <>
-          <Header themeMode={themeMode} />
-          <TopBar
-            handleOffcanvasToggle={handleOffcanvasToggle}
-            toogleSidebarHide={toogleSidebarHide}
-            toogleMobileSidebarHide={toogleMobileSidebarHide}
-            themeMode={themeMode}
-            changeThemeMode={changeThemeMode}
-          />
-          <div className="pc-container">
-            <div className={"pc-content " + getLayoutWidth}>{children}</div>
-          </div>
-          {/* <Footer /> */}
-          <RightCustomizer
-            showOffcanvas={showOffcanvas}
-            handleOffcanvasToggle={handleOffcanvasToggle}
-            themeMode={themeMode}
-            changeThemeMode={changeThemeMode}
-            themePreset={themePreset}
-            changeThemePreset={changeThemePreset}
-            themeLayout={themeLayout}
-            changeThemeLayout={changeThemeLayout}
-            isLayoutWidth={isLayoutWidth}
-            handleChangeLayoutWidth={handleChangeLayoutWidth}
-            sidebarTheme={sidebarTheme}
-            changeSidebarTheme={changeSidebarTheme}
-            sidebarThemeCaptions={sidebarThemeCaptions}
-            changeSidebarThemeCaptions={changeSidebarThemeCaptions}
-          />
-        </>
-      ) : layoutTheme === "horizontal" ? (
-        <>
-          <HorizontalLayout
-            children={children}
-            handleOffcanvasToggle={handleOffcanvasToggle}
-            toogleSidebarHide={toogleSidebarHide}
-            toogleMobileSidebarHide={toogleMobileSidebarHide}
-            themeMode={themeMode}
-            changeThemeMode={changeThemeMode}
-          />
-        </>
-      ) : layoutTheme === "vertical-tab" ? (
-        <>
-          <VerticalTab
-            children={children}
-            handleOffcanvasToggle={handleOffcanvasToggle}
-            toogleSidebarHide={toogleSidebarHide}
-            toogleMobileSidebarHide={toogleMobileSidebarHide}
-            themeMode={themeMode}
-            changeThemeMode={changeThemeMode}
-          />
-        </>
-      ) : (
-        <>
-          <Moduler
-            children={children}
-            handleOffcanvasToggle={handleOffcanvasToggle}
-            toogleSidebarHide={toogleSidebarHide}
-            toogleMobileSidebarHide={toogleMobileSidebarHide}
-            themeMode={themeMode}
-            changeThemeMode={changeThemeMode}
-          />
-        </>
-      )}
-      
-      {/* Global Integration Management Modal */}
+      <Header themeMode={themeMode} />
+      <TopBar
+        handleOffcanvasToggle={handleOffcanvasToggle}
+        toogleSidebarHide={toogleSidebarHide}
+        toogleMobileSidebarHide={toogleMobileSidebarHide}
+        themeMode={themeMode}
+        changeThemeMode={changeThemeMode}
+      />
+      <div className="pc-container">
+        <div className={"pc-content " + (isLayoutWidth ? "container" : "")}>
+          {children}
+        </div>
+      </div>
+      <RightCustomizer
+        showOffcanvas={showOffcanvas}
+        handleOffcanvasToggle={handleOffcanvasToggle}
+        themeMode={themeMode}
+        changeThemeMode={changeThemeMode}
+        themePreset={themePreset}
+        changeThemePreset={changeThemePreset}
+        themeLayout={themeLayout}
+        changeThemeLayout={changeThemeLayout}
+        isLayoutWidth={isLayoutWidth}
+        handleChangeLayoutWidth={setLayoutWidth}
+        sidebarTheme={sidebarTheme}
+        changeSidebarTheme={changeSidebarTheme}
+        sidebarThemeCaptions={sidebarThemeCaptions}
+        changeSidebarThemeCaptions={changeSidebarThemeCaptions}
+      />
       <IntegrationManagementModal />
     </>
   );
 };
+
 export default Layout;

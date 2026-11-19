@@ -7,7 +7,7 @@ import avatar1 from "../assets/images/user/avatar-1.jpg";
 import SimpleBar from "simplebar-react";
 import { menuItems } from "./MenuData";
 import { useDynamicMenu } from "@/hooks/useDynamicMenu";
-import NestedMenu from "@/Layouts/Moduler/NestedMenu";
+import NestedMenu from "@/Layouts/NestedMenu";
 import { Dropdown } from "react-bootstrap";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/toolkit/hooks";
