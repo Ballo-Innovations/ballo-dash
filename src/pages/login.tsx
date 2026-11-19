@@ -5,7 +5,7 @@ import NavBar from "@views/Landing/Navbar";
 import React, { useState } from "react";
 import { Lock, UserRound, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { safeCallbackUrl } from "@/lib/safe-redirect";
 
 const Login = () => {
@@ -13,7 +13,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = safeCallbackUrl(searchParams?.get("callbackUrl"));
 
@@ -22,16 +21,23 @@ const Login = () => {
     setLoading(true);
     const toastId = toast.loading("Logging in...");
 
+    // Read from the form, not React state: values typed (or autofilled) before
+    // hydration never reach state, and would otherwise be submitted as empty.
+    const form = new FormData(e.currentTarget as HTMLFormElement);
     const res = await signIn("credentials", {
-      username,
-      password,
+      username: String(form.get("username") ?? username),
+      password: String(form.get("password") ?? password),
       redirect: false,
       callbackUrl,
     });
 
     if (res?.ok) {
-      toast.success("Login successful!", { id: toastId });
-      router.push(callbackUrl);
+      toast.success("Signed in", { id: toastId });
+      // Full page load, not router.push: links prefetched while signed out
+      // (for example "Dashboard" in the top bar) are cached as redirects to
+      // /login, and a client-side push would replay that redirect.
+      window.location.assign(callbackUrl);
+      return;
     } else {
       // NextAuth passes a thrown authorize() error's message through (used for rate limiting).
       const message = res?.error && res.error !== "CredentialsSignin" ? res.error : "Invalid email or password";
@@ -56,7 +62,7 @@ const Login = () => {
         <div className="home-content-wrapper">
           <div className="login-container">
             <h2 className="login-title">Log in</h2>
-            <form className="login-form" onSubmit={handleLogin}>
+            <form className="login-form" method="post" onSubmit={handleLogin}>
               <div className="form-group">
                 <label className="form-label">Email</label>
                 <div className="form-input-wrapper gap-2">
@@ -65,6 +71,8 @@ const Login = () => {
                     type="text"
                     placeholder="Username"
                     className="form-input"
+                    name="username"
+                    autoComplete="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                   />
@@ -81,6 +89,8 @@ const Login = () => {
                     type={showPassword ? "text" : "password"}
                     placeholder="Password"
                     className="form-input"
+                    name="password"
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />

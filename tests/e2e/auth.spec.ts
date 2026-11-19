@@ -53,6 +53,7 @@ test.describe("signed in", () => {
     await page.getByRole("button", { name: "Sign in" }).click();
     await page.waitForURL((url) => !url.pathname.startsWith("/login"));
 
+    await page.locator("#pc-navbar a[href^='/']").first().waitFor();
     const hrefs = await page.locator("#pc-navbar a[href^='/']").evaluateAll((links) =>
       Array.from(new Set(links.map((link) => link.getAttribute("href")!)))
     );

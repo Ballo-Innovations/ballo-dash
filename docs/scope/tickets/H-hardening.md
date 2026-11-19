@@ -107,7 +107,7 @@
 - [x] Unused packages removed (CKEditor, TinyMCE, FullCalendar, MUI, PrimeReact, uppy and others confirmed unused)
 - [x] Npm ci works without --legacy-peer-deps
 - [x] Build passes
-- [x] Remaining real pages unchanged in screenshots (removal approved by George on 2026-11-19) (Verified in the browser on the local build, see the PR.)
+- [x] Remaining real pages unchanged in screenshots (removal approved by George on 2026-11-19) (Reviewed in screenshots at 375, 430, 768, 1280 and 1440 px, light and dark, on the production build. No before-and-after baseline comparison was made. Dead template sidebar links found and removed.)
 
 **Notes:** MUI stays (used by the table, avatar and skeletons) together with its Emotion peers.
 
