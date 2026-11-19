@@ -5,6 +5,7 @@ import { Card, Col, Row } from "react-bootstrap";
 import instaIcon from "@/assets/images/socials/instagram.png";
 import Image from "next/image";
 import "@/assets/scss/data-page.scss";
+import { logger } from "@/lib/logger";
 
 interface Props {
   isExpanded: boolean;
@@ -40,7 +41,7 @@ type InstagramTransformedPost = {
 };
 
 function transformInstagramData(data: InstagramRawPost[]): InstagramTransformedPost[] {
-  console.log('🚀🚀🚀transformInstagramData', data);
+  logger.debug('🚀🚀🚀transformInstagramData', data);
   return data
     .filter(
       (post): post is InstagramRawPost & { message: string; created_time: string } =>
@@ -94,7 +95,7 @@ const InstagramPostsTable: React.FC<Props> = ({
   onToggleExpand,
   data,
 }) => {
-  console.log("📸 InstagramPostsTable - Data:", data);
+  logger.debug("📸 InstagramPostsTable - Data:", data);
 
   const transformedData = Array.isArray(data?.posts)
     ? transformInstagramData(data?.posts)

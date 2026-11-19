@@ -5,6 +5,7 @@ import facebookIcon from "@/assets/images/socials/facebook.png";
 import instagramIcon from "@/assets/images/socials/instagram.png";
 import linkedinIcon from "@/assets/images/socials/linkedin.png";
 import xIcon from "@/assets/images/socials/X_icon.png";
+import { logger } from "@/lib/logger";
 
 interface Post {
     id: number;
@@ -59,7 +60,7 @@ const HighestPerformingPosts: React.FC<HighestPerformingPostsProps> = ({
 }) => {
 
     const bestPosts = posts.sort((a, b) => b.engagement - a.engagement);
-    console.log(bestPosts); 
+    logger.debug(bestPosts); 
     return (
         <div>
             <div 

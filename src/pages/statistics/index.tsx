@@ -20,6 +20,7 @@ import {
     MetricsPanel,
     RecentPostsTable
 } from "@/components/statistics";
+import { logger } from "@/lib/logger";
 
 const StatisticsIndex = () => {
     const company = useAppSelector(selectCompany);
@@ -49,7 +50,7 @@ const StatisticsIndex = () => {
 
     const handleExportPDF = () => {
         // TODO: Implement PDF export functionality
-        console.log('Exporting statistics as PDF for platform:', platform);
+        logger.debug('Exporting statistics as PDF for platform:', platform);
         // This would typically generate a PDF report of the current statistics
     };
 

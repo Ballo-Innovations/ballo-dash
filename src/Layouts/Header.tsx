@@ -18,6 +18,7 @@ import { useSession } from "next-auth/react";
 import balloLogo from "@/assets/images/logos/Ballo logo white.png";
 import { Play } from "lucide-react";
 import Skeleton from "@mui/material/Skeleton";
+import { logger } from "@/lib/logger";
 
 const Header = ({ themeMode }: any) => {
   const dispatch = useAppDispatch();
@@ -40,7 +41,7 @@ const Header = ({ themeMode }: any) => {
   }, [dispatch]);
 
   // useEffect(() => {
-  //   console.log("user:", session?.user);
+  //   logger.debug("user:", session?.user);
   // }, [session]);
 
   return (

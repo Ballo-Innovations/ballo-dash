@@ -2,6 +2,7 @@ import { db } from "@/db/db";
 import { integrations } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { tokenCache } from "./tokenCache";
+import { logger } from "@/lib/logger";
 
 /**
  * Fetches Facebook/Meta access token from database for a given company
@@ -16,7 +17,7 @@ export async function getFacebookAccessToken(companyId: string): Promise<string 
       return cachedToken;
     }
 
-    console.log("Fetching Facebook access token from database for company:", companyId);
+    logger.debug("Fetching Facebook access token from database for company:", companyId);
     
     const facebookIntegration = await db
       .select()
@@ -30,26 +31,26 @@ export async function getFacebookAccessToken(companyId: string): Promise<string 
       .limit(1);
 
     if (!facebookIntegration || facebookIntegration.length === 0) {
-      console.error("❌ Facebook integration not found in database for company:", companyId);
+      logger.error("❌ Facebook integration not found in database for company:", companyId);
       return null;
     }
 
     const accessToken = facebookIntegration[0].accessToken;
     
     if (!accessToken) {
-      console.error("❌ Facebook access token is empty for company:", companyId);
+      logger.error("❌ Facebook access token is empty for company:", companyId);
       return null;
     }
 
     // Cache the token for future use
     tokenCache.cacheToken(companyId, 'FACEBOOK', accessToken);
 
-    console.log("✅ Facebook access token fetched successfully for company:", companyId);
-    console.log("   Token preview:", accessToken.substring(0, 20) + "...");
+    logger.debug("✅ Facebook access token fetched successfully for company:", companyId);
+    logger.debug("   Token preview:", accessToken.substring(0, 20) + "...");
     
     return accessToken;
   } catch (error) {
-    console.error("❌ Error fetching Facebook access token from database:", error);
+    logger.error("❌ Error fetching Facebook access token from database:", error);
     return null;
   }
 }
@@ -74,7 +75,7 @@ export async function hasFacebookIntegration(companyId: string): Promise<boolean
 
     return integration.length > 0;
   } catch (error) {
-    console.error("❌ Error checking Facebook integration:", error);
+    logger.error("❌ Error checking Facebook integration:", error);
     return false;
   }
 }
@@ -92,9 +93,10 @@ export async function getInstagramAccessToken(companyId: string): Promise<string
       return cachedToken;
     }
 
-    console.log("Fetching Instagram access token from database for company:", companyId);
+    logger.debug("Fetching Instagram access token from database for company:", companyId);
     
     const instagramIntegration = await db
+      .select()
       .from(integrations)
       .where(
         and(
@@ -105,26 +107,26 @@ export async function getInstagramAccessToken(companyId: string): Promise<string
       .limit(1);
 
     if (!instagramIntegration || instagramIntegration.length === 0) {
-      console.error("❌ Instagram integration not found in database for company:", companyId);
+      logger.error("❌ Instagram integration not found in database for company:", companyId);
       return null;
     }
 
     const accessToken = instagramIntegration[0].accessToken;
     
     if (!accessToken) {
-      console.error("❌ Instagram access token is empty for company:", companyId);
+      logger.error("❌ Instagram access token is empty for company:", companyId);
       return null;
     }
 
     // Cache the token for future use
     tokenCache.cacheToken(companyId, 'INSTAGRAM', accessToken);
 
-    console.log("✅ Instagram access token fetched successfully for company:", companyId);
-    console.log("   Token preview:", accessToken.substring(0, 20) + "...");
+    logger.debug("✅ Instagram access token fetched successfully for company:", companyId);
+    logger.debug("   Token preview:", accessToken.substring(0, 20) + "...");
     
     return accessToken;
   } catch (error) {
-    console.error("❌ Error fetching Instagram access token from database:", error);
+    logger.error("❌ Error fetching Instagram access token from database:", error);
     return null;
   }
 }

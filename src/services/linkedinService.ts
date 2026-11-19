@@ -1,4 +1,5 @@
 import { Company } from "@/types";
+import { logger } from "@/lib/logger";
 
 interface LinkedInOrganizationInfo {
   id: string;
@@ -39,12 +40,12 @@ class LinkedInService {
     const cacheKey = `org_${organizationId}`;
     
     if (this.orgInfo && this.isDataFresh(cacheKey)) {
-      console.log('LinkedInService: Returning cached organization info');
+      logger.debug('LinkedInService: Returning cached organization info');
       return this.orgInfo;
     }
 
     if (this.isLoading) {
-      console.log('LinkedInService: Request already in progress, waiting...');
+      logger.debug('LinkedInService: Request already in progress, waiting...');
       while (this.isLoading) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
@@ -52,7 +53,7 @@ class LinkedInService {
     }
 
     try {
-      console.log('LinkedInService: Fetching organization info...');
+      logger.debug('LinkedInService: Fetching organization info...');
       this.isLoading = true;
       
       const response = await fetch(`/api/data/linkedin/organizationInfo?organizationId=${organizationId}`);
@@ -65,10 +66,10 @@ class LinkedInService {
       this.orgInfo = data;
       this.lastFetch[cacheKey] = Date.now();
       
-      console.log('LinkedInService: Organization info stored in cache');
+      logger.debug('LinkedInService: Organization info stored in cache');
       return this.orgInfo;
     } catch (error) {
-      console.error('❌ LinkedInService: Error fetching organization info:', error);
+      logger.error('❌ LinkedInService: Error fetching organization info:', error);
       return null;
     } finally {
       this.isLoading = false;
@@ -79,12 +80,12 @@ class LinkedInService {
     const cacheKey = `metrics_${organizationId}_${metric}`;
     
     if (this.metrics[cacheKey] && this.isDataFresh(cacheKey)) {
-      console.log(`LinkedInService: Returning cached ${metric} metrics`);
+      logger.debug(`LinkedInService: Returning cached ${metric} metrics`);
       return this.metrics[cacheKey];
     }
 
     try {
-      console.log(`LinkedInService: Fetching ${metric} metrics...`);
+      logger.debug(`LinkedInService: Fetching ${metric} metrics...`);
       
       const response = await fetch(`/api/data/linkedin/metric?organizationId=${organizationId}&metric=${metric}`);
       
@@ -96,16 +97,16 @@ class LinkedInService {
       this.metrics[cacheKey] = data;
       this.lastFetch[cacheKey] = Date.now();
       
-      console.log(`LinkedInService: ${metric} metrics stored in cache`);
+      logger.debug(`LinkedInService: ${metric} metrics stored in cache`);
       return this.metrics[cacheKey];
     } catch (error) {
-      console.error(`❌ LinkedInService: Error fetching ${metric} metrics:`, error);
+      logger.error(`❌ LinkedInService: Error fetching ${metric} metrics:`, error);
       return null;
     }
   }
 
   public async getMultipleMetrics(organizationId: string, metrics: string[]): Promise<Record<string, LinkedInMetrics>> {
-    console.log(`LinkedInService: Fetching multiple metrics: ${metrics.join(', ')}`);
+    logger.debug(`LinkedInService: Fetching multiple metrics: ${metrics.join(', ')}`);
     
     const results: Record<string, LinkedInMetrics> = {};
     
@@ -126,12 +127,12 @@ class LinkedInService {
     const cacheKey = `posts_${organizationId}`;
     
     if (this.isDataFresh(cacheKey)) {
-      console.log('LinkedInService: Returning cached posts');
+      logger.debug('LinkedInService: Returning cached posts');
       return null; // Posts are usually not cached for long
     }
 
     try {
-      console.log('LinkedInService: Fetching posts...');
+      logger.debug('LinkedInService: Fetching posts...');
       
       const response = await fetch(`/api/data/linkedin/posts?organizationId=${organizationId}`);
       
@@ -142,17 +143,17 @@ class LinkedInService {
       const data = await response.json();
       this.lastFetch[cacheKey] = Date.now();
       
-      console.log('LinkedInService: Posts fetched successfully');
+      logger.debug('LinkedInService: Posts fetched successfully');
       return data.posts || [];
     } catch (error) {
-      console.error('❌ LinkedInService: Error fetching posts:', error);
+      logger.error('❌ LinkedInService: Error fetching posts:', error);
       return null;
     }
   }
 
   private isDataFresh(cacheKey: string): boolean {
     const lastFetch = this.lastFetch[cacheKey];
-    return lastFetch && (Date.now() - lastFetch < this.CACHE_DURATION);
+    return lastFetch !== undefined && Date.now() - lastFetch < this.CACHE_DURATION;
   }
 
   public clearCache(): void {

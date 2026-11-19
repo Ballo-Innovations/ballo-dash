@@ -5,6 +5,7 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { db } from "@/db/db";
 import { socialProfiles } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,7 +29,7 @@ export default async function handler(
 
       return res.status(200).json(profiles);
     } catch (error) {
-      console.error("❌ Error fetching social profiles:", error);
+      logger.error("❌ Error fetching social profiles:", error);
       return res.status(500).json({ error: "Internal server error" });
     }
   } else if (req.method === "POST") {
@@ -78,7 +79,7 @@ export default async function handler(
 
       return res.status(200).json({ success: true });
     } catch (error) {
-      console.error("❌ Error creating/updating social profile:", error);
+      logger.error("❌ Error creating/updating social profile:", error);
       return res.status(500).json({ error: "Internal server error" });
     }
   } else {

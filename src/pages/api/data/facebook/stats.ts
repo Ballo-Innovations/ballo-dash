@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getFacebookAccessToken } from "@/lib/facebook";
+import { logger } from "@/lib/logger";
 
 function hasDataChanged(oldData: any, newData: any) {
   return JSON.stringify(oldData) !== JSON.stringify(newData);
@@ -28,19 +29,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Get company ID from session
     const companyId = session.user.companyId;
     if (!companyId) {
-      console.error("❌ No company ID found in session for user:", session.user.email);
+      logger.error("❌ No company ID found in session for user:", session.user.email);
       return res.status(400).json({ error: "Company ID not found in session" });
     }
 
     const accessToken = await getFacebookAccessToken(companyId);
     
     if (!accessToken) {
-      console.error("❌ Facebook access token not found in database for company:", companyId);
+      logger.error("❌ Facebook access token not found in database for company:", companyId);
       return res.status(400).json({ error: "Facebook access token not found in database" });
     }
 
-    console.log("✅ Retrieved Facebook access token from database for stats, company:", companyId);
-    console.log("   Token preview:", accessToken.substring(0, 20) + "...");
+    logger.debug("✅ Retrieved Facebook access token from database for stats, company:", companyId);
+    logger.debug("   Token preview:", accessToken.substring(0, 20) + "...");
 
     const cacheKey = `facebookStats:${pageId}:${since || " "}:${until || " "}:${
       datePreset || " "
@@ -101,7 +102,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
       } else {
         const failedMetric = metricList[index];
-        console.warn(`Failed to fetch ${failedMetric}:`, result);
+        logger.warn(`Failed to fetch ${failedMetric}:`, result);
       }
     });
 
@@ -129,12 +130,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await redis.setex(cacheKey, 300, JSON.stringify(newData)); // Cache for 5 minutes
     }
 
-    // console.log("Meta final response:", JSON.stringify(newData, null, 2));
-    console.log("=== Facebook Stats API Completed Successfully ===");
+    // logger.debug("Meta final response:", JSON.stringify(newData, null, 2));
+    logger.debug("=== Facebook Stats API Completed Successfully ===");
     res.status(200).json(newData);
   } catch (error) {
-    console.error("Error fetching Facebook stats:", error);
-    console.log("=== Facebook Stats API Failed ===");
+    logger.error("Error fetching Facebook stats:", error);
+    logger.debug("=== Facebook Stats API Failed ===");
     res.status(500).json({ error: "Failed to fetch Facebook stats" });
   }
 }

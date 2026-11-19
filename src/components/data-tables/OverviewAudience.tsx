@@ -25,6 +25,7 @@ import {
 import { 
   selectProgressiveXStats
 } from "@/toolkit/xData/reducer";
+import { logger } from "@/lib/logger";
 
 interface OverviewAudienceProps {
   facebook: any;
@@ -184,7 +185,7 @@ const transformProgressiveLinkedInData = (progressiveData: any): PlatformOvervie
 const transformInstagramDataForAudience = (instagramData: any): PlatformOverview | null => {
   if (!instagramData) return null;
 
-  console.log("📸 Transforming Instagram data for Audience:", instagramData);
+  logger.debug("📸 Transforming Instagram data for Audience:", instagramData);
 
   // Check if data is already in PlatformOverview format (has been transformed)
   if (instagramData && instagramData.platform && instagramData.pageName && typeof instagramData.platform === 'string') {
@@ -208,7 +209,7 @@ const transformInstagramDataForAudience = (instagramData: any): PlatformOverview
   const followers = metrics.followers || 0;
   const likes = metrics.likes || 0;    
 
-  console.log("📸 Extracted Instagram metrics for Audience:", { username, followers, likes });
+  logger.debug("📸 Extracted Instagram metrics for Audience:", { username, followers, likes });
 
   return {
     platform: "Instagram",
@@ -278,9 +279,9 @@ const OverviewAudience: React.FC<OverviewAudienceProps> = ({
   if (transformedInstagram) {
     instagramDataArray.push(transformedInstagram);
   } else if (instagramStats || instagramDataProp) {
-    console.log("📸 Instagram Data available but transformation failed:", instagramStats || instagramDataProp);
+    logger.debug("📸 Instagram Data available but transformation failed:", instagramStats || instagramDataProp);
   } else {
-    console.log("📸 No Instagram Data available");
+    logger.debug("📸 No Instagram Data available");
   }
   
   // Transform X data
@@ -423,7 +424,7 @@ const OverviewAudience: React.FC<OverviewAudienceProps> = ({
 const transformXData = (xData: any): PlatformOverview | null => {
   if (!xData) return null;
 
-  console.log("🐦 Transforming X data for Audience:", xData);
+  logger.debug("🐦 Transforming X data for Audience:", xData);
 
   // Handle both direct data and nested data structure
   const data = xData.data || xData;
@@ -435,7 +436,7 @@ const transformXData = (xData: any): PlatformOverview | null => {
   const followers = data.followers || 0;
   const likes = data.likeCount || 0;    
 
-  console.log("🐦 Extracted X metrics for Audience:", { username, name, followers });
+  logger.debug("🐦 Extracted X metrics for Audience:", { username, name, followers });
 
   return {
     platform: "X (Twitter)",

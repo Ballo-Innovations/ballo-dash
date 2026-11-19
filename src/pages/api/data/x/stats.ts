@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getXAccessToken } from "@/lib/x";
 import { socialMediaCacheService } from "@/services/socialMediaCacheService";
+import { logger } from "@/lib/logger";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
@@ -14,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Get user session to verify authentication
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user?.email) {
-      console.log("❌ X API: No session or user email found");
+      logger.debug("❌ X API: No session or user email found");
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -44,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (cachedData && cachedData.fetchStatus === 'SUCCESS') {
       const cacheAgeMinutes = Math.floor((Date.now() - new Date(cachedData.lastFetchedAt).getTime()) / (1000 * 60));
-      console.log("📦 X API - Serving fresh cached data:", {
+      logger.debug("📦 X API - Serving fresh cached data:", {
         username: cleanUsername,
         lastFetched: cachedData.lastFetchedAt,
         cacheAge: cacheAgeMinutes + "m ago"
@@ -77,13 +78,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     
     if (!xApiResponse.ok) {
-      console.error(`❌ X API error: ${xApiResponse.status} - ${xApiResponse.statusText}`);
+      logger.error(`❌ X API error: ${xApiResponse.status} - ${xApiResponse.statusText}`);
       
       // Handle different error status codes
       switch (xApiResponse.status) {
         case 401:
           // When unauthorized, try to return cached data instead
-          console.log("📦 X API unauthorized, attempting to serve cached data");
+          logger.debug("📦 X API unauthorized, attempting to serve cached data");
           const cachedData401 = await socialMediaCacheService.getData(
             session.user.companyId,
             'X',
@@ -92,7 +93,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           
           if (cachedData401 && cachedData401.fetchStatus === 'SUCCESS') {
             const cacheAgeMinutes401 = Math.floor((Date.now() - new Date(cachedData401.lastFetchedAt).getTime()) / (1000 * 60));
-            console.log("📦 X API 401 Error - Serving cached data:", {
+            logger.debug("📦 X API 401 Error - Serving cached data:", {
               username: cleanUsername,
               lastFetched: cachedData401.lastFetchedAt,
               cacheAge: cacheAgeMinutes401 + "m ago"
@@ -113,7 +114,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         case 403:
           // When forbidden, try to return cached data instead
-          console.log("📦 X API forbidden, attempting to serve cached data");
+          logger.debug("📦 X API forbidden, attempting to serve cached data");
           const cachedData403 = await socialMediaCacheService.getData(
             session.user.companyId,
             'X',
@@ -122,7 +123,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           
           if (cachedData403 && cachedData403.fetchStatus === 'SUCCESS') {
             const cacheAgeMinutes403 = Math.floor((Date.now() - new Date(cachedData403.lastFetchedAt).getTime()) / (1000 * 60));
-            console.log("📦 X API 403 Error - Serving cached data:", {
+            logger.debug("📦 X API 403 Error - Serving cached data:", {
               username: cleanUsername,
               lastFetched: cachedData403.lastFetchedAt,
               cacheAge: cacheAgeMinutes403 + "m ago"
@@ -143,7 +144,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         case 404:
           // When user not found, try to return cached data instead
-          console.log("📦 X API user not found, attempting to serve cached data");
+          logger.debug("📦 X API user not found, attempting to serve cached data");
           const cachedData404 = await socialMediaCacheService.getData(
             session.user.companyId,
             'X',
@@ -152,7 +153,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           
           if (cachedData404 && cachedData404.fetchStatus === 'SUCCESS') {
             const cacheAgeMinutes404 = Math.floor((Date.now() - new Date(cachedData404.lastFetchedAt).getTime()) / (1000 * 60));
-            console.log("📦 X API 404 Error - Serving cached data:", {
+            logger.debug("📦 X API 404 Error - Serving cached data:", {
               username: cleanUsername,
               lastFetched: cachedData404.lastFetchedAt,
               cacheAge: cacheAgeMinutes404 + "m ago"
@@ -173,7 +174,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         case 429:
           // When rate limited, try to return cached data instead
-          console.log("📦 X API rate limited, attempting to serve cached data");
+          logger.debug("📦 X API rate limited, attempting to serve cached data");
           const cachedData = await socialMediaCacheService.getData(
             session.user.companyId,
             'X',
@@ -182,7 +183,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           
           if (cachedData && cachedData.fetchStatus === 'SUCCESS') {
             const cacheAgeMinutes = Math.floor((Date.now() - new Date(cachedData.lastFetchedAt).getTime()) / (1000 * 60));
-            console.log("📦 X API 429 Rate Limited - Serving cached data:", {
+            logger.debug("📦 X API 429 Rate Limited - Serving cached data:", {
               username: cleanUsername,
               lastFetched: cachedData.lastFetchedAt,
               cacheAge: cacheAgeMinutes + "m ago"
@@ -197,7 +198,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             };
             return res.status(200).json(responseWithCache);
           } else {
-            console.log("📦 X API 429 Error - No cached data available, returning error");
+            logger.debug("📦 X API 429 Error - No cached data available, returning error");
             return res.status(429).json({ 
               error: "Rate limited: Too many requests to X API.",
               details: "Wait a few minutes before trying again. No cached data available."
@@ -205,7 +206,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
         default:
           // For any other error, try to return cached data instead
-          console.log(`📦 X API error ${xApiResponse.status}, attempting to serve cached data`);
+          logger.debug(`📦 X API error ${xApiResponse.status}, attempting to serve cached data`);
           const cachedDataDefault = await socialMediaCacheService.getData(
             session.user.companyId,
             'X',
@@ -214,7 +215,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           
           if (cachedDataDefault && cachedDataDefault.fetchStatus === 'SUCCESS') {
             const cacheAgeMinutesDefault = Math.floor((Date.now() - new Date(cachedDataDefault.lastFetchedAt).getTime()) / (1000 * 60));
-            console.log("📦 X API Error " + xApiResponse.status + " - Serving cached data:", {
+            logger.debug("📦 X API Error " + xApiResponse.status + " - Serving cached data:", {
               username: cleanUsername,
               lastFetched: cachedDataDefault.lastFetchedAt,
               cacheAge: cacheAgeMinutesDefault + "m ago"
@@ -287,7 +288,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   } catch (error: any) {
     // If there's an internal error, try to return cached data instead
-    console.log("📦 X API internal error, attempting to serve cached data");
+    logger.debug("📦 X API internal error, attempting to serve cached data");
     
     try {
       const session = await getServerSession(req, res, authOptions);
@@ -304,7 +305,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           
           if (cachedData && cachedData.fetchStatus === 'SUCCESS') {
             const cacheAgeMinutesInternal = Math.floor((Date.now() - new Date(cachedData.lastFetchedAt).getTime()) / (1000 * 60));
-            console.log("📦 X API Internal Error - Serving cached data:", {
+            logger.debug("📦 X API Internal Error - Serving cached data:", {
               username: cleanUsername,
               lastFetched: cachedData.lastFetchedAt,
               cacheAge: cacheAgeMinutesInternal + "m ago"
@@ -321,7 +322,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
     } catch (cacheError) {
-      console.log("📦 Failed to retrieve cached data during error:", cacheError);
+      logger.debug("📦 Failed to retrieve cached data during error:", cacheError);
     }
     
     return res.status(500).json({ 

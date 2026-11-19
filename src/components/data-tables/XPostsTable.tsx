@@ -5,6 +5,7 @@ import { Card, Col, Row } from "react-bootstrap";
 import xIcon from "@/assets/images/socials/X_icon.png";
 import Image from "next/image";
 import "@/assets/scss/data-page.scss";
+import { logger } from "@/lib/logger";
 
 interface Props {
   isExpanded: boolean;
@@ -44,7 +45,7 @@ type XTransformedPost = {
 };
 
 function transformXData(data: XRawPost[]): XTransformedPost[] {
-  console.log('🐦🐦🐦transformXData', data);
+  logger.debug('🐦🐦🐦transformXData', data);
   return data
     .filter(
       (post): post is XRawPost & { message: string; created_time: string } =>
@@ -97,7 +98,7 @@ const XPostsTable: React.FC<Props> = ({
   onToggleExpand,
   data,
 }) => {
-  console.log("🐦 XPostsTable - Data:", data);
+  logger.debug("🐦 XPostsTable - Data:", data);
 
   const transformedData = Array.isArray(data?.posts)
     ? transformXData(data?.posts)

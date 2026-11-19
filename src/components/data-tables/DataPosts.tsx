@@ -18,6 +18,7 @@ import { fetchXPosts, selectXPosts, selectXPostsStatus, fetchXStats, selectXStat
 import { selectIntegrations } from "@/toolkit/Integrations/reducer";
 import { useAppDispatch } from "@/toolkit/hooks";
 import { useSelector } from "react-redux";
+import { logger } from "@/lib/logger";
 
 interface Props {
   data?: any;
@@ -57,9 +58,9 @@ const Posts: React.FC<Props> = ({ data }) => {
         until: '',
         datePreset: 'last_30_days'
       })).unwrap();
-      console.log('✅ Facebook posts refreshed successfully');
+      logger.debug('✅ Facebook posts refreshed successfully');
     } catch (error) {
-      console.error('❌ Failed to refresh Facebook posts:', error);
+      logger.error('❌ Failed to refresh Facebook posts:', error);
     }
   };
 
@@ -88,9 +89,9 @@ const Posts: React.FC<Props> = ({ data }) => {
         accountId: accountId,
         username: username
       })).unwrap();
-      console.log(`✅ Instagram posts refreshed successfully for accountId: ${accountId}`);
+      logger.debug(`✅ Instagram posts refreshed successfully for accountId: ${accountId}`);
     } catch (error) {
-      console.error('❌ Failed to refresh Instagram posts:', error);
+      logger.error('❌ Failed to refresh Instagram posts:', error);
     }
   };
 
@@ -104,9 +105,9 @@ const Posts: React.FC<Props> = ({ data }) => {
       await dispatch(fetchLinkedInPosts({
         organizationId: organizationId
       })).unwrap();
-      console.log(`✅ LinkedIn posts refreshed successfully for organizationId: ${organizationId}`);
+      logger.debug(`✅ LinkedIn posts refreshed successfully for organizationId: ${organizationId}`);
     } catch (error) {
-      console.error('❌ Failed to refresh LinkedIn posts:', error);
+      logger.error('❌ Failed to refresh LinkedIn posts:', error);
     }
   };
 
@@ -137,12 +138,12 @@ const Posts: React.FC<Props> = ({ data }) => {
           accountId: accountId,
           username: username
         })).unwrap();
-        console.log(`✅ X posts refreshed successfully for accountId: ${accountId}`);
+        logger.debug(`✅ X posts refreshed successfully for accountId: ${accountId}`);
       } else {
-        console.error('❌ No accountId available for X posts');
+        logger.error('❌ No accountId available for X posts');
       }
     } catch (error) {
-      console.error('❌ Failed to refresh X posts:', error);
+      logger.error('❌ Failed to refresh X posts:', error);
     }
   };
 

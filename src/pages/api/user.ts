@@ -5,6 +5,7 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { db } from "@/db/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 export default async function handler(
   req: NextApiRequest,
@@ -46,7 +47,7 @@ export default async function handler(
 
     return res.status(200).json({ user: safeUser });
   } catch (error) {
-    console.error("❌ User API Error:", error);
+    logger.error("❌ User API Error:", error);
     return res.status(500).json({ error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" });
   }
 }

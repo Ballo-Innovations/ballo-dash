@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState, AppDispatch } from "..";
 import { fetchIntegrations } from "../Integrations/reducer";
+import { logger } from "@/lib/logger";
 
 interface FacebookStats {
   pageId: string;
@@ -92,15 +93,15 @@ export const fetchFacebookStats = createAsyncThunk<
     { pageId, platform, since = "", until = "", datePreset = "" },
     { dispatch, getState }
   ) => {
-    console.log("\n" + "=".repeat(60));
-    console.log("📘 FACEBOOK REDUX THUNK: fetchFacebookStats STARTED");
-    console.log("=".repeat(60));
-    console.log("📅 Timestamp:", new Date().toISOString());
-    console.log("📋 Parameters:", { pageId, platform, since, until, datePreset });
+    logger.debug("\n" + "=".repeat(60));
+    logger.debug("📘 FACEBOOK REDUX THUNK: fetchFacebookStats STARTED");
+    logger.debug("=".repeat(60));
+    logger.debug("📅 Timestamp:", new Date().toISOString());
+    logger.debug("📋 Parameters:", { pageId, platform, since, until, datePreset });
     
     let state = getState();
-    console.log("Current Redux state - integrations count:", state.integrations.integrations.length);
-    console.log("Current Redux state - integration status:", state.integrations.loading);
+    logger.debug("Current Redux state - integrations count:", state.integrations.integrations.length);
+    logger.debug("Current Redux state - integration status:", state.integrations.loading);
 
 
 
@@ -108,15 +109,15 @@ export const fetchFacebookStats = createAsyncThunk<
       state.integrations.integrations.length === 0 &&
       state.integrations.loading !== true
     ) {
-      console.log("No integrations in state, fetching integrations...");
+      logger.debug("No integrations in state, fetching integrations...");
       // Get company ID from company state
       const companyId = state.company?.id;
       if (companyId) {
         await dispatch(fetchIntegrations(companyId));
         state = getState();
-        console.log("After fetching integrations - count:", state.integrations.integrations.length);
+        logger.debug("After fetching integrations - count:", state.integrations.integrations.length);
       } else {
-        console.error("❌ No company ID found in state");
+        logger.error("❌ No company ID found in state");
         throw new Error("Company ID not found");
       }
     }
@@ -127,53 +128,53 @@ export const fetchFacebookStats = createAsyncThunk<
     );
 
     if (!facebookIntegration) {
-      console.error("❌ No Facebook integration found in Redux state");
-      console.log("Available integrations:", state.integrations.integrations.map((i: any) => ({ type: i.type, status: i.status })));
-      console.log("Looking for platform:", platform.toUpperCase());
-      console.log("=".repeat(60));
+      logger.error("❌ No Facebook integration found in Redux state");
+      logger.debug("Available integrations:", state.integrations.integrations.map((i: any) => ({ type: i.type, status: i.status })));
+      logger.debug("Looking for platform:", platform.toUpperCase());
+      logger.debug("=".repeat(60));
       throw new Error("No Facebook integration found");
     }
 
-    console.log("✅ Facebook integration found:", facebookIntegration.type);
-    console.log("🔑 Integration status:", facebookIntegration.status);
-    console.log("🔑 Has access token:", !!facebookIntegration.accessToken);
+    logger.debug("✅ Facebook integration found:", facebookIntegration.type);
+    logger.debug("🔑 Integration status:", facebookIntegration.status);
+    logger.debug("🔑 Has access token:", !!facebookIntegration.accessToken);
 
     const accessToken = facebookIntegration.accessToken;
 
     const url = `/api/data/facebook/stats?platform=${platform.toLowerCase()}&pageId=${pageId}&since=${since}&until=${until}&date_preset=${datePreset}&limit=100`;
-    console.log("🌐 About to call Facebook API endpoint:", url);
+    logger.debug("🌐 About to call Facebook API endpoint:", url);
     
     try {
       const res = await fetch(url);
-      console.log("📡 Facebook API response status:", res.status);
-      console.log("📡 Facebook API response ok:", res.ok);
+      logger.debug("📡 Facebook API response status:", res.status);
+      logger.debug("📡 Facebook API response ok:", res.ok);
 
       if (!res.ok) {
         const errText = await res.text();
-        console.error("❌ Facebook stats fetch failed:", errText);
-        console.log("=".repeat(60));
+        logger.error("❌ Facebook stats fetch failed:", errText);
+        logger.debug("=".repeat(60));
         throw new Error(`Failed to fetch Facebook stats: ${errText}`);
       }
 
       const result = await res.json();
-      console.log("✅ Facebook API response received successfully");
-      console.log("📊 Response data keys:", Object.keys(result));
-      console.log("📊 Page info:", result.pageInfo);
-      console.log("📊 Metrics available:", Object.keys(result.metrics || {}));
-      console.log("📊 Recent post:", result.recentPost ? "Available" : "None");
+      logger.debug("✅ Facebook API response received successfully");
+      logger.debug("📊 Response data keys:", Object.keys(result));
+      logger.debug("📊 Page info:", result.pageInfo);
+      logger.debug("📊 Metrics available:", Object.keys(result.metrics || {}));
+      logger.debug("📊 Recent post:", result.recentPost ? "Available" : "None");
       
-      console.log("✅ SUCCESS: Facebook data fetched and ready");
-      console.log("📊 Final result summary:", {
+      logger.debug("✅ SUCCESS: Facebook data fetched and ready");
+      logger.debug("📊 Final result summary:", {
         platform: result.platform,
         pageName: result.pageInfo?.name,
         metricsCount: Object.keys(result.metrics || {}).length,
         hasRecentPost: !!result.recentPost
       });
-      console.log("=".repeat(60));
+      logger.debug("=".repeat(60));
       return result;
     } catch (error) {
-      console.error("❌ ERROR in Facebook thunk:", error);
-      console.log("=".repeat(60));
+      logger.error("❌ ERROR in Facebook thunk:", error);
+      logger.debug("=".repeat(60));
       throw error;
     }
   }
@@ -203,36 +204,36 @@ export const fetchFacebookStatsProgressive = createAsyncThunk<
       state.integrations.integrations.length === 0 &&
       state.integrations.loading !== true
     ) {
-      // console.log("No integrations found, fetching integrations...");
+      // logger.debug("No integrations found, fetching integrations...");
       const companyId = state.company?.id;
       if (companyId) {
         await dispatch(fetchIntegrations(companyId));
         state = getState();
       } else {
-        console.error("❌ No company ID found in state");
+        logger.error("❌ No company ID found in state");
         throw new Error("Company ID not found");
       }
     }
 
     // Wait for integrations to finish loading if they're currently loading
     if (state.integrations.loading === true) {
-      console.log("Waiting for integrations to finish loading...");
+      logger.debug("Waiting for integrations to finish loading...");
       // Wait for the integration status to change from loading
       while (state.integrations.loading === true) {
         await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms
         state = getState();
       }
-      console.log("Integrations finished loading, status:", state.integrations.loading);
+      logger.debug("Integrations finished loading, status:", state.integrations.loading);
     }
 
     // Check if integrations loaded successfully
     if (state.integrations.error) {
-      console.error("Failed to load integrations:", state.integrations.error);
+      logger.error("Failed to load integrations:", state.integrations.error);
       throw new Error("Failed to load integrations");
     }
 
     if (state.integrations.integrations.length === 0) {
-      console.error("No integrations found after loading");
+      logger.error("No integrations found after loading");
       throw new Error("No integrations found");
     }
 
@@ -240,13 +241,13 @@ export const fetchFacebookStatsProgressive = createAsyncThunk<
       (integration: { type: string }) => integration.type === platform.toUpperCase()
     );
 
-    // console.log("Available integrations:", state.integration.items.map((i: any) => ({
+    // logger.debug("Available integrations:", state.integration.items.map((i: any) => ({
     //   id: i.id,
     //   type: i.type,
     //   accessToken: i.accessToken ? `${i.accessToken.substring(0, 20)}...` : 'NO_TOKEN'
     // })));
-    // console.log("Looking for integration with type:", platform.toUpperCase());
-    // console.log("Found Facebook integration:", integration ? {
+    // logger.debug("Looking for integration with type:", platform.toUpperCase());
+    // logger.debug("Found Facebook integration:", integration ? {
     //   id: integration.id,
     //   type: integration.type,
     //   accessToken: integration.accessToken ? `${integration.accessToken.substring(0, 20)}...` : 'NO_TOKEN'
@@ -255,7 +256,7 @@ export const fetchFacebookStatsProgressive = createAsyncThunk<
     // Get company ID from state
     const companyId = state.company.data?.id;
     if (!companyId) {
-      console.error("No company ID found in state");
+      logger.error("No company ID found in state");
       throw new Error("Company ID not found");
     }
 
@@ -265,20 +266,20 @@ export const fetchFacebookStatsProgressive = createAsyncThunk<
     );
     
     if (!facebookIntegration) {
-      console.error("No Facebook integration found for company:", companyId);
+      logger.error("No Facebook integration found for company:", companyId);
       throw new Error("Facebook integration not found");
     }
 
     const accessToken = facebookIntegration.accessToken;
     if (!accessToken) {
-      console.error("Facebook access token not found in integration");
+      logger.error("Facebook access token not found in integration");
       throw new Error("Facebook access token not found");
     }
 
-    console.log("Using Facebook access token from database integration");
+    logger.debug("Using Facebook access token from database integration");
 
     // Initialize progressive stats
-    console.log("Initializing progressive stats...");
+    logger.debug("Initializing progressive stats...");
             dispatch(initializeProgressiveFacebookStats({
       pageId,
       platform,
@@ -288,17 +289,17 @@ export const fetchFacebookStatsProgressive = createAsyncThunk<
     }));
 
     // Fetch page info first
-    // console.log("Fetching page info...");
+    // logger.debug("Fetching page info...");
     const pageInfoRes = await fetch(
       `/api/data/facebook/pageInfo?platform=${platform.toLowerCase()}&pageId=${pageId}`
     );
     
     if (pageInfoRes.ok) {
       const pageInfo = await pageInfoRes.json();
-      console.log("Page info received:", pageInfo);
+      logger.debug("Page info received:", pageInfo);
       dispatch(updatePageInfo(pageInfo));
     } else {
-      console.error("Failed to fetch page info:", pageInfoRes.statusText);
+      logger.error("Failed to fetch page info:", pageInfoRes.statusText);
     }
 
     // Define metrics to fetch
@@ -310,12 +311,12 @@ export const fetchFacebookStatsProgressive = createAsyncThunk<
       "page_total_actions"
     ];
 
-    // console.log("Starting to fetch metrics:", metricList);
+    // logger.debug("Starting to fetch metrics:", metricList);
 
     // Fetch each metric individually
     for (const metric of metricList) {
       try {
-        console.log(`Starting to fetch metric: ${metric}`);
+        logger.debug(`Starting to fetch metric: ${metric}`);
         dispatch(startMetricFetch(metric));
         
         const res = await fetch(
@@ -324,37 +325,37 @@ export const fetchFacebookStatsProgressive = createAsyncThunk<
 
         if (res.ok) {
           const metricData = await res.json();
-          console.log(`Metric ${metric} received:`, metricData);
+          logger.debug(`Metric ${metric} received:`, metricData);
           dispatch(updateMetric({ metric, data: metricData }));
         } else {
-          console.error(`Failed to fetch metric ${metric}:`, res.statusText);
+          logger.error(`Failed to fetch metric ${metric}:`, res.statusText);
           dispatch(failMetric({ metric, error: `Failed to fetch ${metric}` }));
         }
       } catch (error) {
-        console.error(`Error fetching metric ${metric}:`, error);
+        logger.error(`Error fetching metric ${metric}:`, error);
         dispatch(failMetric({ metric, error: error instanceof Error ? error.message : 'Unknown error' }));
       }
     }
 
     // Fetch recent post
     try {
-      // console.log("Fetching recent post...");
+      // logger.debug("Fetching recent post...");
       const recentPostRes = await fetch(
         `/api/data/facebook/recentPost?platform=${platform.toLowerCase()}&pageId=${pageId}`
       );
       
       if (recentPostRes.ok) {
         const recentPost = await recentPostRes.json();
-        // console.log("Recent post received:", recentPost);
+        // logger.debug("Recent post received:", recentPost);
         dispatch(updateRecentPost(recentPost));
       } else {
-        console.error("Failed to fetch recent post:", recentPostRes.statusText);
+        logger.error("Failed to fetch recent post:", recentPostRes.statusText);
       }
     } catch (error) {
-      console.error("Failed to fetch recent post:", error);
+      logger.error("Failed to fetch recent post:", error);
     }
     
-    console.log("=== fetchFacebookStatsProgressive completed ===");
+    logger.debug("=== fetchFacebookStatsProgressive completed ===");
   }
 );
 
@@ -386,7 +387,7 @@ export const fetchFacebookPosts = createAsyncThunk<
         await dispatch(fetchIntegrations(companyId));
         state = getState();
       } else {
-        console.error("❌ No company ID found in state");
+        logger.error("❌ No company ID found in state");
         throw new Error("Company ID not found");
       }
     }
@@ -457,7 +458,7 @@ const facebookSlice = createSlice({
     },
     updateMetric: (state, action) => {
       const { metric, data } = action.payload;
-      // console.log(`Updating metric ${metric} with data:`, data);
+      // logger.debug(`Updating metric ${metric} with data:`, data);
       if (state.progressiveStats) {
         // Remove from loading
         state.progressiveStats.loadingMetrics = state.progressiveStats.loadingMetrics.filter(m => m !== metric);
@@ -467,7 +468,7 @@ const facebookSlice = createSlice({
         }
         // Update metrics data
         state.progressiveStats.metrics[metric] = data;
-        // console.log(`Updated progressive stats for ${metric}:`, state.progressiveStats.metrics[metric]);
+        // logger.debug(`Updated progressive stats for ${metric}:`, state.progressiveStats.metrics[metric]);
       }
     },
     updateFacebookMetric: (state, action) => {
@@ -488,7 +489,7 @@ const facebookSlice = createSlice({
       if (state.progressiveStats) {
         // Remove from loading
         state.progressiveStats.loadingMetrics = state.progressiveStats.loadingMetrics.filter(m => m !== metric);
-        console.error(`Failed to fetch metric ${metric}:`, error);
+        logger.error(`Failed to fetch metric ${metric}:`, error);
       }
     },
     failFacebookMetric: (state, action) => {
@@ -523,19 +524,19 @@ const facebookSlice = createSlice({
     builder
       // Facebook Stats
       .addCase(fetchFacebookStats.pending, (state) => {
-        console.log("🔄 Facebook Reducer: fetchFacebookStats.pending - Setting status to loading");
+        logger.debug("🔄 Facebook Reducer: fetchFacebookStats.pending - Setting status to loading");
         state.statusStats = "loading";
         state.errorStats = null;
       })
       .addCase(fetchFacebookStats.fulfilled, (state, action) => {
-        console.log("✅ Facebook Reducer: fetchFacebookStats.fulfilled - Setting stats data");
-        console.log("📊 Facebook stats received:", action.payload);
+        logger.debug("✅ Facebook Reducer: fetchFacebookStats.fulfilled - Setting stats data");
+        logger.debug("📊 Facebook stats received:", action.payload);
         state.statusStats = "succeeded";
         state.stats = action.payload;
       })
       .addCase(fetchFacebookStats.rejected, (state, action) => {
-        console.log("❌ Facebook Reducer: fetchFacebookStats.rejected - Setting error state");
-        console.log("❌ Error:", action.error.message);
+        logger.debug("❌ Facebook Reducer: fetchFacebookStats.rejected - Setting error state");
+        logger.debug("❌ Error:", action.error.message);
         state.statusStats = "failed";
         state.errorStats = action.error.message || "Failed to load Facebook stats";
       })

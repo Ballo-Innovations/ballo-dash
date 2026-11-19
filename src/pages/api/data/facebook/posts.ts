@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getFacebookAccessToken } from "@/lib/facebook";
+import { logger } from "@/lib/logger";
 
 export default async function handler(
   req: NextApiRequest,
@@ -118,7 +119,7 @@ export default async function handler(
             const insightJson = await insightRes.json();
 
             if (!insightRes.ok) {
-              console.warn(
+              logger.warn(
                 `Failed to fetch insights for post ${post.id}`,
                 insightJson.error
               );
@@ -147,9 +148,9 @@ export default async function handler(
             return { ...post, insights };
           } catch (error: any) {
             if (error.name === 'AbortError') {
-              console.warn(`Timeout fetching insights for post ${post.id}`);
+              logger.warn(`Timeout fetching insights for post ${post.id}`);
             } else {
-              console.warn(`Error fetching insights for ${post.id}`, error);
+              logger.warn(`Error fetching insights for ${post.id}`, error);
             }
             return { ...post };
           }
@@ -181,7 +182,7 @@ export default async function handler(
       posts: enrichedPosts,
     });
   } catch (error: any) {
-    console.error("Error fetching Facebook posts:", error);
+    logger.error("Error fetching Facebook posts:", error);
     res.status(500).json({
       error: "Failed to fetch Facebook posts",
       details: error.message,

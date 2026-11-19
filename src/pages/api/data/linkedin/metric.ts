@@ -1,9 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-// @ts-ignore
 import { JSDOM } from "jsdom";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getLinkedInAccessToken } from "@/lib/linkedin";
+import { logger } from "@/lib/logger";
 
 const LINKEDIN_API_BASE = "https://api.linkedin.com/v2";
 
@@ -17,7 +17,7 @@ export default async function handler(
     typeof organizationId !== "string" ||
     typeof metric !== "string"
   ) {
-    console.error(`❌ Missing required parameters`);
+    logger.error(`❌ Missing required parameters`);
     return res.status(400).json({ error: "Missing required parameters" });
   }
 
@@ -27,26 +27,26 @@ export default async function handler(
     const session = await getServerSession(req, res, authOptions);
     
     if (!session?.user?.email) {
-      console.error("❌ No session or user email found");
+      logger.error("❌ No session or user email found");
       return res.status(401).json({ error: "Unauthorized" });
     }
 
     // Get company ID from session
     const companyId = session.user.companyId;
     if (!companyId) {
-      console.error("❌ No company ID found in session for user:", session.user.email);
+      logger.error("❌ No company ID found in session for user:", session.user.email);
       return res.status(400).json({ error: "Company ID not found in session" });
     }
 
     // Fetch LinkedIn access token directly from database
-    console.log("Fetching LinkedIn access token from database...");
-    console.log("   User Email:", session.user.email);
-    console.log("   Company ID:", companyId);
+    logger.debug("Fetching LinkedIn access token from database...");
+    logger.debug("   User Email:", session.user.email);
+    logger.debug("   Company ID:", companyId);
     
     const accessToken = await getLinkedInAccessToken(companyId);
     
     if (!accessToken) {
-      console.error("❌ LinkedIn access token not found in database for company:", companyId);
+      logger.error("❌ LinkedIn access token not found in database for company:", companyId);
       return res.status(400).json({ error: "LinkedIn access token not found in database" });
     }
 
@@ -54,23 +54,23 @@ export default async function handler(
 
     // Check if access token is available and has content
     if (!accessToken || accessToken.trim() === '') {
-      console.error("❌ LinkedIn access token is empty or invalid");
+      logger.error("❌ LinkedIn access token is empty or invalid");
       return res.status(400).json({ error: "LinkedIn access token is empty or invalid" });
     }
 
-    console.log("✅ LinkedIn access token is available");
+    logger.debug("✅ LinkedIn access token is available");
 
     // Log the request details for inspection
-    console.log("LinkedIn API Request Details:");
-    console.log("   Organization ID:", organizationId);
-    console.log("   Metric:", metric);
-    console.log("   Since:", since);
-    console.log("   Until:", until);
-    console.log("   Date Preset:", datePreset);
-    console.log("   Organization URN:", orgUrn);
-    console.log("   Access Token Preview:", accessToken.substring(0, 20) + "...");
+    logger.debug("LinkedIn API Request Details:");
+    logger.debug("   Organization ID:", organizationId);
+    logger.debug("   Metric:", metric);
+    logger.debug("   Since:", since);
+    logger.debug("   Until:", until);
+    logger.debug("   Date Preset:", datePreset);
+    logger.debug("   Organization URN:", orgUrn);
+    logger.debug("   Access Token Preview:", accessToken.substring(0, 20) + "...");
     
-    console.log("✅ LinkedIn access token fetched from database successfully");
+    logger.debug("✅ LinkedIn access token fetched from database successfully");
 
     let metricData: any = {};
 
@@ -81,10 +81,10 @@ export default async function handler(
         followersUrl.searchParams.set('q', 'organizationalEntity');
         followersUrl.searchParams.set('organizationalEntity', orgUrn);
         
-        console.log("📊 LinkedIn Followers API Request:");
-        console.log("   URL:", followersUrl.toString());
-        console.log("   Method: GET");
-        console.log("   Headers:", {
+        logger.debug("📊 LinkedIn Followers API Request:");
+        logger.debug("   URL:", followersUrl.toString());
+        logger.debug("   Method: GET");
+        logger.debug("   Headers:", {
           Authorization: `Bearer ${accessToken.substring(0, 20)}...`,
           "X-Restli-Protocol-Version": "2.0.0"
         });
@@ -164,10 +164,10 @@ export default async function handler(
         statsUrl.searchParams.set('q', 'organizationalEntity');
         statsUrl.searchParams.set('organizationalEntity', orgUrn);
         
-        console.log("👁️ LinkedIn Impressions API Request:");
-        console.log("   URL:", statsUrl.toString());
-        console.log("   Method: GET");
-        console.log("   Headers:", {
+        logger.debug("👁️ LinkedIn Impressions API Request:");
+        logger.debug("   URL:", statsUrl.toString());
+        logger.debug("   Method: GET");
+        logger.debug("   Headers:", {
           Authorization: `Bearer ${accessToken.substring(0, 20)}...`,
           "X-Restli-Protocol-Version": "2.0.0"
         });
@@ -200,10 +200,10 @@ export default async function handler(
         clicksUrl.searchParams.set('q', 'organizationalEntity');
         clicksUrl.searchParams.set('organizationalEntity', orgUrn);
         
-        console.log("🖱️ LinkedIn Clicks API Request:");
-        console.log("   URL:", clicksUrl.toString());
-        console.log("   Method: GET");
-        console.log("   Headers:", {
+        logger.debug("🖱️ LinkedIn Clicks API Request:");
+        logger.debug("   URL:", clicksUrl.toString());
+        logger.debug("   Method: GET");
+        logger.debug("   Headers:", {
           Authorization: `Bearer ${accessToken.substring(0, 20)}...`,
           "X-Restli-Protocol-Version": "2.0.0"
         });
@@ -230,16 +230,16 @@ export default async function handler(
         break;
 
       case "engagement":
-        console.log(`\n❤️ Fetching LinkedIn Engagement Data...`);
+        logger.debug(`\n❤️ Fetching LinkedIn Engagement Data...`);
         // Fetch engagement data
         const engagementUrl = new URL(`${LINKEDIN_API_BASE}/organizationalEntityShareStatistics`);
         engagementUrl.searchParams.set('q', 'organizationalEntity');
         engagementUrl.searchParams.set('organizationalEntity', orgUrn);
         
-        console.log("❤️ LinkedIn Engagement API Request:");
-        console.log("   URL:", engagementUrl.toString());
-        console.log("   Method: GET");
-        console.log("   Headers:", {
+        logger.debug("❤️ LinkedIn Engagement API Request:");
+        logger.debug("   URL:", engagementUrl.toString());
+        logger.debug("   Method: GET");
+        logger.debug("   Headers:", {
           Authorization: `Bearer ${accessToken.substring(0, 20)}...`,
           "X-Restli-Protocol-Version": "2.0.0"
         });
@@ -251,15 +251,15 @@ export default async function handler(
           },
         });
         
-        console.log(`📡 Engagement API Response Status: ${engagementRes.status}`);
-        console.log(`📡 Engagement API Response Headers:`, Object.fromEntries(engagementRes.headers.entries()));
+        logger.debug(`📡 Engagement API Response Status: ${engagementRes.status}`);
+        logger.debug(`📡 Engagement API Response Headers:`, Object.fromEntries(engagementRes.headers.entries()));
         
         if (engagementRes.ok) {
           const engagementData = await engagementRes.json();
-          console.log(`✅ LinkedIn Engagement API Response:`, JSON.stringify(engagementData, null, 2));
+          logger.debug(`✅ LinkedIn Engagement API Response:`, JSON.stringify(engagementData, null, 2));
           
           const shareStats = engagementData.elements?.[0]?.totalShareStatistics || {};
-          console.log(`📊 Extracted share statistics:`, shareStats);
+          logger.debug(`📊 Extracted share statistics:`, shareStats);
           
           metricData = {
             engagement: shareStats.engagement || 0,
@@ -272,22 +272,22 @@ export default async function handler(
 
           
           
-          console.log(`📊 Final engagement metric data:`, metricData);
+          logger.debug(`📊 Final engagement metric data:`, metricData);
         } else {
           const errorText = await engagementRes.text();
-          console.error(`❌ LinkedIn Engagement API Error: ${engagementRes.status} - ${errorText}`);
+          logger.error(`❌ LinkedIn Engagement API Error: ${engagementRes.status} - ${errorText}`);
           metricData = { error: `Engagement API failed: ${engagementRes.status}` };
         }
         break;
 
       default:
-        console.error(`❌ Unknown metric: ${metric}`);
+        logger.error(`❌ Unknown metric: ${metric}`);
         throw new Error(`Unknown metric: ${metric}`);
     }
 
     res.status(200).json(metricData);
   } catch (error) {
-    console.error(`Error fetching LinkedIn metric ${metric}:`, error);
+    logger.error(`Error fetching LinkedIn metric ${metric}:`, error);
     res.status(500).json({ error: `Failed to fetch metric ${metric}` });
   }
 } 

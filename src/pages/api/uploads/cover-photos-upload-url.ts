@@ -7,6 +7,7 @@ import { s3Client } from "@/app/lib/aws";
 import { companies } from "@/db/schema"; // your drizzle schema
 import { eq } from "drizzle-orm";
 import { db } from "@/db/db";
+import { logger } from "@/lib/logger";
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME!;
 const REGION = process.env.AWS_REGION!;
@@ -16,7 +17,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const { fileName, fileType, folder, companyId } = req.query;
-  console.log("Received query params:", req.query);
+  logger.debug("Received query params:", req.query);
 
   if (!fileName || !fileType) {
     return res.status(400).json({ error: "Missing required fields" });
@@ -45,7 +46,7 @@ export default async function handler(
         .set({ logoUrl: fileUrl, updatedAt: new Date() })
         .where(eq(companies.id, companyId));
     } catch (error) {
-      console.error("Failed to update company logo URL:", error);
+      logger.error("Failed to update company logo URL:", error);
       return res.status(500).json({ error: "Failed to update company record" });
     }
   }

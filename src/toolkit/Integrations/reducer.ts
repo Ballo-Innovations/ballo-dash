@@ -1,6 +1,7 @@
 // src/store/integrationSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { integrationsService } from '@/services/integrationsService';
+import { logger } from "@/lib/logger";
 
 // Types
 export interface Integration {
@@ -46,7 +47,7 @@ const logCriticalStateChange = (action: string, previousState: any, newState: an
   
   // Only log when integrations are lost or when fetching starts
   if (integrationsLost || action === 'fetchIntegrations.pending') {
-    console.log(`🚨 CRITICAL REDUX CHANGE [${action}]:`, {
+    logger.debug(`🚨 CRITICAL REDUX CHANGE [${action}]:`, {
       timestamp: new Date().toISOString(),
       reason: reason || 'No reason provided',
       integrationsLost,
@@ -99,7 +100,7 @@ export const fetchIntegrations = createAsyncThunk<
       return data;
     } catch (error: any) {
       fetchPromise = null; // Clear the promise on error
-      console.error('❌ Redux: Error in fetchIntegrations thunk:', error);
+      logger.error('❌ Redux: Error in fetchIntegrations thunk:', error);
       return rejectWithValue(error.message || 'Failed to fetch integrations');
     }
   }

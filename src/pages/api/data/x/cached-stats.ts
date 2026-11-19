@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { socialMediaCacheService } from "@/services/socialMediaCacheService";
+import { logger } from "@/lib/logger";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
@@ -13,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Get user session to verify authentication
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user?.email) {
-      console.log("❌ X Cached API: No session or user email found");
+      logger.debug("❌ X Cached API: No session or user email found");
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -31,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
 
-    console.log("📦 X Cached Stats API - Looking for cached data:", {
+    logger.debug("📦 X Cached Stats API - Looking for cached data:", {
       companyId: session.user.companyId,
       platform: 'X',
       username: cleanUsername
@@ -45,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
 
     if (!cachedData) {
-      console.log("📦 X Cached Stats API - No cached data found for:", cleanUsername);
+      logger.debug("📦 X Cached Stats API - No cached data found for:", cleanUsername);
       return res.status(404).json({ 
         error: "No cached data found",
         details: "No cached data available for this username",
@@ -53,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    console.log("📦 X Cached Stats API - Found cached data:", {
+    logger.debug("📦 X Cached Stats API - Found cached data:", {
       username: cleanUsername,
       fetchStatus: cachedData.fetchStatus,
       lastFetched: cachedData.lastFetchedAt

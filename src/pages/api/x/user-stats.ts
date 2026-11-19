@@ -2,6 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { logger } from "@/lib/logger";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -12,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Get user session to verify authentication
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user?.email) {
-      console.log("❌ API: No session or user email found");
+      logger.debug("❌ API: No session or user email found");
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -37,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "Invalid username format" });
     }
 
-    console.log("🐦 X API: Fetching stats for username:", username);
+    logger.debug("🐦 X API: Fetching stats for username:", username);
 
     // Make real API call to X API using the integration's access token
     const xApiResponse = await fetch(`https://api.x.com/2/users/by/username/${cleanUsername}?user.fields=profile_image_url,description,public_metrics,verified`, {
@@ -48,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     
     if (!xApiResponse.ok) {
-      console.error(`❌ X API error: ${xApiResponse.status} - ${xApiResponse.statusText}`);
+      logger.error(`❌ X API error: ${xApiResponse.status} - ${xApiResponse.statusText}`);
       
       // Handle different error status codes
       switch (xApiResponse.status) {
@@ -81,11 +82,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     
     const data = await xApiResponse.json();
-    console.log("✅ X API: Real response received:", data);
+    logger.debug("✅ X API: Real response received:", data);
     
     // Validate response structure
     if (!data || !data.data || !data.data.username) {
-      console.error("❌ X API: Invalid response structure:", data);
+      logger.error("❌ X API: Invalid response structure:", data);
       return res.status(500).json({ 
         error: "Invalid response from X API",
         details: "The API response doesn't contain the expected user data structure"
@@ -95,7 +96,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json(data);
 
   } catch (error: any) {
-    console.error("❌ X API: Error fetching user stats:", error);
+    logger.error("❌ X API: Error fetching user stats:", error);
     return res.status(500).json({ 
       error: "Internal server error",
       details: error.message 

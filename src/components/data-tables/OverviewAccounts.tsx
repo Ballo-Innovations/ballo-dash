@@ -28,6 +28,7 @@ import {
   selectLinkedInPosts
 } from "@/toolkit/linkedInData/reducer";
 import DataTransformationService, { PlatformOverview } from "@/services/dataTransformationService";
+import { logger } from "@/lib/logger";
 
 interface OverviewAccountsProps {
   facebook: any;
@@ -134,12 +135,12 @@ const OverviewAccounts: React.FC<OverviewAccountsProps> = ({
     : transformFacebookData(facebookStats || facebook);
     
   // Debug logging
-  console.log("🔍 Facebook Data Debug in OverviewAccounts:");
-  console.log("  - progressiveData:", progressiveData);
-  console.log("  - facebookStats:", facebookStats);
-  console.log("  - facebook prop:", facebook);
-  console.log("  - transformed:", transformed);
-  console.log("  - facebookData array:", facebookData);
+  logger.debug("🔍 Facebook Data Debug in OverviewAccounts:");
+  logger.debug("  - progressiveData:", progressiveData);
+  logger.debug("  - facebookStats:", facebookStats);
+  logger.debug("  - facebook prop:", facebook);
+  logger.debug("  - transformed:", transformed);
+  logger.debug("  - facebookData array:", facebookData);
     
   if (transformed) {
     facebookData.push(transformed);
@@ -166,9 +167,9 @@ const OverviewAccounts: React.FC<OverviewAccountsProps> = ({
   if (transformedInstagram) {
     instagramDataArray.push(transformedInstagram);
   } else if (instagramStats || instagramDataProp) {
-    console.log("📸 Instagram Data available but transformation failed:", instagramStats || instagramDataProp);
+    logger.debug("📸 Instagram Data available but transformation failed:", instagramStats || instagramDataProp);
   } else {
-    console.log("📸 No Instagram Data available");
+    logger.debug("📸 No Instagram Data available");
   }
   
   // Transform X data
@@ -185,9 +186,9 @@ const OverviewAccounts: React.FC<OverviewAccountsProps> = ({
     };
     xDataArray.push(xWithLastPost);
   } else if (progressiveXData || xData) {
-    console.log("🐦 X Data available but transformation failed:", progressiveXData || xData);
+    logger.debug("🐦 X Data available but transformation failed:", progressiveXData || xData);
   } else {
-    console.log("🐦 No X Data available");
+    logger.debug("🐦 No X Data available");
   }
   
   const tiktokData: { tiktokData: any }[] = [];

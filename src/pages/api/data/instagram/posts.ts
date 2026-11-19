@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getInstagramAccessToken, getStoredInstagramAccountId, getInstagramUsername } from "@/lib/instagram";
+import { logger } from "@/lib/logger";
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,7 +29,7 @@ export default async function handler(
       return res.status(400).json({ error: "Instagram access token not found in database" });
     }
 
-    console.log("✅ Retrieved Instagram access token from database for posts, company:", companyId);
+    logger.debug("✅ Retrieved Instagram access token from database for posts, company:", companyId);
 
     // Get the stored account ID if not provided
     const storedAccountId = await getStoredInstagramAccountId(companyId);
@@ -41,7 +42,7 @@ export default async function handler(
     // Get Instagram username if not provided
     let finalUsername = username as string;
     if (!finalUsername) {
-      console.log("🔍 Username not provided, fetching from Instagram API...");
+      logger.debug("🔍 Username not provided, fetching from Instagram API...");
       const fetchedUsername = await getInstagramUsername(finalAccountId, accessToken);
       if (!fetchedUsername) {
         return res.status(400).json({ error: "Instagram username not found" });
@@ -49,7 +50,7 @@ export default async function handler(
       finalUsername = fetchedUsername;
     }
 
-    console.log(`📸 Fetching Instagram posts for account: ${finalAccountId}, username: ${finalUsername}`);
+    logger.debug(`📸 Fetching Instagram posts for account: ${finalAccountId}, username: ${finalUsername}`);
 
     // Use business discovery API to fetch posts
     const postsRes = await fetch(
@@ -64,7 +65,7 @@ export default async function handler(
     const postsJson = await postsRes.json();
     
     if (!postsRes.ok) {
-      console.error("Failed to fetch Instagram posts:", postsJson.error);
+      logger.error("Failed to fetch Instagram posts:", postsJson.error);
       return res.status(500).json({ 
         error: "Failed to fetch Instagram posts",
         details: postsJson.error?.message || "Unknown error"
@@ -99,12 +100,12 @@ export default async function handler(
               return acc;
             }, {});
             
-            console.log(`📊 Fetched insights for post ${post.id}:`, insights);
+            logger.debug(`📊 Fetched insights for post ${post.id}:`, insights);
           } else {
-            console.log(`⚠️ Failed to fetch insights for post ${post.id}`);
+            logger.debug(`⚠️ Failed to fetch insights for post ${post.id}`);
           }
         } catch (insightsError) {
-          console.log(`⚠️ Error fetching insights for post ${post.id}:`, insightsError);
+          logger.debug(`⚠️ Error fetching insights for post ${post.id}:`, insightsError);
         }
 
         return {
@@ -133,7 +134,7 @@ export default async function handler(
       total: posts.length
     });
   } catch (error: any) {
-    console.error("Error fetching Instagram posts:", error);
+    logger.error("Error fetching Instagram posts:", error);
     res.status(500).json({ 
       error: "Failed to fetch Instagram posts",
       details: error.message 

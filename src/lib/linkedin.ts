@@ -2,6 +2,7 @@ import { db } from "@/db/db";
 import { integrations } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { tokenCache } from "./tokenCache";
+import { logger } from "@/lib/logger";
 
 /**
  * Fetches LinkedIn access token from database for a given company
@@ -94,7 +95,7 @@ export async function getStoredLinkedInOrganizationId(companyId: string): Promis
 
     return linkedInIntegration[0]?.accountId || null;
   } catch (error) {
-    console.error("Error fetching LinkedIn organization ID:", error);
+    logger.error("Error fetching LinkedIn organization ID:", error);
     return null;
   }
 }

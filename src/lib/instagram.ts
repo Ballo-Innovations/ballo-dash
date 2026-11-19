@@ -4,6 +4,7 @@ import { db } from "@/db/db";
 import { integrations } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { tokenCache } from "./tokenCache";
+import { logger } from "@/lib/logger";
 
 /**
  * Get Instagram access token for a company
@@ -95,7 +96,7 @@ export async function getInstagramAccountId(accessToken: string): Promise<string
       return null;
     }
   } catch (error) {
-    console.error(`❌ getInstagramAccountId: Error:`, error);
+    logger.error(`❌ getInstagramAccountId: Error:`, error);
     return null;
   }
 }
@@ -139,11 +140,11 @@ export async function storeInstagramAccountId(companyId: string, accountId: stri
       )
       .limit(1);
     
-    console.log(`🔍 storeInstagramAccountId: Verification query result:`, verification);
+    logger.debug(`🔍 storeInstagramAccountId: Verification query result:`, verification);
     
   } catch (error: any) {
-    console.error(`❌ storeInstagramAccountId: Failed to store Instagram account ID:`, error);
-    console.error(`❌ storeInstagramAccountId: Error details:`, {
+    logger.error(`❌ storeInstagramAccountId: Failed to store Instagram account ID:`, error);
+    logger.error(`❌ storeInstagramAccountId: Error details:`, {
       message: error.message,
       stack: error.stack,
       companyId,
@@ -158,7 +159,7 @@ export async function storeInstagramAccountId(companyId: string, accountId: stri
  */
 export async function getStoredInstagramAccountId(companyId: string): Promise<string | null> {
   try {
-    console.log(`🔍 getStoredInstagramAccountId: Looking for stored account ID for company: ${companyId}`);
+    logger.debug(`🔍 getStoredInstagramAccountId: Looking for stored account ID for company: ${companyId}`);
     
     const integration = await db
       .select({ accountId: integrations.accountId })
@@ -172,20 +173,20 @@ export async function getStoredInstagramAccountId(companyId: string): Promise<st
       )
       .limit(1);
 
-    console.log(`🔍 getStoredInstagramAccountId: Query result:`, {
+    logger.debug(`🔍 getStoredInstagramAccountId: Query result:`, {
       found: integration.length > 0,
       accountId: integration[0]?.accountId || null
     });
 
     if (integration[0]?.accountId) {
-      console.log(`✅ getStoredInstagramAccountId: Found stored account ID: ${integration[0].accountId}`);
+      logger.debug(`✅ getStoredInstagramAccountId: Found stored account ID: ${integration[0].accountId}`);
     } else {
-      console.log(`❌ getStoredInstagramAccountId: No stored account ID found`);
+      logger.debug(`❌ getStoredInstagramAccountId: No stored account ID found`);
     }
 
     return integration[0]?.accountId || null;
   } catch (error) {
-    console.error(`❌ getStoredInstagramAccountId: Error:`, error);
+    logger.error(`❌ getStoredInstagramAccountId: Error:`, error);
     return null;
   }
 }
@@ -195,7 +196,7 @@ export async function getStoredInstagramAccountId(companyId: string): Promise<st
  */
 export async function getInstagramUsername(accountId: string, accessToken: string): Promise<string | null> {
   try {
-    console.log(`🔍 getInstagramUsername: Fetching username for account ID: ${accountId}`);
+    logger.debug(`🔍 getInstagramUsername: Fetching username for account ID: ${accountId}`);
     
     const response = await fetch(
       `https://graph.facebook.com/v23.0/${accountId}?fields=username&access_token=${accessToken}`,
@@ -205,10 +206,10 @@ export async function getInstagramUsername(accountId: string, accessToken: strin
         }
       }
     );
-    console.log(`🤖🤖🤖getInstagramUsername: Request: https://graph.facebook.com/v23.0/${accountId}?fields=username&access_token=${accessToken}`);
+    logger.debug(`🤖🤖🤖getInstagramUsername: Request: https://graph.facebook.com/v23.0/${accountId}?fields=username&access_token=${accessToken}`);
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`❌ getInstagramUsername: API error:`, errorText);
+      logger.error(`❌ getInstagramUsername: API error:`, errorText);
       return null;
     }
 
@@ -216,14 +217,14 @@ export async function getInstagramUsername(accountId: string, accessToken: strin
     const username = data.username;
 
     if (username) {
-      console.log(`✅ getInstagramUsername: Found username: ${username}`);
+      logger.debug(`✅ getInstagramUsername: Found username: ${username}`);
       return username;
     } else {
-      console.log(`❌ getInstagramUsername: No username found in response`);
+      logger.debug(`❌ getInstagramUsername: No username found in response`);
       return null;
     }
   } catch (error) {
-    console.error(`❌ getInstagramUsername: Error:`, error);
+    logger.error(`❌ getInstagramUsername: Error:`, error);
     return null;
   }
 }

@@ -9,7 +9,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable prefer-const */
-/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Table, Form, Spinner, Row, Col } from 'react-bootstrap';
 import { Cable, Pencil, Save, X, RefreshCw, Plus, Trash2, Info, Building2 } from 'lucide-react';
@@ -28,6 +27,7 @@ import {
 import { useIntegrationModal } from '@/hooks/useIntegrationModal';
 
 import toast from 'react-hot-toast';
+import { logger } from "@/lib/logger";
 
 interface Integration {
   id: string;
@@ -111,8 +111,8 @@ const IntegrationManagementModal: React.FC = () => {
     try {
       // Use the modal-specific endpoint that includes access tokens
       const data = await integrationsService.getIntegrationsForModal();
-      console.log('Modal: Fetched integrations:', data);
-      console.log('Modal: Integration details:', data.map(i => ({
+      logger.debug('Modal: Fetched integrations:', data);
+      logger.debug('Modal: Integration details:', data.map(i => ({
         id: i.id,
         type: i.type,
         status: i.status,
@@ -130,7 +130,7 @@ const IntegrationManagementModal: React.FC = () => {
       setIntegrations(editableIntegrations);
     } catch (error) {
       toast.error('Failed to fetch integrations');
-      console.error('Error fetching integrations:', error);
+      logger.error('Error fetching integrations:', error);
     } finally {
       setLoading(false);
     }
@@ -159,8 +159,8 @@ const IntegrationManagementModal: React.FC = () => {
     setSaving(true);
 
     try {
-      console.log('Saving integration:', id);
-      console.log('Integration data to save:', {
+      logger.debug('Saving integration:', id);
+      logger.debug('Integration data to save:', {
         accessToken: integration.accessToken ? '***' : 'empty',
         refreshToken: integration.refreshToken ? '***' : 'empty',
         status: integration.status,
@@ -183,7 +183,7 @@ const IntegrationManagementModal: React.FC = () => {
         accountId: integration.accountId
       });
 
-      console.log('✅ Save successful, result:', result);
+      logger.debug('✅ Save successful, result:', result);
 
       // Update local state
       setIntegrations(prev => prev.map(i => 
@@ -223,9 +223,9 @@ const IntegrationManagementModal: React.FC = () => {
       toast.success('Integration updated successfully');
       
     } catch (error: any) {
-      console.error('❌ Save failed with error:', error);
-      console.error('❌ Error message:', error.message);
-      console.error('❌ Error stack:', error.stack);
+      logger.error('❌ Save failed with error:', error);
+      logger.error('❌ Error message:', error.message);
+      logger.error('❌ Error stack:', error.stack);
       
       toast.error(`Failed to update integration: ${error.message}`);
     } finally {
@@ -430,7 +430,7 @@ const IntegrationManagementModal: React.FC = () => {
             toast.success('Meta data fetched successfully for new integration!');
           }
         } catch (error) {
-          console.error('Failed to fetch data for new integration:', error);
+          logger.error('Failed to fetch data for new integration:', error);
           toast.error('Integration created but failed to fetch data');
         }
       }
@@ -541,12 +541,12 @@ const IntegrationManagementModal: React.FC = () => {
           ...prev,
           status: 'CONNECTED'
         }));
-        console.log('✅ Access token validated, status updated to CONNECTED');
+        logger.debug('✅ Access token validated, status updated to CONNECTED');
       }
       
       return isValid;
     } catch (error) {
-      console.error('❌ Error validating access token:', error);
+      logger.error('❌ Error validating access token:', error);
       return false;
     }
   };
@@ -591,9 +591,9 @@ const IntegrationManagementModal: React.FC = () => {
           }
 
           const result = await response.json();
-          console.log('Facebook token info response in frontend:', result);
+          logger.debug('Facebook token info response in frontend:', result);
           expiryDate = result.tokenInfo?.expiresAt;
-          console.log('Extracted expiry date:', expiryDate);
+          logger.debug('Extracted expiry date:', expiryDate);
           break;
 
         case 'LINKEDIN':
@@ -627,8 +627,8 @@ const IntegrationManagementModal: React.FC = () => {
       if (expiryDate) {
         // Convert ISO date string to YYYY-MM-DD format for the date input
         const dateForInput = new Date(expiryDate).toISOString().split('T')[0];
-        console.log('Original expiry date:', expiryDate);
-        console.log('Converted to date input format:', dateForInput);
+        logger.debug('Original expiry date:', expiryDate);
+        logger.debug('Converted to date input format:', dateForInput);
         
         setNewIntegration(prev => ({
           ...prev,

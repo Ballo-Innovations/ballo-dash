@@ -1,25 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable ESLint during build
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  // Disable TypeScript checking during build
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  experimental: {
-    // reactRoot: true, // Enables React 18's new root API (removed, not supported)
-  },
+  reactStrictMode: true,
+  poweredByHeader: false,
+  // Type and lint errors fail the build (H-05).
+  eslint: { dirs: ["src"] },
   webpack(config, { isServer }) {
     if (isServer) {
-      // Exclude client-specific libraries (like ones using 'document' or 'window')
+      // Browser-only library; keep it out of the server bundle.
       config.externals = ["react-syntax-highlighter", ...config.externals];
     }
     return config;
   },
   images: {
-    domains: ["lh3.google.com", "images.unsplash.com"], // ✅ Whitelist image domains
+    remotePatterns: [
+      { protocol: "https", hostname: "lh3.google.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+    ],
   },
 };
 

@@ -4,6 +4,7 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { db } from "@/db/db";
 import { integrations } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -32,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (integrationId) {
       // Existing flow: fetch integration by ID
-      console.log("Fetching Facebook token info for integration:", integrationId);
+      logger.debug("Fetching Facebook token info for integration:", integrationId);
 
       const integration = await db
         .select()
@@ -63,14 +64,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "Access token, app ID, and app secret are required" });
       }
 
-      console.log("Fetching Facebook token info for direct access token");
+      logger.debug("Fetching Facebook token info for direct access token");
       targetAccessToken = accessToken;
       targetAppId = appId;
       targetAppSecret = appSecret;
     }
 
     if (!targetAppId || !targetAppSecret) {
-      console.error("❌ Facebook app credentials not found");
+      logger.error("❌ Facebook app credentials not found");
       return res.status(500).json({ error: "Facebook app credentials are required. Please provide App ID and App Secret." });
     }
 
@@ -85,12 +86,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       if (!fbResponse.ok) {
         const errorText = await fbResponse.text();
-        console.error("❌ Facebook API error:", fbResponse.status, errorText);
+        logger.error("❌ Facebook API error:", fbResponse.status, errorText);
         throw new Error(`Facebook API error: ${fbResponse.status}`);
       }
 
       const fbData = await fbResponse.json();
-      console.log("Facebook token info response:", fbData);
+      logger.debug("Facebook token info response:", fbData);
 
       if (!fbData.data) {
         throw new Error("Invalid response from Facebook API");
@@ -144,9 +145,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       if (integrationId) {
-        console.log("✅ Facebook token info updated successfully in database");
+        logger.debug("✅ Facebook token info updated successfully in database");
       } else {
-        console.log("✅ Facebook token info fetched successfully");
+        logger.debug("✅ Facebook token info fetched successfully");
       }
 
       // Return the updated token information
@@ -163,7 +164,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
     } catch (fbError: any) {
-      console.error("❌ Error fetching Facebook token info:", fbError);
+      logger.error("❌ Error fetching Facebook token info:", fbError);
       return res.status(500).json({
         error: "Failed to fetch Facebook token info",
         details: fbError.message
@@ -171,7 +172,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
   } catch (error: any) {
-    console.error("❌ Unexpected error:", error);
+    logger.error("❌ Unexpected error:", error);
     return res.status(500).json({
       error: "Internal server error",
       details: error.message

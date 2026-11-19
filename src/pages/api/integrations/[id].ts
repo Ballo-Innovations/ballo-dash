@@ -4,6 +4,7 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { db } from "@/db/db";
 import { integrations } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
@@ -30,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Update integration
       const { accessToken, refreshToken, status, handle, expiresAt } = req.body;
 
-      console.log("Updating integration:", {
+      logger.debug("Updating integration:", {
         integrationId,
         companyId,
         accessToken: accessToken ? "***" : "not provided",
@@ -41,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Validate required fields
       if (!accessToken && !refreshToken && !status && expiresAt === undefined) {
-        console.log("❌ Validation failed: No fields provided for update");
+        logger.debug("❌ Validation failed: No fields provided for update");
         return res.status(400).json({ error: "At least one field must be provided for update" });
       }
 
@@ -54,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (expiresAt !== undefined) updateData.expiresAt = expiresAt ? new Date(expiresAt) : null;
       updateData.updatedAt = new Date();
 
-      console.log("Update data to be applied:", updateData);
+      logger.debug("Update data to be applied:", updateData);
 
       try {
         // Update the integration
@@ -69,22 +70,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           )
           .returning();
 
-        console.log("Database update result:", result);
+        logger.debug("Database update result:", result);
 
         if (result.length === 0) {
-          console.log("❌ No rows updated - integration not found or access denied");
+          logger.debug("❌ No rows updated - integration not found or access denied");
           return res.status(404).json({ error: "Integration not found or access denied" });
         }
 
-        console.log("✅ Integration updated successfully:", result[0].id);
+        logger.debug("✅ Integration updated successfully:", result[0].id);
         
         // Return the updated integration (without sensitive data)
         const { accessToken: _, refreshToken: __, ...safeIntegration } = result[0];
         return res.status(200).json(safeIntegration);
       } catch (dbError: any) {
-        console.error("❌ Database error during update:", dbError);
-        console.error("❌ Database error message:", dbError.message);
-        console.error("❌ Database error code:", dbError.code);
+        logger.error("❌ Database error during update:", dbError);
+        logger.error("❌ Database error message:", dbError.message);
+        logger.error("❌ Database error code:", dbError.code);
         return res.status(500).json({
           error: "Database error during update",
           details: dbError.message,
@@ -127,7 +128,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ error: "Integration not found or access denied" });
       }
 
-      console.log("✅ Integration deleted successfully:", integrationId);
+      logger.debug("✅ Integration deleted successfully:", integrationId);
       return res.status(200).json({ message: "Integration deleted successfully" });
 
     } else {
@@ -135,7 +136,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
   } catch (error: any) {
-    console.error("❌ Error in integration API:", error);
+    logger.error("❌ Error in integration API:", error);
     return res.status(500).json({
       error: "Internal server error",
       details: error.message,

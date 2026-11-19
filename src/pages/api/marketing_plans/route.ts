@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { db } from "@/db/db";
 import { marketingPlans } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,7 +33,7 @@ export default async function handler(
 
         return res.status(200).json(plans[0] ?? null);
       } catch (error) {
-        console.error("Failed to fetch marketing plan:", error);
+        logger.error("Failed to fetch marketing plan:", error);
         return res.status(500).json({ error: "Internal Server Error" });
       }
     }
@@ -46,7 +47,7 @@ export default async function handler(
           .returning();
         return res.status(201).json(result[0]);
       } catch (error) {
-        console.error("Failed to create marketing plan:", error);
+        logger.error("Failed to create marketing plan:", error);
         return res.status(500).json({ error: "Internal Server Error" });
       }
     }
@@ -65,7 +66,7 @@ export default async function handler(
           .returning();
         return res.status(200).json(result[0]);
       } catch (error) {
-        console.error("Failed to update marketing plan:", error);
+        logger.error("Failed to update marketing plan:", error);
         return res.status(500).json({ error: "Internal Server Error" });
       }
     }
@@ -82,7 +83,7 @@ export default async function handler(
 
         return res.status(200).json({ message: "Plan deleted" });
       } catch (error) {
-        console.error("Failed to delete marketing plan:", error);
+        logger.error("Failed to delete marketing plan:", error);
         return res.status(500).json({ error: "Internal Server Error" });
       }
     }

@@ -171,7 +171,7 @@ export const socialMediaDataCache = pgTable(
       .references(() => companies.id),
     platform: integrationTypeEnum("platform").notNull(),
     profileId: text("profile_id").notNull(), // e.g., LinkedIn org ID, X username, Facebook page ID
-    data: jsonb("data").notNull(), // The actual social media data
+    data: jsonb("data").$type<Record<string, unknown>>().notNull(), // The actual social media data
     lastFetchedAt: timestamp("last_fetched_at").defaultNow().notNull(),
     expiresAt: timestamp("expires_at").notNull(), // When this cache entry expires
     fetchStatus: text("fetch_status").default("SUCCESS").notNull(), // SUCCESS, ERROR, PENDING

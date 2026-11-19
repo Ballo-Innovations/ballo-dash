@@ -5,6 +5,7 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { db } from "@/db/db";
 import { integrations } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
@@ -24,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: "Company ID not found in session" });
     }
 
-    console.log("Modal API: Fetching integrations for company:", companyId);
+    logger.debug("Modal API: Fetching integrations for company:", companyId);
 
     try {
       const result = await db
@@ -32,8 +33,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         .from(integrations)
         .where(eq(integrations.companyId, companyId));
 
-      console.log("Modal API: Found integrations:", result.length);
-      console.log("Modal API: Integration details:", result.map(i => ({
+      logger.debug("Modal API: Found integrations:", result.length);
+      logger.debug("Modal API: Integration details:", result.map(i => ({
         id: i.id,
         type: i.type,
         status: i.status,
@@ -45,14 +46,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Return FULL integration data including access tokens for modal
       return res.status(200).json(result);
     } catch (dbError: any) {
-      console.error("❌ Modal API: Database error during fetch:", dbError);
+      logger.error("❌ Modal API: Database error during fetch:", dbError);
       return res.status(500).json({
         error: "Database error during fetch",
         details: dbError.message,
       });
     }
   } catch (error: any) {
-    console.error("❌ Modal API: Unexpected error:", error);
+    logger.error("❌ Modal API: Unexpected error:", error);
     return res.status(500).json({ 
       error: "Internal server error",
       details: error.message 

@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getFacebookAccessToken } from "@/lib/facebook";
+import { logger } from "@/lib/logger";
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,10 +32,10 @@ export default async function handler(
     }
 
     // Fetch Facebook access token directly from database
-    console.log("Fetching Facebook access token from database for metric...");
-    console.log("   User Email:", session.user.email);
-    console.log("   Company ID:", companyId);
-    console.log("   Metric:", metric);
+    logger.debug("Fetching Facebook access token from database for metric...");
+    logger.debug("   User Email:", session.user.email);
+    logger.debug("   Company ID:", companyId);
+    logger.debug("   Metric:", metric);
     
     const accessToken = await getFacebookAccessToken(companyId);
     
@@ -42,7 +43,7 @@ export default async function handler(
       return res.status(400).json({ error: "Facebook access token not found in database" });
     }
 
-    console.log("✅ Retrieved Facebook access token from database for metric, company:", companyId);
+    logger.debug("✅ Retrieved Facebook access token from database for metric, company:", companyId);
 
     const timeParams = new URLSearchParams();
     if (since) timeParams.append("since=", since.toString());
@@ -81,7 +82,7 @@ export default async function handler(
 
     return res.status(200).json(structuredData);
   } catch (error) {
-    console.error(`Error fetching metric ${metric}:`, error);
+    logger.error(`Error fetching metric ${metric}:`, error);
     res.status(500).json({ error: `Failed to fetch metric ${metric}` });
   }
 } 

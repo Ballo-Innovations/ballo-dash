@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getXAccessToken } from "@/lib/x";
 import { socialMediaCacheService } from "@/services/socialMediaCacheService";
+import { logger } from "@/lib/logger";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
@@ -14,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Get user session to verify authentication
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user?.email) {
-      console.log("❌ X Posts API: No session or user email found");
+      logger.debug("❌ X Posts API: No session or user email found");
       return res.status(401).json({ error: "Unauthorized" });
     }
 
@@ -40,7 +41,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (cachedData && cachedData.fetchStatus === 'SUCCESS') {
       const cacheAgeMinutes = Math.floor((Date.now() - new Date(cachedData.lastFetchedAt).getTime()) / (1000 * 60));
-      console.log("📦 X Posts API - Serving fresh cached data:", {
+      logger.debug("📦 X Posts API - Serving fresh cached data:", {
         accountId,
         lastFetched: cachedData.lastFetchedAt,
         cacheAge: cacheAgeMinutes + "m ago"
@@ -67,7 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
     
     if (!tweetsResponse.ok) {
-      console.error(`❌ X Posts API error: ${tweetsResponse.status} - ${tweetsResponse.statusText}`);
+      logger.error(`❌ X Posts API error: ${tweetsResponse.status} - ${tweetsResponse.statusText}`);
       
       // Handle different error status codes
       switch (tweetsResponse.status) {
@@ -152,13 +153,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
     } catch (cacheError) {
       // Don't fail the request if caching fails
-      console.log("Failed to cache X posts data:", cacheError);
+      logger.debug("Failed to cache X posts data:", cacheError);
     }
     
     res.status(200).json(response);
 
   } catch (error: any) {
-    console.error("Error fetching X posts:", error);
+    logger.error("Error fetching X posts:", error);
     res.status(500).json({ 
       error: "Failed to fetch X posts",
       details: error.message 

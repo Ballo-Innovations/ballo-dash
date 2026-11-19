@@ -3,17 +3,7 @@ import { db } from "@/db/db";
 import { socialMediaDataCache } from "@/db/schema";
 import { eq, and, lt } from "drizzle-orm";
 
-interface CacheEntry {
-  id: string;
-  companyId: string;
-  platform: string;
-  profileId: string;
-  data: any;
-  lastFetchedAt: Date;
-  expiresAt: Date;
-  fetchStatus: 'SUCCESS' | 'ERROR' | 'PENDING';
-  errorMessage?: string;
-}
+type CacheEntry = typeof socialMediaDataCache.$inferSelect;
 
 class SocialMediaCacheService {
   private static instance: SocialMediaCacheService;
@@ -182,13 +172,10 @@ class SocialMediaCacheService {
     byPlatform: Record<string, number>;
   }> {
     try {
-      let query = db.select().from(socialMediaDataCache);
-      
-      if (companyId) {
-        query = query.where(eq(socialMediaDataCache.companyId, companyId));
-      }
-
-      const result = await query;
+      const result = await db
+        .select()
+        .from(socialMediaDataCache)
+        .where(companyId ? eq(socialMediaDataCache.companyId, companyId) : undefined);
       const now = new Date();
       
       let expired = 0;

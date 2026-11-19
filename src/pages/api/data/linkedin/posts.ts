@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getLinkedInAccessToken, getStoredLinkedInOrganizationId } from "@/lib/linkedin";
+import { logger } from "@/lib/logger";
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,7 +29,7 @@ export default async function handler(
       return res.status(400).json({ error: "LinkedIn access token not found in database" });
     }
 
-    console.log("✅ Retrieved LinkedIn access token from database for posts, company:", companyId);
+    logger.debug("✅ Retrieved LinkedIn access token from database for posts, company:", companyId);
 
     // Get the stored organization ID if not provided
     const storedOrganizationId = await getStoredLinkedInOrganizationId(companyId);
@@ -53,12 +54,12 @@ export default async function handler(
       if (orgRes.ok) {
         const orgData = await orgRes.json();
         organizationName = orgData.localizedName || orgData.name || "LinkedIn Organization";
-        console.log("✅ Retrieved LinkedIn organization name:", organizationName);
+        logger.debug("✅ Retrieved LinkedIn organization name:", organizationName);
       } else {
-        console.log("⚠️ Failed to fetch organization details, using default name");
+        logger.debug("⚠️ Failed to fetch organization details, using default name");
       }
     } catch (orgError) {
-      console.log("⚠️ Error fetching organization details:", orgError);
+      logger.debug("⚠️ Error fetching organization details:", orgError);
     }
 
     // Fetch posts from LinkedIn API
@@ -74,7 +75,7 @@ export default async function handler(
     const postsJson = await postsRes.json();
 
     if (!postsRes.ok) {
-      console.error("Failed to fetch LinkedIn posts:", postsJson);
+      logger.error("Failed to fetch LinkedIn posts:", postsJson);
       return res.status(500).json({ 
         error: "Failed to fetch LinkedIn posts",
         details: postsJson.message || "Unknown error"
@@ -118,7 +119,7 @@ export default async function handler(
     });
 
   } catch (error: any) {
-    console.error("Error fetching LinkedIn posts:", error);
+    logger.error("Error fetching LinkedIn posts:", error);
     res.status(500).json({ 
       error: "Failed to fetch LinkedIn posts",
       details: error.message 

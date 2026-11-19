@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getFacebookAccessToken } from "@/lib/facebook";
+import { logger } from "@/lib/logger";
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,11 +31,11 @@ export default async function handler(
     }
 
     // Fetch Facebook access token directly from database
-    console.log("Fetching Facebook access token from database for recent post...");
-    console.log("   User Email:", session.user.email);
-    console.log("   Company ID:", companyId);
-    console.log("   Platform:", platform);
-    console.log("   Page ID:", pageId);
+    logger.debug("Fetching Facebook access token from database for recent post...");
+    logger.debug("   User Email:", session.user.email);
+    logger.debug("   Company ID:", companyId);
+    logger.debug("   Platform:", platform);
+    logger.debug("   Page ID:", pageId);
     
     const accessToken = await getFacebookAccessToken(companyId);
     
@@ -42,7 +43,7 @@ export default async function handler(
       return res.status(400).json({ error: "Facebook access token not found in database" });
     }
 
-    console.log("✅ Retrieved Facebook access token from database for recent post, company:", companyId);
+    logger.debug("✅ Retrieved Facebook access token from database for recent post, company:", companyId);
 
     const recentPostRes = await fetch(
       `https://graph.${platform}.com/v23.0/${pageId}/posts?limit=1&access_token=${accessToken}`
@@ -55,7 +56,7 @@ export default async function handler(
     const recentPost = await recentPostRes.json();
     res.status(200).json(recentPost);
   } catch (error) {
-    console.error("Error fetching recent post:", error);
+    logger.error("Error fetching recent post:", error);
     res.status(500).json({ error: "Failed to fetch recent post" });
   }
 } 

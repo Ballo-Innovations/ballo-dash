@@ -5,6 +5,7 @@ import { Card, Col, Row } from "react-bootstrap";
 import linkedinIcon from "@/assets/images/socials/linkedin.png";
 import Image from "next/image";
 import "@/assets/scss/data-page.scss";
+import { logger } from "@/lib/logger";
 
 interface Props {
   isExpanded: boolean;
@@ -47,7 +48,7 @@ type LinkedInTransformedPost = {
 };
 
 function transformLinkedInData(data: LinkedInRawPost[]): LinkedInTransformedPost[] {
-  console.log('🔗🔗🔗transformLinkedInData', data);
+  logger.debug('🔗🔗🔗transformLinkedInData', data);
   return data
     .filter(
       (post): post is LinkedInRawPost & { message: string; created_time: string } =>
@@ -116,8 +117,8 @@ const LinkedInPostsTable: React.FC<Props> = ({
   data,
   isLoading: externalLoading = false,
 }) => {
-  console.log("🔗 LinkedInPostsTable - Data:", data);
-  console.log("🔗 LinkedInPostsTable - External Loading:", externalLoading);
+  logger.debug("🔗 LinkedInPostsTable - Data:", data);
+  logger.debug("🔗 LinkedInPostsTable - External Loading:", externalLoading);
 
   const transformedData = Array.isArray(data?.posts)
     ? transformLinkedInData(data?.posts)

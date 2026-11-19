@@ -3,7 +3,7 @@ import { Card } from "react-bootstrap";
 
 interface RecommendationItem {
     title: string;
-    description: string;
+    description?: string;
     bulletPoints?: string[];
 }
 

@@ -12,6 +12,7 @@ import NoIntegrations from "@/components/NoIntegrations";
 import { useIntegrations } from "@/hooks/useIntegrations";
 import { useAutoDataRefresh } from "@/hooks/useAutoDataRefresh";
 import CacheStatusIndicator from "@/components/CacheStatusIndicator";
+import { logger } from "@/lib/logger";
 
 const Overview = () => {
   const facebookStats = useSelector(selectFacebookStats) || {};
@@ -25,7 +26,7 @@ const Overview = () => {
     if (xStats && Object.keys(xStats).length > 0) {
       // Only log if this is cached data
       if ((xStats as any)._cached) {
-        console.log("📦 Cached X Data in Overview:", {
+        logger.debug("📦 Cached X Data in Overview:", {
           username: xStats.username,
           followers: xStats.followers,
           lastFetched: (xStats as any)._lastFetchedAt,

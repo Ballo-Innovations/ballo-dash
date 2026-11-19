@@ -12,7 +12,7 @@ const UserChartsData = () => {
     },
   ];
 
-  var options: any = {
+  const options: any = {
     chart: {
       type: "line",
       height: 200,

@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { tokenCache } from "@/lib/tokenCache";
+import { logger } from "@/lib/logger";
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,8 +19,8 @@ export default async function handler(
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    console.log("🔄 Force refreshing token cache for user:", session.user.email);
-    console.log("   Company ID:", session.user.companyId);
+    logger.debug("🔄 Force refreshing token cache for user:", session.user.email);
+    logger.debug("   Company ID:", session.user.companyId);
 
     // Clear all cached tokens for this company to force fresh database fetch
     tokenCache.clearCompanyTokens(session.user.companyId);
@@ -35,7 +36,7 @@ export default async function handler(
     });
 
   } catch (error) {
-    console.error("❌ Error refreshing tokens:", error);
+    logger.error("❌ Error refreshing tokens:", error);
     res.status(500).json({ 
       error: "Failed to refresh tokens",
       details: error instanceof Error ? error.message : "Unknown error"

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { logger } from "@/lib/logger";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -22,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    console.log("Generating access token for platform:", platform);
+    logger.debug("Generating access token for platform:", platform);
 
     let accessToken: string;
     let expiresAt: string | null = null;
@@ -61,7 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           });
       }
 
-      console.log("✅ Access token generated successfully for platform:", platform);
+      logger.debug("✅ Access token generated successfully for platform:", platform);
 
       return res.status(200).json({
         success: true,
@@ -72,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
     } catch (error: any) {
-      console.error("❌ Error generating access token:", error);
+      logger.error("❌ Error generating access token:", error);
       return res.status(500).json({
         error: "Failed to generate access token",
         details: error.message
@@ -80,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
   } catch (error: any) {
-    console.error("❌ Unexpected error:", error);
+    logger.error("❌ Unexpected error:", error);
     return res.status(500).json({
       error: "Internal server error",
       details: error.message
@@ -90,7 +91,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 // Facebook OAuth token generation
 async function generateFacebookAccessToken(appId: string, appSecret: string) {
-  console.log("Generating Facebook access token...");
+  logger.debug("Generating Facebook access token...");
   
   // Generate app access token first
   const appAccessToken = `${appId}|${appSecret}`;
@@ -114,7 +115,7 @@ async function generateFacebookAccessToken(appId: string, appSecret: string) {
 
 // LinkedIn OAuth token generation
 async function generateLinkedInAccessToken(appId: string, appSecret: string) {
-  console.log("Generating LinkedIn access token...");
+  logger.debug("Generating LinkedIn access token...");
   
   // LinkedIn OAuth flow
   const authUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${appId}&redirect_uri=${encodeURIComponent(process.env.LINKEDIN_REDIRECT_URI || 'http://localhost:3000/auth/linkedin/callback')}&scope=r_liteprofile%20r_emailaddress%20w_member_social&state=${Math.random().toString(36).substr(2, 9)}`;
@@ -135,7 +136,7 @@ async function generateLinkedInAccessToken(appId: string, appSecret: string) {
 
 // Instagram OAuth token generation
 async function generateInstagramAccessToken(appId: string, appSecret: string) {
-  console.log("Generating Instagram access token...");
+  logger.debug("Generating Instagram access token...");
   
   // Instagram uses Facebook's OAuth system
   const authUrl = `https://www.facebook.com/v18.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(process.env.INSTAGRAM_REDIRECT_URI || 'http://localhost:3000/auth/instagram/callback')}&scope=instagram_basic,instagram_content_publish&response_type=code`;
@@ -154,7 +155,7 @@ async function generateInstagramAccessToken(appId: string, appSecret: string) {
 
 // X (Twitter) OAuth token generation
 async function generateXAccessToken(appId: string, appSecret: string) {
-  console.log("Generating X (Twitter) access token...");
+  logger.debug("Generating X (Twitter) access token...");
   
   // X OAuth 2.0 flow
   const authUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${appId}&redirect_uri=${encodeURIComponent(process.env.X_REDIRECT_URI || 'http://localhost:3000/auth/x/callback')}&scope=tweet.read%20tweet.write%20users.read%20offline.access&state=${Math.random().toString(36).substr(2, 9)}&code_challenge_method=S256&code_challenge=${generateCodeChallenge()}`;

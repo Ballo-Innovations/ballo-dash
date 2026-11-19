@@ -11,7 +11,7 @@ import { useAutoDataRefresh } from "@/hooks/useAutoDataRefresh";
 import { useIntegrations } from "@/hooks/useIntegrations";
 import Loading from "@/components/PageLoading";  
 
-const dataTables = () => {
+const DataPage = () => {
   const company = useAppSelector(selectCompany);
   const { hasIntegrations, error, isInitialized } = useIntegrations();
   
@@ -40,8 +40,8 @@ const dataTables = () => {
   );
 };
 
-dataTables.getLayout = (page: ReactElement) => {
+DataPage.getLayout = (page: ReactElement) => {
   return <Layout>{page}</Layout>;
 };
 
-export default dataTables;
+export default DataPage;

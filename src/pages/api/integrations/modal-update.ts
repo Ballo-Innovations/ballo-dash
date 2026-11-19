@@ -5,6 +5,7 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { db } from "@/db/db";
 import { integrations } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { logger } from "@/lib/logger";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "PUT") {
@@ -34,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Update integration
     const { accessToken, refreshToken, status, handle, appId, appSecret, expiresAt, accountId } = req.body;
 
-    console.log("Modal Update API: Updating integration:", {
+    logger.debug("Modal Update API: Updating integration:", {
       integrationId,
       companyId,
       accessToken: accessToken ? "***" : "not provided",
@@ -49,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Validate required fields
     if (!accessToken && !refreshToken && !status && !handle && !appId && !appSecret && expiresAt === undefined && !accountId) {
-      console.log("❌ Modal Update API: Validation failed: No fields provided for update");
+      logger.debug("❌ Modal Update API: Validation failed: No fields provided for update");
       return res.status(400).json({ error: "At least one field must be provided for update" });
     }
 
@@ -65,7 +66,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (accountId !== undefined) updateData.accountId = accountId;
     updateData.updatedAt = new Date();
 
-    console.log("Modal Update API: Update data to be applied:", updateData);
+    logger.debug("Modal Update API: Update data to be applied:", updateData);
 
     try {
       // Update the integration
@@ -80,28 +81,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         )
         .returning();
 
-      console.log("Modal Update API: Database update result:", result);
+      logger.debug("Modal Update API: Database update result:", result);
 
       if (result.length === 0) {
-        console.log("❌ Modal Update API: No rows updated - integration not found or access denied");
+        logger.debug("❌ Modal Update API: No rows updated - integration not found or access denied");
         return res.status(404).json({ error: "Integration not found or access denied" });
       }
 
-      console.log("✅ Modal Update API: Integration updated successfully:", result[0].id);
+      logger.debug("✅ Modal Update API: Integration updated successfully:", result[0].id);
       
       // Return the FULL updated integration including access tokens for modal
       return res.status(200).json(result[0]);
     } catch (dbError: any) {
-      console.error("❌ Modal Update API: Database error during update:", dbError);
-      console.error("❌ Modal Update API: Database error message:", dbError.message);
-      console.error("❌ Modal Update API: Database error code:", dbError.code);
+      logger.error("❌ Modal Update API: Database error during update:", dbError);
+      logger.error("❌ Modal Update API: Database error message:", dbError.message);
+      logger.error("❌ Modal Update API: Database error code:", dbError.code);
       return res.status(500).json({
         error: "Database error during update",
         details: dbError.message,
       });
     }
   } catch (error: any) {
-    console.error("❌ Modal Update API: Unexpected error:", error);
+    logger.error("❌ Modal Update API: Unexpected error:", error);
     return res.status(500).json({ 
       error: "Internal server error",
       details: error.message 

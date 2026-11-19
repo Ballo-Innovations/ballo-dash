@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "@/types";
 import { RootState } from "..";
+import { logger } from "@/lib/logger";
 
 // State shape
 interface UserState {
@@ -24,7 +25,7 @@ export const fetchUsers = createAsyncThunk<User[]>(
     const res = await fetch("/api/users");
     if (!res.ok) throw new Error("Failed to fetch users");
     const data = await res.json();
-    console.log("user data: ", data);
+    logger.debug("user data: ", data);
     return data.users;
   }
 );

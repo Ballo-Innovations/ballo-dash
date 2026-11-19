@@ -6,6 +6,7 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { getInstagramAccessToken, getInstagramAccountId, storeInstagramAccountId, getStoredInstagramAccountId } from "@/lib/instagram";
 import { socialMediaCacheService } from "@/services/socialMediaCacheService";
 import DataTransformationService from "@/services/dataTransformationService";
+import { logger } from "@/lib/logger";
 
 export default async function handler(
   req: NextApiRequest,
@@ -42,33 +43,33 @@ export default async function handler(
     let accountId = await getStoredInstagramAccountId(companyId);
     
     if (!accountId) {
-      console.log("❌ No stored account ID found in database");
-      console.log("🔄 Attempting to fetch from Instagram API...");
+      logger.debug("❌ No stored account ID found in database");
+      logger.debug("🔄 Attempting to fetch from Instagram API...");
       
       accountId = await getInstagramAccountId(accessToken);
       
       if (accountId) {
-        console.log(`✅ Successfully fetched account ID from API: ${accountId}`);
-        console.log(`💾 Storing account ID in database...`);
+        logger.debug(`✅ Successfully fetched account ID from API: ${accountId}`);
+        logger.debug(`💾 Storing account ID in database...`);
         
         try {
           await storeInstagramAccountId(companyId, accountId);
-          console.log(`✅ Account ID stored successfully in database`);
+          logger.debug(`✅ Account ID stored successfully in database`);
         } catch (storeError) {
-          console.log(`⚠️ Warning: Failed to store account ID:`, storeError);
+          logger.debug(`⚠️ Warning: Failed to store account ID:`, storeError);
         }
       } else {
-        console.log("❌ Failed to fetch account ID from Instagram API");
+        logger.debug("❌ Failed to fetch account ID from Instagram API");
       }
     } else {
-      console.log(`✅ Found stored account ID in database: ${accountId}`);
+      logger.debug(`✅ Found stored account ID in database: ${accountId}`);
     }
     
-    console.log(`Final Account ID: ${accountId || 'NULL'}`);
-    console.log("========================================");
+    logger.debug(`Final Account ID: ${accountId || 'NULL'}`);
+    logger.debug("========================================");
     
     if (!accountId) {
-      console.log("❌ Instagram account not found - returning 404");
+      logger.debug("❌ Instagram account not found - returning 404");
       return res.status(404).json({ error: "Instagram account not found" });
     }
 
@@ -99,7 +100,7 @@ export default async function handler(
       recentPostResponse.json()
     ]);
 
-    console.log("📸 Instagram Profile Data:", {
+    logger.debug("📸 Instagram Profile Data:", {
       username: profileData.username,
       biography: profileData.biography,
       id: profileData.id,
@@ -143,7 +144,7 @@ export default async function handler(
     const transformedData = DataTransformationService.getInstance().transformInstagramData(rawData);
     
     if (!transformedData) {
-      console.log("❌ Failed to transform Instagram data using DataTransformationService");
+      logger.debug("❌ Failed to transform Instagram data using DataTransformationService");
       return res.status(500).json({ error: "Failed to transform Instagram data" });
     }
 

@@ -5,6 +5,7 @@ import { Card, Col, Row } from "react-bootstrap";
 import facebookIcon from "@/assets/images/socials/facebook.png";
 import Image from "next/image";
 import "@/assets/scss/data-page.scss";
+import { logger } from "@/lib/logger";
 
 interface Props {
   isExpanded: boolean;
@@ -97,8 +98,8 @@ const FacebookPostsTable: React.FC<Props> = ({
   data,
   isLoading: externalLoading = false,
 }) => {
-  console.log("📘 FacebookPostsTable - Data:", data);
-  console.log("📘 FacebookPostsTable - External Loading:", externalLoading);
+  logger.debug("📘 FacebookPostsTable - Data:", data);
+  logger.debug("📘 FacebookPostsTable - External Loading:", externalLoading);
 
   const transformedData = Array.isArray(data?.posts)
     ? transformFacebookData(data?.posts)

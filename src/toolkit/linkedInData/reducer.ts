@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState, AppDispatch } from "..";
 import { fetchIntegrations } from "../Integrations/reducer";
+import { logger } from "@/lib/logger";
 
 // --- Interfaces ---
 interface LinkedInStats {
@@ -135,8 +136,8 @@ export const fetchLinkedInStats = createAsyncThunk<
     
     try {
       const res = await fetch(url);
-      console.log("📡 LinkedIn API response status:", res.status);
-      console.log("📡 LinkedIn API response ok:", res.ok);
+      logger.debug("📡 LinkedIn API response status:", res.status);
+      logger.debug("📡 LinkedIn API response ok:", res.ok);
 
       if (!res.ok) {
         const errText = await res.text();
@@ -176,7 +177,7 @@ export const fetchLinkedInStats = createAsyncThunk<
         if (cachedResponse.ok) {
           const cachedData = await cachedResponse.json();
           if (cachedData._cached && cachedData._fetchStatus === 'SUCCESS') {
-            console.log("📦 LinkedIn: Fresh data failed, falling back to cached data");
+            logger.debug("📦 LinkedIn: Fresh data failed, falling back to cached data");
             
             // Transform cached data to match LinkedInStats interface
             const transformedCachedStats: LinkedInStats = {
@@ -209,7 +210,7 @@ export const fetchLinkedInStats = createAsyncThunk<
           }
         }
       } catch (cacheError) {
-        console.warn("LinkedIn: Failed to fallback to cached data:", cacheError);
+        logger.warn("LinkedIn: Failed to fallback to cached data:", cacheError);
       }
       
       // If no cached data available, throw the original error
@@ -233,7 +234,7 @@ export const fetchLinkedInPosts = createAsyncThunk<
         await dispatch(fetchIntegrations(companyId));
         state = getState();
       } else {
-        console.error("❌ No company ID found in state");
+        logger.error("❌ No company ID found in state");
         throw new Error("Company ID not found");
       }
     }
@@ -249,7 +250,7 @@ export const fetchLinkedInPosts = createAsyncThunk<
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error("❌ LinkedIn posts fetch failed:", errText);
+      logger.error("❌ LinkedIn posts fetch failed:", errText);
       throw new Error(`Failed to fetch LinkedIn posts: ${errText}`);
     }
 
@@ -278,14 +279,14 @@ export const fetchLinkedInStatsProgressive = createAsyncThunk<
         await dispatch(fetchIntegrations(companyId));
         state = getState();
       } else {
-        console.error("❌ No company ID found in state");
+        logger.error("❌ No company ID found in state");
         throw new Error("Company ID not found");
       }
     }
 
     // Wait for integrations to finish loading if they're currently loading
     if (state.integrations.loading === true) {
-      console.log("⏳ Waiting for integrations to finish loading...");
+      logger.debug("⏳ Waiting for integrations to finish loading...");
       // Wait for the integration status to change from loading
       while (state.integrations.loading === true) {
         await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms
@@ -295,12 +296,12 @@ export const fetchLinkedInStatsProgressive = createAsyncThunk<
 
     // Check if integrations loaded successfully
     if (state.integrations.error) {
-      console.error("❌ Failed to load integrations:", state.integrations.error);
+      logger.error("❌ Failed to load integrations:", state.integrations.error);
       throw new Error("Failed to load integrations");
     }
 
     if (state.integrations.integrations.length === 0) {
-      console.error("❌ No integrations found after loading");
+      logger.error("❌ No integrations found after loading");
       throw new Error("No integrations found");
     }
 
@@ -311,7 +312,7 @@ export const fetchLinkedInStatsProgressive = createAsyncThunk<
     
 
     if (!integration) {
-      console.error("❌ No LinkedIn integration found");
+      logger.error("❌ No LinkedIn integration found");
       throw new Error("No LinkedIn integration found");
     }
 
@@ -341,11 +342,11 @@ export const fetchLinkedInStatsProgressive = createAsyncThunk<
         dispatch(linkedinSlice.actions.updateLinkedInOrgInfo(orgInfo));
       } else {
         const errorText = await orgInfoRes.text();
-        console.error("❌ Failed to fetch organization info:", orgInfoRes.statusText, errorText);
+        logger.error("❌ Failed to fetch organization info:", orgInfoRes.statusText, errorText);
         dispatch(linkedinSlice.actions.failLinkedInMetric({ metric: "organizationInfo", error: orgInfoRes.statusText }));
       }
     } catch (error) {
-      console.error("💥 Error fetching organization info:", error);
+      logger.error("💥 Error fetching organization info:", error);
       dispatch(linkedinSlice.actions.failLinkedInMetric({ 
         metric: "organizationInfo", 
         error: error instanceof Error ? error.message : 'Unknown error' 
@@ -387,11 +388,11 @@ export const fetchLinkedInStatsProgressive = createAsyncThunk<
           dispatch(linkedinSlice.actions.updateLinkedInMetric({ metric, data: metricData }));
         } else {
           const errorText = await res.text();
-          console.error(`❌ Failed to fetch LinkedIn metric ${metric}:`, res.statusText, errorText);
+          logger.error(`❌ Failed to fetch LinkedIn metric ${metric}:`, res.statusText, errorText);
           dispatch(linkedinSlice.actions.failLinkedInMetric({ metric, error: `Failed to fetch ${metric}` }));
         }
       } catch (error) {
-        console.error(`💥 Error fetching LinkedIn metric ${metric}:`, error);
+        logger.error(`💥 Error fetching LinkedIn metric ${metric}:`, error);
         dispatch(linkedinSlice.actions.failLinkedInMetric({ metric, error: error instanceof Error ? error.message : 'Unknown error' }));
       }
     }
@@ -484,19 +485,19 @@ const linkedinSlice = createSlice({
     builder
       // Stats
       .addCase(fetchLinkedInStats.pending, (state) => {
-        console.log("🔄 LinkedIn Reducer: fetchLinkedInStats.pending - Setting status to loading");
+        logger.debug("🔄 LinkedIn Reducer: fetchLinkedInStats.pending - Setting status to loading");
         state.statusStats = "loading";
         state.errorStats = null;
       })
       .addCase(fetchLinkedInStats.fulfilled, (state, action) => {
-        console.log("✅ LinkedIn Reducer: fetchLinkedInStats.fulfilled - Setting stats data");
-        console.log("📊 LinkedIn stats received:", action.payload);
+        logger.debug("✅ LinkedIn Reducer: fetchLinkedInStats.fulfilled - Setting stats data");
+        logger.debug("📊 LinkedIn stats received:", action.payload);
         state.statusStats = "succeeded";
         state.stats = action.payload;
       })
       .addCase(fetchLinkedInStats.rejected, (state, action) => {
-        console.log("❌ LinkedIn Reducer: fetchLinkedInStats.rejected - Setting error state");
-        console.log("❌ Error:", action.error.message);
+        logger.debug("❌ LinkedIn Reducer: fetchLinkedInStats.rejected - Setting error state");
+        logger.debug("❌ Error:", action.error.message);
         state.statusStats = "failed";
         state.errorStats = action.error.message || "Failed to load LinkedIn stats";
       })

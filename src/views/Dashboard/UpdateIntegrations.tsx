@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { selectCompany } from "@/toolkit/Company/reducer";
 import { integrationsService } from "@/services/integrationsService";
 import { Pencil } from "lucide-react";
+import { logger } from "@/lib/logger";
 
 type FormValues = {
   platform: string;
@@ -30,7 +31,7 @@ export default function UpdateIntegrationModal() {
           const integrationsData = await integrationsService.getIntegrations();
           setIntegrations(integrationsData);
         } catch (error) {
-          console.error('Error fetching integrations:', error);
+          logger.error('Error fetching integrations:', error);
         }
       }
     };
@@ -44,7 +45,7 @@ export default function UpdateIntegrationModal() {
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     try {
-      console.log("submitting...");
+      logger.debug("submitting...");
       
       // Use the centralized integrations service instead of direct API call
       const socialProfiles = await integrationsService.getSocialProfiles();
@@ -57,7 +58,7 @@ export default function UpdateIntegrationModal() {
       reset();
       handleClose();
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       alert("Something went wrong.");
     } finally {
       setLoading(false);
