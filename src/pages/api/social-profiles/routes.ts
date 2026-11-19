@@ -1,7 +1,7 @@
 // src/pages/api/social-profiles/routes.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { authOptions } from "@/server/auth";
 import { db } from "@/db/db";
 import { socialProfiles } from "@/db/schema";
 import { eq, and } from "drizzle-orm";

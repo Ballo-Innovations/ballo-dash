@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "./schema";
 import { reset } from "drizzle-seed";
+import { assertDestructiveAllowed } from "./guard";
 
 async function main() {
   const connectionString = process.env.DATABASE_URL;
@@ -11,6 +12,7 @@ async function main() {
     throw new Error("DATABASE_URL not found in environment variables");
   }
 
+  assertDestructiveAllowed(connectionString);
   const pool = new Pool({ connectionString });
   const db = drizzle(pool);
 

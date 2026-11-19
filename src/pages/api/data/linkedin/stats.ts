@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { JSDOM } from "jsdom";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { authOptions } from "@/server/auth";
 import { getLinkedInAccessToken } from "@/lib/linkedin";
 import { socialMediaCacheService } from "@/services/socialMediaCacheService";
 import { logger } from "@/lib/logger";

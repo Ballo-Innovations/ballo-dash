@@ -1,0 +1,20 @@
+{
+ "name":"outage_kitwe","durationMin":3,"ratePerMin":14,
+ "sentimentMix":{"neg":0.8,"neu":0.15,"pos":0.05},
+ "regions":[{"city":"Kitwe","weight":0.7},{"city":"Ndola","weight":0.2},{"city":"Lusaka","weight":0.1}],
+ "topics":[
+  {"name":"fibre outage","weight":0.8,"hashtags":["#ZedNet","#InfratelDown","#Kitwe"],
+   "templates":[
+    "Fibre down again in {city} since {time}, ba {brand} 😤 any update?",
+    "{brand} network dead in {city} whole morning. Businesses losing money 😡",
+    "Is it just me or is {brand} down in {city}? #ZedNet",
+    "Third outage this month in {city}. {brand} this is not reliable 👎",
+    "{brand} support line not answering, {city} offline 🙄 #InfratelDown",
+    "Any ETA from {brand}? {city} office can't work. Eish."
+   ]},
+  {"name":"customer service","weight":0.2,"hashtags":["#InfratelDown"],
+   "templates":["Called {brand} 4 times, still waiting. {city}","{brand} chat bot keeps looping. Need a human. {city}"]}
+ ],
+ "highReachInjections":[{"author":"@KitweBusinessHub","followers":48000,"verified":true,"text":"Reports of a major {brand} fibre outage across {city} CBD. Multiple businesses affected. Awaiting statement.","shares":120}],
+ "competitorShare":0.05
+}

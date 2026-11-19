@@ -4,7 +4,6 @@ import React from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import instaIcon from "@/assets/images/socials/instagram.png";
 import Image from "next/image";
-import "@/assets/scss/data-page.scss";
 import { logger } from "@/lib/logger";
 
 interface Props {

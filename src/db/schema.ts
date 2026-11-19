@@ -8,13 +8,25 @@ import {
   pgEnum,
   index,
   unique,
+  customType,
 } from "drizzle-orm/pg-core";
+import { decryptSecret, encryptSecret } from "../lib/secret-box";
 import {
   integrationStatus,
   integrationTypes,
   subscriptionsPlans,
   userRoles,
 } from "src/data/constants";
+
+/**
+ * Text column encrypted at rest with AES-256-GCM (H-04). Code reads and writes
+ * plaintext; the database only ever sees "enc:v1:..." values.
+ */
+const encryptedText = customType<{ data: string; driverData: string }>({
+  dataType: () => "text",
+  toDriver: (value) => encryptSecret(value),
+  fromDriver: (value) => decryptSecret(value),
+});
 
 // 1. ENUMS
 export const planEnum = pgEnum("plan", [
@@ -104,9 +116,9 @@ export const integrations = pgTable(
     status: integrationStatusEnum("status").default("PENDING").notNull(),
     handle: text("handle"), // Social media handle or profile identifier
     appId: text("app_id"),
-    appSecret: text("app_secret"),
-    accessToken: text("access_token").notNull(),
-    refreshToken: text("refresh_token"),
+    appSecret: encryptedText("app_secret"),
+    accessToken: encryptedText("access_token").notNull(),
+    refreshToken: encryptedText("refresh_token"),
     expiresAt: timestamp("expires_at"),
     lastSyncedAt: timestamp("last_synced_at"),
     accountId: text("account_id"), // Platform-specific account ID (e.g., Instagram business account ID, Facebook page ID)

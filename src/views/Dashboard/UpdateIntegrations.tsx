@@ -4,7 +4,6 @@ import { integrationTypes } from "@/data/constants";
 import { useEffect, useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import "./style.scss";
 import { useSelector } from "react-redux";
 import { selectCompany } from "@/toolkit/Company/reducer";
 import { integrationsService } from "@/services/integrationsService";

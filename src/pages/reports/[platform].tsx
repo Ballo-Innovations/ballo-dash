@@ -6,8 +6,6 @@ import { Spinner, Card } from "react-bootstrap";
 import { useAppSelector } from "@/toolkit/hooks";
 import { selectCompany } from "@/toolkit/Company/reducer";
 import { useIntegrations } from "@/hooks/useIntegrations";
-import "@/assets/scss/reports-page.scss";
-import "@/assets/scss/platform-report.scss";
 import {
     ReportHeader,
     ExecutiveSummary,

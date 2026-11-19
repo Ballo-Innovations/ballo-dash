@@ -1,7 +1,7 @@
 // src/pages/api/data/meta/posts.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { authOptions } from "@/server/auth";
 import { getFacebookAccessToken } from "@/lib/facebook";
 import { logger } from "@/lib/logger";
 

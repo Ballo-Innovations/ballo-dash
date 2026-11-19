@@ -15,7 +15,6 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import "./style.scss";
 import { CirclePlus, CircleXIcon, Pencil, Save, Trash } from "lucide-react";
 
 const timeFrames = ["weekly", "monthly", "quarterly", "annual"] as const;

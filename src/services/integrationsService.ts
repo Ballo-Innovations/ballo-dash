@@ -72,7 +72,7 @@ class IntegrationsService {
         throw new Error('Company not found');
       }
       
-      const response = await fetch(`/api/integrations?companyId=${company.id}`);
+      const response = await fetch("/api/integrations");
       
       if (!response.ok) {
         throw new Error(`Failed to fetch integrations: ${response.status}`);

@@ -9,7 +9,6 @@ import facebookIcon from "@/assets/images/socials/facebook.png";
 import instaIcon from "@/assets/images/socials/instagram.png";
 import linkedinIcon from "@/assets/images/socials/linkedin.png";
 import xIcon from "@/assets/images/socials/X_icon.png";
-import "@/assets/scss/statistics-page.scss";
 import AudienceChart from "@/views/Chart/AudienceChart";
 import {
     PlatformSelector,

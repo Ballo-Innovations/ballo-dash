@@ -1,6 +1,16 @@
 // pages/_app.tsx
 import "@assets/scss/custom.scss";
 import "@assets/css/global.css";
+// Page and component stylesheets. Next only allows global CSS here (Next 15).
+import "@/assets/scss/loading.scss";
+import "@/assets/scss/login.scss";
+import "@/assets/scss/data-page.scss";
+import "@/assets/scss/statistics-page.scss";
+import "@/assets/scss/reports-page.scss";
+import "@/assets/scss/platform-report.scss";
+import "@/views/Home/Welcome Banner/style.scss";
+import "@/views/Home/Home Content/style.scss";
+import "@/views/Dashboard/style.scss";
 import React, { ReactElement, ReactNode, useEffect, useState } from "react";
 import Head from "next/head";
 import { Provider as ReduxProvider } from "react-redux";

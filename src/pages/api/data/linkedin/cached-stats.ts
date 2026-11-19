@@ -1,7 +1,7 @@
 // src/pages/api/data/linkedin/cached-stats.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { authOptions } from "@/server/auth";
 import { socialMediaCacheService } from "@/services/socialMediaCacheService";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

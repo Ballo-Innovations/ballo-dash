@@ -8,7 +8,6 @@ import linkedinIcon from "@/assets/images/socials/linkedin.png";
 import tiktokIcon from "@/assets/images/socials/tiktok.png";
 import tableIcon from "@/assets/images/socials/table.png";
 import Image from "next/image";
-import "@/assets/scss/data-page.scss";
 
 interface Props {
   isExpanded: boolean;

@@ -1,49 +1,60 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import { db } from "@/db/db";
-import { users, companies } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { logger } from "@/lib/logger";
+import { z } from "zod";
+import { db } from "@/db/db";
+import { companies } from "@/db/schema";
+import { apiHandler, route } from "@/server/api";
+import { badRequest, notFound } from "@/server/errors";
+import { isCompanyImageUrl } from "@/server/uploads";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  logger.debug("=== Company API called ===");
-  
-  const session = await getServerSession(req, res, authOptions);
-  logger.debug("Session user email:", session?.user?.email);
+const publicFields = {
+  id: companies.id,
+  name: companies.name,
+  domain: companies.domain,
+  logoUrl: companies.logoUrl,
+  websiteUrl: companies.websiteUrl,
+  timezone: companies.timezone,
+  locale: companies.locale,
+  plan: companies.plan,
+};
 
-  if (!session?.user?.email) {
-    logger.debug("No session or user email");
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+export default apiHandler({
+  GET: route({
+    handler: async ({ user }) => {
+      const [company] = await db.select(publicFields).from(companies).where(eq(companies.id, user.companyId)).limit(1);
+      if (!company) throw notFound("Company");
+      return { company };
+    },
+  }),
 
-  logger.debug("User email:", session.user.email);
-
-  try {
-    const [user] = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, session.user.email));
-
-    logger.debug("User found:", user ? "Yes" : "No");
-
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    const [company] = await db
-      .select()
-      .from(companies)
-      .where(eq(companies.id, user.companyId));
-
-    logger.debug("Company found:", company ? "Yes" : "No");
-    logger.debug("Company data:", company);
-
-    return res.status(200).json({ company });
-  } catch (error) {
-    logger.error("❌ Company API Error:", error);
-    return res.status(500).json({ error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" });
-  }
-}
+  PATCH: route({
+    capability: "company.edit",
+    body: z
+      .object({
+        name: z.string().trim().min(1).max(120).optional(),
+        websiteUrl: z.string().url().max(300).nullable().optional(),
+        timezone: z.string().max(60).optional(),
+        locale: z.string().max(20).optional(),
+        logoUrl: z.string().url().nullable().optional(),
+      })
+      .strict(),
+    handler: async ({ user, body }) => {
+      if (body.logoUrl) {
+        const bucket = process.env.AWS_S3_BUCKET_NAME ?? "";
+        const region = process.env.AWS_REGION ?? "";
+        if (!isCompanyImageUrl(body.logoUrl, user.companyId, bucket, region, "logo")) {
+          throw badRequest("Logo must be uploaded through Ballo Dash");
+        }
+      }
+      if (body.timezone && !Intl.supportedValuesOf("timeZone").includes(body.timezone)) {
+        throw badRequest("Unknown time zone");
+      }
+      const [company] = await db
+        .update(companies)
+        .set({ ...body, updatedAt: new Date(), updatedBy: user.id })
+        .where(eq(companies.id, user.companyId))
+        .returning(publicFields);
+      if (!company) throw notFound("Company");
+      return { company };
+    },
+  }),
+});

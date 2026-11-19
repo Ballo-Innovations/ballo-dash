@@ -3,10 +3,10 @@
 import { signIn } from "next-auth/react";
 import NavBar from "@views/Landing/Navbar";
 import React, { useState } from "react";
-import "@assets/scss/login.scss";
 import { Lock, UserRound, Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
+import { safeCallbackUrl } from "@/lib/safe-redirect";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -15,7 +15,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams?.get("callbackUrl") || "/";
+  const callbackUrl = safeCallbackUrl(searchParams?.get("callbackUrl"));
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +33,9 @@ const Login = () => {
       toast.success("Login successful!", { id: toastId });
       router.push(callbackUrl);
     } else {
-      toast.error("Invalid username or password", { id: toastId });
+      // NextAuth passes a thrown authorize() error's message through (used for rate limiting).
+      const message = res?.error && res.error !== "CredentialsSignin" ? res.error : "Invalid email or password";
+      toast.error(message, { id: toastId });
     }
 
     setLoading(false);

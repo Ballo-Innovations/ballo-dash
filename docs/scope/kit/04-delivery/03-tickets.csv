@@ -1,0 +1,73 @@
+ID,Epic,Title,Assignee,Priority,Estimate(h),Week,Depends on,Acceptance criteria
+E0-01,E0 Foundations,Init Next.js 15 TS Tailwind shadcn pnpm lint,Dev A,P0,2,0,,Builds; lint clean; README
+E0-02,E0 Foundations,Monorepo apps/web + apps/worker shared prisma client,Dev C,P0,3,0,E0-01,Worker runs and logs heartbeat
+E0-03,E0 Foundations,docker-compose app worker db minio + .env.example,Dev C,P0,3,0,E0-02,`docker compose up` boots
+E0-04,E0 Foundations,Prisma schema v1 + migration,Dev A,P0,3,0,E0-01,All tables present
+E0-05,E0 Foundations,Auth.js login + roles + requireRole + row tests,Dev A,P0,5,0,E0-04,Role matrix tests pass
+E0-06,E0 Foundations,withAudit middleware,Dev A,P0,2,0,E0-04,Diff rows written
+E0-07,E0 Foundations,App shell sidebar topbar period picker brand filter alert bell dark tokens,Dev B,P0,5,0,E0-01,All nav routes render
+E0-08,E0 Foundations,Shared components KpiCard SourceChip SentimentPill Drawer DataTable SeriesChart Skeletons,Dev B,P0,6,0,E0-07,Demo page renders all
+E0-09,E0 Foundations,GitHub Actions CI,Dev C,P0,2,0,E0-01,Green on main
+E0-10,E0 Foundations,Seed v0 users brands sources,Dev A,P0,2,0,E0-04,Idempotent
+E0-11,E0 Foundations,Deploy app + worker + db + object storage,Dev C,P0,4,0,E0-09,Public URL login
+E0-12,E0 Foundations,Helpers formatZMW dates(Lusaka) period ranges zod errors,Dev A,P0,2,0,E0-01,Unit tests
+E1-01,E1 Listening,Mentions queries with filters + list page,Dev A,P0,4,1,E0-10,Paginated; filters combine
+E1-02,E1 Listening,Live wall with SSE endpoint + client reconnect,Dev A,P0,6,1,E1-01,New mention appears ≤2s
+E1-03,E1 Listening,Mention drawer with matchedTerms highlight aspects summary link,Dev A,P0,4,1,E1-01 E6-01,
+E1-04,E1 Listening,Keyword rules per brand (include/exclude) applied by normaliser,Dev A,P1,3,1,E2-01,
+E1-05,E1 Listening,Rising topics panel + topic page,Dev A,P0,4,1,E6-03,
+E1-06,E1 Listening,Media (news) page: outlet table reach ranking coverage chart,Dev A,P0,4,1,E2-03,
+E1-07,E1 Listening,Alert banner + alerts list + alert drawer (evidence sparkline response ack/assign/resolve),Dev A,P0,6,1,E6-04,Statuses persist; audited
+E2-01,E2 Connectors,Connector interface registry ConnectorRun logging scheduler,Dev C,P0,4,1,E0-02,Runs logged with counts
+E2-02,E2 Connectors,Simulated social stream generator + 4 scenario files + author pool,Dev C,P0,8,1,E2-01,Deterministic; realistic Zambian content
+E2-03,E2 Connectors,RSS/news connector with outlet config + reach table,Dev C,P0,4,1,E2-01,Live articles ingested
+E2-04,E2 Connectors,First-party tracker /t.js + /collect + sessionisation + demo landing page,Dev C,P0,6,1,E0-04,Judge click → event stored
+E2-05,E2 Connectors,CSV import wizard GA4/Meta/Mailchimp/X with column mapping → MetricPoints/Mentions,Dev C,P0,6,2,E2-01,Sample files import idempotently
+E2-06,E2 Connectors,X/Meta/LinkedIn connector stubs shaped to official responses (disabled),Dev C,P2,3,2,E2-01,Typed; unit test on fixture
+E2-07,E2 Connectors,Admin Sources page (table run-now last run counts) + Simulation page (scenario rate inject),Dev A,P0,4,2,E2-01 E2-02,Inject starts stream
+E3-01,E3 Analytics,KPI service (definitions in spec) + /dashboard/kpis,Dev C,P0,5,2,E2-05,Values match SQL spot-check
+E3-02,E3 Analytics,Dashboard page KPI strip + sentiment/mentions chart + SoV donut + channel mix + paid stacked bars + insights panel,Dev B,P0,6,2,E3-01 E6-06,
+E3-03,E3 Analytics,Web analytics: sessions sources funnel + goals,Dev C,P0,5,2,E2-04,Funnel rates computed
+E3-04,E3 Analytics,Campaigns CRUD + email metrics series + UTM attribution,Dev C,P0,5,2,E2-05 E3-03,
+E3-05,E3 Analytics,Nightly materialisation of web/session metrics into MetricPoints,Dev C,P1,2,2,E3-03,
+E4-01,E4 Paid media,MediaPlanLine CRUD inline-edit table (budget spend billing invoice),Dev C,P0,5,2,E3-04,Audited
+E4-02,E4 Paid media,Paid media summary rollups variance burn forecast unbilled,Dev C,P0,4,2,E4-01,Unit tests on formulas
+E4-03,E4 Paid media,Billing Kanban + variance heatmap + burn chart,Dev C,P1,4,2,E4-02,
+E4-04,E4 Paid media,Paid media alert rules → insights,Dev B,P1,2,2,E4-02 E6-06,
+E5-01,E5 Competitors,Competitor brand CRUD + handles/keywords,Dev A,P0,2,2,E0-10,
+E5-02,E5 Competitors,Benchmark service + table (followers growth engagement mentions sentiment SoV index),Dev A,P0,5,2,E3-01,
+E5-03,E5 Competitors,Share of voice by channel/period + donut + lines,Dev A,P0,3,2,E5-02,
+E5-04,E5 Competitors,Top topics per brand,Dev A,P1,2,2,E1-05,
+E6-01,E6 Intelligence,Lexicon sentiment T1 + custom lexicon + negation/intensifier + tests,Dev B,P0,6,1,E0-04,≥30 test sentences incl. local phrases
+E6-02,E6 Intelligence,Aspect sentiment T2 via LLM + AiArtifact cache + fallback + trigger rules,Dev B,P0,5,1,E6-01,Works with key unset
+E6-03,E6 Intelligence,Trend detector (daily term counts baseline z clustering → Topic),Dev B,P0,5,1,E6-01,Unit test on synthetic spike
+E6-04,E6 Intelligence,Crisis detector job (z velocity reach severities cooldown) → Alert + recommended response templates,Dev B,P0,6,1,E6-01,outage scenario → CRISIS within 3 min
+E6-05,E6 Intelligence,Alert LLM narrative (cached),Dev B,P1,2,2,E6-04,
+E6-06,E6 Intelligence,Insight detectors (12 types) + feed page + dismiss,Dev B,P0,6,2,E3-01 E5-02,≥8 types on seed
+E6-07,E6 Intelligence,Recommendation engine rules + projections + cards + [Create campaign] prefill,Dev B,P0,6,2,E6-06 E3-04,
+E6-08,E6 Intelligence,Forecasting (Holt-Winters/linear) + API + chart band,Dev B,P1,5,2,E3-01,Tests on synthetic series
+E6-09,E6 Intelligence,Sentiment aggregates by aspect/channel/region + bars,Dev B,P0,3,1,E6-01,
+E7-01,E7 Feedback,Survey builder (CSAT NPS Perception) + slug + QR,Dev A,P0,5,2,E0-10,
+E7-02,E7 Feedback,Public /s/[slug] mobile form + submit + rate limit,Dev A,P0,4,2,E7-01,Submit from phone works
+E7-03,E7 Feedback,Results: NPS gauge CSAT MPI verbatims with aspects follow-up status,Dev A,P0,5,2,E7-02 E6-02,
+E7-04,E7 Feedback,Perception radar vs competitors,Dev A,P1,3,2,E7-03 E6-09,
+E8-01,E8 Reports,Report templates (Weekly Exec Monthly Brand) sections config,Dev C,P0,3,2,E3-01,
+E8-02,E8 Reports,PDF renderer (@react-pdf) with charts as SVG → MinIO + download,Dev C,P0,6,2,E8-01,Snapshot test
+E8-03,E8 Reports,Schedule (cadence recipients) + worker job + email mock log,Dev C,P1,3,2,E8-02,
+E9-01,E9 Admin/CIMS,Users & roles page,Dev A,P0,2,2,E0-05,
+E9-02,E9 Admin/CIMS,Audit log page with diff,Dev A,P0,3,2,E0-06,
+E9-03,E9 Admin/CIMS,API keys + Bearer + OpenAPI + Swagger page,Dev A,P1,4,2,E0-05,
+E9-04,E9 Admin/CIMS,Data protection: response export/erase + policy page,Dev A,P1,3,2,E9-02,
+E9-05,E9 Admin/CIMS,Global search ⌘K (mentions topics campaigns surveys),Dev A,P1,3,2,E1-01,
+E10-01,E10 Data & QA,Seed v1 (25k mentions 120d 4 brands topics metrics 20k web events campaigns lines surveys responses) per spec,Dev C,P0,8,1,E2-02,Dashboards alive; all insight types present
+E10-02,E10 Data & QA,Seed-time LLM cache + insights + recommendations + historic alerts,Dev B,P0,3,2,E6-06,Offline demo works
+E10-03,E10 Data & QA,Vitest suite ≥ 50 tests,Dev B,P0,4,2,E6-01,
+E10-04,E10 Data & QA,Playwright smoke: login wall inject crisis ack survey submit report pdf,Dev C,P1,5,3,E8-02,In CI
+E10-05,E10 Data & QA,Full QA pass + bug bash,All,P0,8,3,,All P0 pass
+E10-06,E10 Data & QA,Performance: indexes; dashboard <1.5s; wall 200 cards smooth,Dev A,P1,3,3,E10-01,
+E10-07,E10 Data & QA,Mobile 390px pass incl. survey page,Dev B,P1,2,3,,
+E11-01,E11 Pitch,Deck per outline,Dev B+CEO,P0,4,3,,
+E11-02,E11 Pitch,Demo rehearsals ×3,All,P0,3,3,E10-05,<8 min
+E11-03,E11 Pitch,Dry-run judging + fixes,All,P0,4,3,E11-02,
+E11-04,E11 Pitch,Submission package README arch demo URL creds QR video,Dev A,P0,3,3,E11-03,
+E11-05,E11 Pitch,Backup laptop compose + recording,Dev C,P0,2,3,E11-04,

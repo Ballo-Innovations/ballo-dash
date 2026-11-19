@@ -1,7 +1,7 @@
 // src/pages/api/data/x/posts.ts
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { authOptions } from "@/server/auth";
 import { getXAccessToken } from "@/lib/x";
 import { socialMediaCacheService } from "@/services/socialMediaCacheService";
 import { logger } from "@/lib/logger";

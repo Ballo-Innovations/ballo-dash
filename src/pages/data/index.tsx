@@ -3,7 +3,6 @@ import Layout from "@layout/index";
 import React, { ReactElement } from "react";
 import { useAppSelector } from "@/toolkit/hooks";
 import { selectCompany } from "@/toolkit/Company/reducer";
-import "@/assets/scss/data-page.scss";
 import Overview from "@/components/data-tables/DataOverview";
 import Posts from "@/components/data-tables/DataPosts";
 import NoIntegrations from "@/components/NoIntegrations";

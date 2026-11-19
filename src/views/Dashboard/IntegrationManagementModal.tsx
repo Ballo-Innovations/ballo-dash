@@ -42,6 +42,10 @@ interface Integration {
   expiresAt: string | null;
   accountId?: string; // Platform-specific account ID
   metadata?: any;
+  /** Secrets are never sent to the browser; these flags say whether one is saved. */
+  hasAccessToken?: boolean;
+  hasRefreshToken?: boolean;
+  hasAppSecret?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -112,14 +116,6 @@ const IntegrationManagementModal: React.FC = () => {
       // Use the modal-specific endpoint that includes access tokens
       const data = await integrationsService.getIntegrationsForModal();
       logger.debug('Modal: Fetched integrations:', data);
-      logger.debug('Modal: Integration details:', data.map(i => ({
-        id: i.id,
-        type: i.type,
-        status: i.status,
-        hasAccessToken: !!i.accessToken,
-        accessTokenLength: i.accessToken?.length || 0,
-        accessTokenPreview: i.accessToken ? `${i.accessToken.substring(0, 20)}...` : 'NONE'
-      })));
       
       const editableIntegrations: EditableIntegration[] = data.map((integration: any) => ({
         ...integration,
@@ -851,13 +847,13 @@ const IntegrationManagementModal: React.FC = () => {
                           value={integration.appSecret || ''}
                           onChange={(e) => handleInputChange(integration.id, 'appSecret', e.target.value)}
                           size="sm"
-                          placeholder="Enter app secret"
+                          placeholder={integration.hasAppSecret ? "Saved. Enter a new value to replace it" : "Enter app secret"}
                           autoComplete="new-password"
                           data-lpignore="true"
                           data-form-type="other"
                         />
                       ) : (
-                        <small className="text-muted">{integration.appSecret ? maskToken(integration.appSecret) : 'Not set'}</small>
+                        <small className="text-muted">{integration.hasAppSecret ? 'Saved' : 'Not set'}</small>
                       )}
                     </td>
                     <td>
@@ -867,13 +863,13 @@ const IntegrationManagementModal: React.FC = () => {
                           value={integration.accessToken || ''}
                           onChange={(e) => handleInputChange(integration.id, 'accessToken', e.target.value)}
                           size="sm"
-                          placeholder="Enter access token"
+                          placeholder={integration.hasAccessToken ? "Saved. Enter a new value to replace it" : "Enter access token"}
                           autoComplete="off"
                           data-lpignore="true"
                           data-form-type="other"
                         />
                       ) : (
-                        <small className="text-muted">{integration.accessToken ? maskToken(integration.accessToken) : 'Not set'}</small>
+                        <small className="text-muted">{integration.hasAccessToken ? 'Saved' : 'Not set'}</small>
                       )}
                     </td>
                     <td>
@@ -883,11 +879,11 @@ const IntegrationManagementModal: React.FC = () => {
                           value={integration.refreshToken || ''}
                           onChange={(e) => handleInputChange(integration.id, 'refreshToken', e.target.value)}
                           size="sm"
-                          placeholder="Enter refresh token (optional)"
+                          placeholder={integration.hasRefreshToken ? "Saved. Enter a new value to replace it" : "Enter refresh token (optional)"}
                         />
                       ) : (
                         <small className="text-muted">
-                          {integration.refreshToken ? maskToken(integration.refreshToken) : 'N/A'}
+                          {integration.hasRefreshToken ? 'Saved' : 'N/A'}
                         </small>
                       )}
                     </td>

@@ -4,11 +4,17 @@ import * as schema from "./schema";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
 import * as dotenv from "dotenv";
+import { assertDestructiveAllowed } from "./guard";
 
 dotenv.config();
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL not found in .env.development");
+// Seeding creates admin accounts, so it only runs against local databases
+// (or a remote one confirmed with ALLOW_DESTRUCTIVE_DB) and never uses a
+// password that lives in the repository.
+assertDestructiveAllowed(process.env.DATABASE_URL);
+const seedPassword: string = process.env.SEED_ADMIN_PASSWORD ?? "";
+if (seedPassword.length < 12) {
+  throw new Error("Set SEED_ADMIN_PASSWORD (at least 12 characters) to run the seed");
 }
 
 async function main() {
@@ -18,7 +24,7 @@ async function main() {
 
   const db = drizzle(pool);
   const companyId = uuidv4();
-  const hashedPassword = await bcrypt.hash("ballo2025", 10);
+  const hashedPassword = await bcrypt.hash(seedPassword, 12);
 
   await db.insert(schema.companies).values({
     id: companyId,

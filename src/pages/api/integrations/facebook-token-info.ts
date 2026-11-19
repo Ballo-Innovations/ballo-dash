@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { can } from "@/server/rbac";
+import { authOptions } from "@/server/auth";
 import { db } from "@/db/db";
 import { integrations } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -16,6 +17,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getServerSession(req, res, authOptions);
     if (!session?.user?.email) {
       return res.status(401).json({ error: "Unauthorized" });
+    }
+    if (!can(session.user.role, "integrations.manage")) {
+      return res.status(403).json({ error: { code: "forbidden", message: "You do not have permission to do this" } });
     }
 
     // Get company ID from session
