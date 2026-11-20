@@ -63,6 +63,6 @@ export function formatMoney(
     })
       .format(major)
       // Engines differ on a space between the symbol and the digits ("K 1,234.50"); Zambia writes K1,234.50.
-      .replace(/([^\d\s-])[\s\u00a0\u202f]+(?=\d)/u, "$1")
+      .replace(/([^\d\s-])[\s\u00a0\u202f]+(?=\d)/, "$1")
   );
 }
