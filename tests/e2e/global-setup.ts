@@ -2,11 +2,14 @@ import { randomBytes, randomUUID } from "node:crypto";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import { Pool } from "pg";
-import { assertDestructiveAllowed } from "../../src/db/guard";
 
 /**
- * Creates (or resets) a dedicated end-to-end company and admin user in the
- * local database and exposes the credentials to the tests through env vars.
+ * End-to-end tests run the web app against a local Ballo Dash API. This setup
+ * creates (or resets) a dedicated test company and admin user in the API's
+ * LOCAL database and passes the credentials to the tests.
+ *
+ *   E2E_API_DATABASE_URL  the API's local database (default ballo_dash_api_dev on localhost)
+ *   E2E_BASE_URL          test an already running deployment instead (then set E2E_EMAIL/E2E_PASSWORD)
  */
 export default async function globalSetup() {
   dotenv.config();
@@ -17,8 +20,12 @@ export default async function globalSetup() {
     return;
   }
 
-  const url = process.env.DATABASE_URL;
-  assertDestructiveAllowed(url);
+  const url = process.env.E2E_API_DATABASE_URL ?? `postgres://${process.env.USER ?? "postgres"}@localhost:5432/ballo_dash_api_dev`;
+  const host = new URL(url).hostname;
+  if (!["localhost", "127.0.0.1", "::1"].includes(host)) {
+    throw new Error(`Refusing to create test users in a non-local database (${host})`);
+  }
+
   const email = "e2e-admin@example.test";
   const password = randomBytes(18).toString("base64url");
   const pool = new Pool({ connectionString: url });

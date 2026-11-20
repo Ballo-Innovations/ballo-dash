@@ -567,7 +567,7 @@
       top: $header-height;
 
       .header-wrapper {
-        background: var(pc-header-background);
+        background: var(--pc-header-background);
         position: relative;
         z-index: 5;
       }

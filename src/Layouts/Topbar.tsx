@@ -18,7 +18,7 @@ import { Button, Dropdown, DropdownToggle } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import SimpleBar from "simplebar-react";
 import { chanageLanguage } from "src/toolkit/themeLayouts/thunk";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "@/contexts/SessionContext";
 import Avatar from "@mui/material/Avatar";
 import Skeleton from "@mui/material/Skeleton";
 
@@ -67,7 +67,7 @@ const TopBar = ({
     setDropdownOpen(false);
   };
 
-  const { data: session } = useSession();
+  const { data: session, signOut } = useSession();
 
   return (
     <React.Fragment>

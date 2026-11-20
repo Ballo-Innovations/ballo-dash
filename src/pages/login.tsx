@@ -1,6 +1,5 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import NavBar from "@views/Landing/Navbar";
 import React, { useState } from "react";
 import { Lock, UserRound, Eye, EyeOff } from "lucide-react";
@@ -24,25 +23,34 @@ const Login = () => {
     // Read from the form, not React state: values typed (or autofilled) before
     // hydration never reach state, and would otherwise be submitted as empty.
     const form = new FormData(e.currentTarget as HTMLFormElement);
-    const res = await signIn("credentials", {
-      username: String(form.get("username") ?? username),
-      password: String(form.get("password") ?? password),
-      redirect: false,
-      callbackUrl,
-    });
-
-    if (res?.ok) {
-      toast.success("Signed in", { id: toastId });
-      // Full page load, not router.push: links prefetched while signed out
-      // (for example "Dashboard" in the top bar) are cached as redirects to
-      // /login, and a client-side push would replay that redirect.
-      window.location.assign(callbackUrl);
-      return;
-    } else {
-      // NextAuth passes a thrown authorize() error's message through (used for rate limiting).
-      const message = res?.error && res.error !== "CredentialsSignin" ? res.error : "Invalid email or password";
-      toast.error(message, { id: toastId });
+    let message = "Could not reach the server. Check your connection and try again.";
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          email: String(form.get("username") ?? username),
+          password: String(form.get("password") ?? password),
+        }),
+      });
+      if (response.ok) {
+        toast.success("Signed in", { id: toastId });
+        // Full page load, not router.push: links prefetched while signed out
+        // (for example "Dashboard" in the top bar) are cached as redirects to
+        // /login, and a client-side push would replay that redirect.
+        window.location.assign(callbackUrl);
+        return;
+      }
+      const problem = await response.json().catch(() => null);
+      message =
+        response.status === 401
+          ? "Invalid email or password"
+          : problem?.error?.message ?? "Sign-in failed. Try again in a moment.";
+    } catch {
+      /* network error: keep the default message */
     }
+    toast.error(message, { id: toastId });
 
     setLoading(false);
   };

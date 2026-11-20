@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "@/toolkit/hooks";
 import { fetchCompany, selectCompany } from "@/toolkit/Company/reducer";
 import UploadPopup from "@/views/ImageUpload";
 import { selectUsers } from "@/toolkit/User/reducer";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/contexts/SessionContext";
 import balloLogo from "@/assets/images/logos/Ballo logo white.png";
 import { Play } from "lucide-react";
 import Skeleton from "@mui/material/Skeleton";

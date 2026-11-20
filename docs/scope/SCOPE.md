@@ -76,7 +76,17 @@ Phase 0 is first because new public endpoints (tracker, surveys) should not be a
 | Hosting | Set up from scratch: Next.js on Vercel, backend on Ballo servers over SSH | K-06, K-10, K-11, C-02 |
 | Ticket home | Markdown files in this folder | `tickets/` |
 
-**Hosting shape**
+**Architecture (decided 2026-11-20): two repos**
+
+| Repo | What | Where |
+|---|---|---|
+| `ballo-dash` | Next.js 16 web app, UI only | Vercel (existing project, `main` deploys production) |
+| `ballo-dash-api` | NestJS 12 API, Postgres 16, Redis, background jobs | Docker on `balloads_dev_staging` (staging); production host still to choose |
+
+The browser only talks to the web app; Vercel forwards `/api/*` to the API. The API owns the schema,
+migrations, encryption and every permission check.
+
+**Hosting shape (original plan, superseded by the table above)**
 
 - **Vercel:** the Next.js app, including pages, API routes, the tracker endpoint, public survey pages and the live stream.
 - **Ballo server:** Postgres (staging and production databases) and one Node worker from this repo that runs connectors, detectors, the sandbox generator and scheduled reports.

@@ -190,25 +190,26 @@ the web app ownership rule). Where they overlap, follow both.
 
 ---
 
-## Appendix: ballo-dash
+## Appendix: ballo-dash (web)
+
+The backend has its own copy and appendix in `ballo-dash-api/docs/QUALITY_ASSURANCE.md`.
 
 ### Commands
 
 | Check | Command | Notes |
 |---|---|---|
-| Lint | `npm run lint` | Errors fail. About 500 legacy warnings (`any`, unused vars) are tolerated by `--max-warnings`; lower the cap as they are fixed, never raise it. |
-| Types | `npm run typecheck` | Must be 0 errors; the build also fails on type errors. |
+| Lint | `npm run lint` | ESLint flat config. Errors fail; legacy warnings are capped (`--max-warnings`) and the cap only goes down. |
+| Types | `npm run typecheck` | Must be 0 errors. |
 | Unit | `npm test` | Vitest, `src/**/*.test.ts`. |
-| Integration | `npm run test:integration` | Real Postgres (`TEST_DATABASE_URL`, default local `ballo_dash_test`). Refuses non-local databases. |
-| End-to-end | `npm run test:e2e` | Playwright (suite grows with ticket Q-02). |
-| Build | `npm run build` | |
-| Dependencies | `npm audit --omit=dev --audit-level=high` | Runs in CI. |
-| Secrets | gitleaks | Runs in CI. |
+| End-to-end | `npm run build && npm run test:e2e` | Playwright against `next start` and a running local API. |
+| Build | `npm run build` | Turbopack. Invalid CSS fails the build. |
+| Dependencies | `npm audit --omit=dev --audit-level=high` | Runs in `npm run deploy:staging`. |
+| Secrets | gitleaks | Run `gitleaks git --redact` before pushing (no hosted CI). |
 
-### Known gaps (2026-11-19)
+### Known gaps (2026-11-20)
 
-- No staging or production environment yet (tickets K-06, K-10); deployment checks are NOT RUN until they exist.
-- Visual review is manual (Playwright screenshots); there are no screenshot baselines.
-- No automated accessibility scan in CI yet (ticket Q-03).
-- Legacy data routes under `src/pages/api/data/` still use hand-written session checks rather than `apiHandler`; they are scoped by the session company and covered by the middleware, and will move to `apiHandler` as their modules are rebuilt.
-- Drizzle migration history in `drizzle/` does not match the schema (two hand-written files share numbers); a baseline migration is ticket F-04.
+- No hosted CI (decided 2026-11-20): checks run in the pre-push hook and in `npm run deploy:staging`.
+- End-to-end tests need the API running; run them locally before merging UI changes.
+- Visual review is manual (Playwright screenshot helper `tests/e2e/visual-review.spec.ts`); no baselines.
+- No automated accessibility scan yet (ticket Q-03). Known: statistics figures have low contrast in dark mode.
+- 11 React Compiler lint findings in template-era components are warnings, not errors, until rebuilt.

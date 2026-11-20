@@ -1,5 +1,4 @@
 import { Company } from "@/types";
-import { tokenCache } from "@/lib/tokenCache";
 import { logger } from "@/lib/logger";
 
 class CompanyService {
@@ -79,16 +78,8 @@ class CompanyService {
   }
 
   public clearCache(): void {
-    // Store company ID before clearing
-    const companyId = this.companyData?.id;
-    
     this.companyData = null;
     this.lastFetch = 0;
-    
-    // Also clear any cached tokens for this company
-    if (companyId) {
-      tokenCache.clearCompanyTokens(companyId);
-    }
   }
 }
 

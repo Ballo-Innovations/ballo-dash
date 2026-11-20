@@ -64,6 +64,20 @@ test.describe("signed in", () => {
     }
   });
 
+  test("signing out ends the session", async ({ page }) => {
+    await page.goto("/login");
+    await page.getByPlaceholder("Username").fill(process.env.E2E_EMAIL!);
+    await page.getByPlaceholder("Password").fill(process.env.E2E_PASSWORD!);
+    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.waitForURL((url) => !url.pathname.startsWith("/login"));
+    expect((await page.request.get("/api/auth/me")).status()).toBe(200);
+
+    expect((await page.request.post("/api/auth/logout")).status()).toBe(204);
+    expect((await page.request.get("/api/auth/me")).status()).toBe(401);
+    await page.goto("/dashboard");
+    await expect(page).toHaveURL(/\/login/);
+  });
+
   test("an external callbackUrl is ignored", async ({ page }) => {
     await page.goto("/login?callbackUrl=https%3A%2F%2Fevil.example");
     await page.getByPlaceholder("Username").fill(process.env.E2E_EMAIL!);

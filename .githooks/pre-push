@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Fast checks before every push (lint, types, unit tests). The full suite,
+# including the production build, runs in scripts/deploy-staging.sh.
+# Skip once with: git push --no-verify
+set -euo pipefail
+echo "pre-push: lint, types, unit tests"
+npm run --silent lint >/dev/null
+npm run --silent typecheck
+npx vitest run --reporter=dot >/dev/null
+echo "pre-push: OK"
