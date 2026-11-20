@@ -3,6 +3,7 @@ import React, { ReactNode, useEffect, useState, createContext, useContext } from
 import { useDispatch } from "react-redux";
 import { Company, User } from "@/types";
 import { companyService } from "@/services/companyService";
+import { useSession } from "@/contexts/SessionContext";
 import { userService } from "@/services/userService";
 import { integrationsService } from "@/services/integrationsService";
 import { linkedinService } from "@/services/linkedinService";
@@ -39,8 +40,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [company, setCompanyLocal] = useState<Company | null>(null);
   const [user, setUserLocal] = useState<User | null>(null);
   const dispatch = useDispatch<AppDispatch>();
+  const { status: sessionStatus } = useSession();
 
   useEffect(() => {
+    // Public pages (sign-in, sign-up) have no session: skip the company and user calls that would 401.
+    if (sessionStatus !== "authenticated") return;
 
     if (!dispatch) {
       logger.error('❌ AppContext: Dispatch is not available');
@@ -251,7 +255,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     fetchData();
-  }, [dispatch]);
+  }, [dispatch, sessionStatus]);
 
 
 

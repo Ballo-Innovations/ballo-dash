@@ -5,7 +5,7 @@
 | ID | Title | Priority | Phase | Hours | Status |
 |---|---|---|---|---|---|
 | K-01 | Company onboarding wizard | P0 | 5 | 10 | TODO |
-| K-02 | Self-service sign-up, email verification, password reset | P0 | 5 | 10 | DONE (dev) |
+| K-02 | Self-service sign-up, email verification, password reset | P0 | 5 | 10 | DONE (staging) |
 | K-03 | Plan limits for FREE PRO ENTERPRISE | P0 | 5 | 8 | TODO |
 | K-04 | Demo workspace seed | P0 | 3 | 10 | TODO |
 | K-05 | Error tracking and health check | P1 | 5 | 5 | TODO |
