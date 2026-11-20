@@ -10,7 +10,7 @@
 | C-04 | RSS and news connector with outlet reach table | P0 | 2 | 6 | DONE (staging) |
 | C-05 | First-party web tracker: /t.js, /api/collect, sessionisation | P0 | 2 | 8 | TODO |
 | C-06 | CSV import wizard: GA4, Meta, Mailchimp, X exports | P0 | 2 | 10 | TODO |
-| C-07 | Keyword rules per brand (include and exclude) | P1 | 2 | 4 | TODO |
+| C-07 | Keyword rules per brand (include and exclude) | P1 | 2 | 4 | DONE (staging) |
 | C-08 | Sandbox data generator with scenarios | P0 | 2 | 10 | DONE (staging) |
 | C-09 | TikTok and YouTube connectors | P2 | 5 | 10 | TODO |
 | C-10 | Nightly materialisation of web sessions and conversions into metric_points | P1 | 3 | 3 | TODO |
@@ -106,15 +106,17 @@
 
 ## C-07 Keyword rules per brand (include and exclude)
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P1  **Phase:** 2  **Estimate:** 4h
 - **Depends on:** C-01
 
 **Acceptance criteria**
 
-- [ ] Rules applied by the normaliser
-- [ ] Excluded matches are dropped
-- [ ] Unit tests for case, hashtags and phrase matching
+- [x] Rules applied by the normaliser
+- [x] Excluded matches are dropped
+- [x] Unit tests for case, hashtags and phrase matching
+
+**Notes:** ballo-dash-api `src/connectors/match-brand.ts`. `brands.keywords` are include rules, `brands.exclude_keywords` (migration 0010) exclude rules; editing them in the UI comes with B-01. Rules match whole words in any case, phrases across spaces and dashes, and hashtags (`zed net` matches `#ZedNet`; `#zednet` matches only the hashtag). An excluded match is dropped, not refiled under the self brand, and the runner also applies excludes when a connector chose the brand. Also fixed: names followed by punctuation or written as hashtags fell back to the self brand. Verified on staging 2026-11-20: with exclude rules AFCON and Chipolopolo, the deployed matcher drops the football article and keeps the other five.
 
 ## C-08 Sandbox data generator with scenarios
 
