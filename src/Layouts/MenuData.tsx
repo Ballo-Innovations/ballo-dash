@@ -61,35 +61,45 @@ const generateReportMenuItems = (integrations: any[] = []) => {
   return reportMenuItems;
 };
 
+import type { FeatureName } from "@/lib/feature-flags";
+import type { Role } from "@/lib/roles";
+
+export interface MenuEntry {
+  id: string;
+  label: string;
+  icon?: string;
+  link?: string;
+  dataPage?: string | null;
+  type?: "HASHMENU" | "HEADER";
+  /** Hidden while this feature flag is off (src/lib/feature-flags.ts). */
+  feature?: FeatureName;
+  /** Only these roles see the item. Omit for everyone. */
+  roles?: Role[];
+  submenu?: MenuEntry[];
+  parentId?: string;
+  order?: number;
+}
+
 /**
- * Sidebar items. Only real product pages belong here; the template's demo
- * entries were removed with the demo pages (H-07). New modules add their item
- * behind a feature flag (F-10): give it `feature: "listening"` (a FeatureName)
- * and Header hides it while that flag is off.
+ * Sidebar (F-10). New modules sit behind their feature flag; Admin is for admins only.
+ * The existing social pages (Data, Statistics) live in the Social group.
  */
-const menuItems = [
+const menuItems: MenuEntry[] = [
+  { id: "dashboard", label: "Dashboard", icon: "ph-duotone ph-gauge", link: "/dashboard", dataPage: null },
+  { id: "listening", label: "Listening", icon: "ph-duotone ph-ear", link: "/listening", feature: "listening" },
+  { id: "media", label: "Media", icon: "ph-duotone ph-newspaper", link: "/media", feature: "listening" },
+  { id: "competitors", label: "Competitors", icon: "ph-duotone ph-users-three", link: "/competitors", feature: "competitors" },
+  { id: "campaigns", label: "Campaigns", icon: "ph-duotone ph-megaphone", link: "/campaigns", feature: "campaigns" },
   {
-    type: "HASHMENU",
-    id: 1,
-    label: "Dashboard",
-    icon: "ph-duotone ph-gauge",
-    dataPage: null,
-    link: "/dashboard",
+    id: "paid-media",
+    label: "Paid Media",
+    icon: "ph-duotone ph-currency-circle-dollar",
+    link: "/paid-media",
+    feature: "paidMedia",
+    roles: ["ADMIN", "MANAGER", "MARKETER"],
   },
-  {
-    id: "data",
-    label: "Data",
-    icon: "ph-duotone ph-database",
-    link: "/data",
-    dataPage: "w_data",
-  },
-  {
-    id: "statistics",
-    label: "Statistics",
-    icon: "ph-duotone ph-projector-screen-chart",
-    link: "/statistics",
-    dataPage: "w_statistics",
-  },
+  { id: "feedback", label: "Feedback", icon: "ph-duotone ph-chat-circle-text", link: "/feedback", feature: "feedback" },
+  { id: "insights", label: "Insights", icon: "ph-duotone ph-lightbulb", link: "/insights", feature: "insights" },
   {
     id: "reports",
     label: "Reports",
@@ -99,6 +109,30 @@ const menuItems = [
     type: "HASHMENU", // Expandable; submenu filled per connected platform
     submenu: [],
   },
+  {
+    id: "social",
+    label: "Social",
+    icon: "ph-duotone ph-share-network",
+    type: "HASHMENU",
+    submenu: [
+      { id: "data", label: "Data", icon: "ph-duotone ph-database", link: "/data", dataPage: "w_data", parentId: "social" },
+      { id: "statistics", label: "Statistics", icon: "ph-duotone ph-projector-screen-chart", link: "/statistics", dataPage: "w_statistics", parentId: "social" },
+    ],
+  },
+  { id: "admin", label: "Admin", icon: "ph-duotone ph-shield-check", link: "/admin", feature: "adminConsole", roles: ["ADMIN"] },
 ];
+
+/** Items this user may see: flags on, role allowed, and groups that still have something in them. */
+export function visibleMenu(items: MenuEntry[], options: { role: unknown; enabled: (name: FeatureName) => boolean }): MenuEntry[] {
+  const role = typeof options.role === "string" ? options.role.toUpperCase() : "";
+  return items.flatMap((item) => {
+    if (item.feature && !options.enabled(item.feature)) return [];
+    if (item.roles && !item.roles.includes(role as Role)) return [];
+    if (!item.submenu || item.submenu.length === 0) return [item];
+    const submenu = visibleMenu(item.submenu, options);
+    if (submenu.length === 0 && !item.link) return [];
+    return [{ ...item, submenu }];
+  });
+}
 
 export { menuItems, generateReportMenuItems };

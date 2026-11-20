@@ -11,7 +11,7 @@ interface MenuItem {
   icon?: string;
   link?: string;
   badge?: string;
-  dataPage?: string;
+  dataPage?: string | null;
   submenu?: MenuItem[];
   parentId?: string;
   order?: number;
@@ -27,13 +27,10 @@ const NestedMenu: React.FC<{ menuItems: MenuItem[] }> = ({ menuItems }) => {
     items: MenuItem[],
     path: string
   ): number | string | null => {
+    // Opens the group that contains the current page.
     for (const item of items) {
-      if (item.link === path) {
+      if (item.submenu && item.submenu.some((child) => child.link === path || initializeOpenMenu(child.submenu ?? [], path))) {
         return item.id;
-      }
-      if (item.submenu) {
-        const found = initializeOpenMenu(item.submenu, path);
-        if (found) return found;
       }
     }
     return null;
@@ -76,9 +73,12 @@ const NestedMenu: React.FC<{ menuItems: MenuItem[] }> = ({ menuItems }) => {
           className={`pc-item pc-hasmenu ${isOpen ? "pc-trigger active" : ""}`}
           style={indentStyle}
         >
-          <span
-            className="pc-link"
+          <button
+            type="button"
+            className="pc-link pc-link-button"
             onClick={() => handleMenuClick(item.id)}
+            aria-expanded={isOpen}
+            aria-controls={`submenu-${item.id}`}
           >
             <span className="pc-micon">
               <i className={item.icon}></i>
@@ -87,8 +87,9 @@ const NestedMenu: React.FC<{ menuItems: MenuItem[] }> = ({ menuItems }) => {
             <span className="pc-arrow">
               <ChevronRight size={16} aria-hidden="true" />
             </span>
-          </span>
+          </button>
           <ul
+            id={`submenu-${item.id}`}
             className={`pc-submenu ${isOpen ? "open" : ""}`}
             style={{ display: isOpen ? "block" : "none" }}
           >
@@ -107,7 +108,8 @@ const NestedMenu: React.FC<{ menuItems: MenuItem[] }> = ({ menuItems }) => {
         <Link
           href={item.link || "#"}
           className="pc-link"
-          data-page={item.dataPage}
+          data-page={item.dataPage ?? undefined}
+          aria-current={isActive ? "page" : undefined}
         >
           <span className="pc-micon">
             <i className={item.icon}></i>

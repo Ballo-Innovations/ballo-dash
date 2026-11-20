@@ -11,9 +11,9 @@
 | F-05 | Drizzle schema v2: mentions topics metric_points | P0 | 1 | 5 | DONE (staging) |
 | F-06 | Drizzle schema v2: web events, goals, campaigns, media plan lines | P0 | 1 | 4 | DONE (staging) |
 | F-07 | Drizzle schema v2: surveys, alerts, insights, recommendations, forecasts, reports, ai_artifacts | P0 | 1 | 5 | DONE (staging) |
-| F-08 | Tenant isolation guard and tests | P0 | 1 | 6 | TODO |
+| F-08 | Tenant isolation guard and tests | P0 | 1 | 6 | DONE (staging) |
 | F-09 | Helpers: money, dates, period ranges | P0 | 1 | 4 | DONE (staging) |
-| F-10 | New sidebar navigation in the existing template shell | P0 | 1 | 5 | TODO |
+| F-10 | New sidebar navigation in the existing template shell | P0 | 1 | 5 | DONE (staging) |
 | F-11 | Top bar: period picker, brand filter, alert bell | P0 | 1 | 6 | TODO |
 | F-12 | Shared components: KpiCard, SourceChip, SentimentPill, Drawer, SeriesChart, DataTable, skeletons, empty and error states | P0 | 1 | 10 | TODO |
 | F-13 | Global search (Cmd+K) across mentions topics campaigns surveys | P2 | 5 | 5 | TODO |
@@ -119,14 +119,16 @@
 
 ## F-08 Tenant isolation guard and tests
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 6h
 - **Depends on:** F-04, F-05, F-06, F-07
 
 **Acceptance criteria**
 
-- [ ] Every query helper takes companyId from the session, never from the request
-- [ ] Integration test creates two companies and proves each list, detail and write endpoint returns 404 or empty for the other company's ids
+- [x] Every query helper takes companyId from the session, never from the request
+- [x] Integration test creates two companies and proves each list, detail and write endpoint returns 404 or empty for the other company's ids
+
+**Notes:** ballo-dash-api `src/db/tenant.ts` (`tenant(db, user)`), `tenant-source.test.ts` (fails on any request-supplied companyId) and `tenancy.int.test.ts` (every list, detail and write endpoint with the other company's ids: 404 or empty, nothing changed). Upload route now applies the session company after the body. On staging since 2026-11-20.
 
 ## F-09 Helpers: money, dates, period ranges
 
@@ -143,16 +145,18 @@
 
 ## F-10 New sidebar navigation in the existing template shell
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 5h
 - **Depends on:** F-01, F-02
 
 **Acceptance criteria**
 
-- [ ] MenuData replaced with Dashboard, Listening, Media, Competitors, Campaigns, Paid Media, Feedback, Insights, Reports, Admin using the template's pc-sidebar and Phosphor icons
-- [ ] Items hidden by role and by flag
-- [ ] Existing Data and Statistics pages kept under a Social group
-- [ ] Works in light and dark theme and at 375px
+- [x] MenuData replaced with Dashboard, Listening, Media, Competitors, Campaigns, Paid Media, Feedback, Insights, Reports, Admin using the template's pc-sidebar and Phosphor icons
+- [x] Items hidden by role and by flag
+- [x] Existing Data and Statistics pages kept under a Social group
+- [x] Works in light and dark theme and at 375px
+
+**Notes:** Items carry `feature` and `roles`; `visibleMenu` filters them (unit tested). Paid Media: ADMIN, MANAGER, MARKETER. Admin: ADMIN. First render uses environment flags only to avoid a hydration mismatch. Group toggles are buttons with aria-expanded; the group holding the current page opens. Checked in Playwright at 1280 and 375 px, light and dark, keyboard.
 
 ## F-11 Top bar: period picker, brand filter, alert bell
 

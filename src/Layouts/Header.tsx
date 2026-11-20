@@ -6,8 +6,8 @@ import Image from "next/image";
 import navCardBg from "../assets/images/layout/nav-card-bg.svg";
 import avatar1 from "../assets/images/user/avatar-1.jpg";
 import SimpleBar from "simplebar-react";
-import { menuItems } from "./MenuData";
-import { withEnabledFeatures } from "@/lib/feature-flags";
+import { menuItems, visibleMenu } from "./MenuData";
+import { isFeatureEnabled, isFeatureEnabledOnServer } from "@/lib/feature-flags";
 import { useDynamicMenu } from "@/hooks/useDynamicMenu";
 import NestedMenu from "@/Layouts/NestedMenu";
 import { Dropdown } from "react-bootstrap";
@@ -27,16 +27,21 @@ const Header = ({ themeMode }: any) => {
   const company = useAppSelector(selectCompany);
   const { data: session } = useSession();
   const { reportsMenuItem } = useDynamicMenu();
+  const [mounted, setMounted] = React.useState(false);
+  useEffect(() => setMounted(true), []);
 
   // Create dynamic menu items by replacing the reports item with the dynamic one
   const dynamicMenuItems = React.useMemo(() => {
-    return withEnabledFeatures(menuItems as any[]).map((item: any) => {
+    // Role and flag filtering (F-10). The first render uses environment flags only so it matches the
+    // server HTML; browser QA overrides (?features=) apply once mounted.
+    const enabled = mounted ? isFeatureEnabled : isFeatureEnabledOnServer;
+    return visibleMenu(menuItems, { role: session?.user.role, enabled }).map((item: any) => {
       if (item.id === "reports") {
         return reportsMenuItem;
       }
       return item;
     });
-  }, [reportsMenuItem]);
+  }, [reportsMenuItem, session?.user.role, mounted]);
 
   useEffect(() => {
     dispatch(fetchCompany());
