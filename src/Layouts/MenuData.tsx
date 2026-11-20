@@ -1,7 +1,7 @@
 // Platform icons mapping
 const platformIcons: { [key: string]: string } = {
   FACEBOOK: "ph-duotone ph-facebook-logo",
-  INSTAGRAM: "ph-duotone ph-instagram-logo", 
+  INSTAGRAM: "ph-duotone ph-instagram-logo",
   LINKEDIN: "ph-duotone ph-linkedin-logo",
   X: "ph-duotone ph-twitter-logo",
   TIKTOK: "ph-duotone ph-video",
@@ -12,7 +12,7 @@ const platformIcons: { [key: string]: string } = {
 const platformNames: { [key: string]: string } = {
   FACEBOOK: "Facebook",
   INSTAGRAM: "Instagram",
-  LINKEDIN: "LinkedIn", 
+  LINKEDIN: "LinkedIn",
   X: "X (Twitter)",
   TIKTOK: "TikTok",
   YOUTUBE: "YouTube",
@@ -26,24 +26,26 @@ const generateReportMenuItems = (integrations: any[] = []) => {
 
   // Filter for connected integrations
   const connectedIntegrations = integrations.filter(
-    (integration: any) => integration?.status?.toUpperCase() === "CONNECTED"
+    (integration: any) => integration?.status?.toUpperCase() === "CONNECTED",
   );
 
   // Generate menu items for each connected platform
-  const reportMenuItems = connectedIntegrations.map((integration: any, index: number) => {
-    const platformType = integration?.type?.toUpperCase();
-    const platformSlug = platformType?.toLowerCase();
-    
-    return {
-      id: `reports-${platformSlug}`,
-      label: platformNames[platformType] || `${platformType} Reports`,
-      icon: platformIcons[platformType] || "ph-duotone ph-chart-line",
-      link: `/reports/${platformSlug}`,
-      dataPage: `w_reports_${platformSlug}`,
-      parentId: "reports", // Group under main reports menu
-      order: index + 1,
-    };
-  });
+  const reportMenuItems = connectedIntegrations.map(
+    (integration: any, index: number) => {
+      const platformType = integration?.type?.toUpperCase();
+      const platformSlug = platformType?.toLowerCase();
+
+      return {
+        id: `reports-${platformSlug}`,
+        label: platformNames[platformType] || `${platformType} Reports`,
+        icon: platformIcons[platformType] || "ph-duotone ph-chart-line",
+        link: `/reports/${platformSlug}`,
+        dataPage: `w_reports_${platformSlug}`,
+        parentId: "reports", // Group under main reports menu
+        order: index + 1,
+      };
+    },
+  );
 
   // Add "All Platforms" report if there are multiple integrations
   if (connectedIntegrations.length > 1) {
@@ -85,11 +87,41 @@ export interface MenuEntry {
  * The existing social pages (Data, Statistics) live in the Social group.
  */
 const menuItems: MenuEntry[] = [
-  { id: "dashboard", label: "Dashboard", icon: "ph-duotone ph-gauge", link: "/dashboard", dataPage: null },
-  { id: "listening", label: "Listening", icon: "ph-duotone ph-ear", link: "/listening", feature: "listening" },
-  { id: "media", label: "Media", icon: "ph-duotone ph-newspaper", link: "/media", feature: "listening" },
-  { id: "competitors", label: "Competitors", icon: "ph-duotone ph-users-three", link: "/competitors", feature: "competitors" },
-  { id: "campaigns", label: "Campaigns", icon: "ph-duotone ph-megaphone", link: "/campaigns", feature: "campaigns" },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: "ph-duotone ph-gauge",
+    link: "/dashboard",
+    dataPage: null,
+  },
+  {
+    id: "listening",
+    label: "Listening",
+    icon: "ph-duotone ph-ear",
+    link: "/listening",
+    feature: "listening",
+  },
+  {
+    id: "media",
+    label: "Media",
+    icon: "ph-duotone ph-newspaper",
+    link: "/media",
+    feature: "listening",
+  },
+  {
+    id: "competitors",
+    label: "Competitors",
+    icon: "ph-duotone ph-users-three",
+    link: "/competitors",
+    feature: "competitors",
+  },
+  {
+    id: "campaigns",
+    label: "Campaigns",
+    icon: "ph-duotone ph-megaphone",
+    link: "/campaigns",
+    feature: "campaigns",
+  },
   {
     id: "paid-media",
     label: "Paid Media",
@@ -98,8 +130,20 @@ const menuItems: MenuEntry[] = [
     feature: "paidMedia",
     roles: ["ADMIN", "MANAGER", "MARKETER"],
   },
-  { id: "feedback", label: "Feedback", icon: "ph-duotone ph-chat-circle-text", link: "/feedback", feature: "feedback" },
-  { id: "insights", label: "Insights", icon: "ph-duotone ph-lightbulb", link: "/insights", feature: "insights" },
+  {
+    id: "feedback",
+    label: "Feedback",
+    icon: "ph-duotone ph-chat-circle-text",
+    link: "/feedback",
+    feature: "feedback",
+  },
+  {
+    id: "insights",
+    label: "Insights",
+    icon: "ph-duotone ph-lightbulb",
+    link: "/insights",
+    feature: "insights",
+  },
   {
     id: "reports",
     label: "Reports",
@@ -115,16 +159,49 @@ const menuItems: MenuEntry[] = [
     icon: "ph-duotone ph-share-network",
     type: "HASHMENU",
     submenu: [
-      { id: "data", label: "Data", icon: "ph-duotone ph-database", link: "/data", dataPage: "w_data", parentId: "social" },
-      { id: "statistics", label: "Statistics", icon: "ph-duotone ph-projector-screen-chart", link: "/statistics", dataPage: "w_statistics", parentId: "social" },
+      {
+        id: "data",
+        label: "Data",
+        icon: "ph-duotone ph-database",
+        link: "/data",
+        dataPage: "w_data",
+        parentId: "social",
+      },
+      {
+        id: "statistics",
+        label: "Statistics",
+        icon: "ph-duotone ph-projector-screen-chart",
+        link: "/statistics",
+        dataPage: "w_statistics",
+        parentId: "social",
+      },
     ],
   },
-  { id: "admin", label: "Admin", icon: "ph-duotone ph-shield-check", link: "/admin", feature: "adminConsole", roles: ["ADMIN"] },
+  {
+    id: "imports",
+    label: "Data imports",
+    icon: "ph-duotone ph-upload-simple",
+    link: "/admin/imports",
+    feature: "adminConsole",
+    roles: ["ADMIN", "MANAGER", "ANALYST"],
+  },
+  {
+    id: "admin",
+    label: "Admin",
+    icon: "ph-duotone ph-shield-check",
+    link: "/admin",
+    feature: "adminConsole",
+    roles: ["ADMIN"],
+  },
 ];
 
 /** Items this user may see: flags on, role allowed, and groups that still have something in them. */
-export function visibleMenu(items: MenuEntry[], options: { role: unknown; enabled: (name: FeatureName) => boolean }): MenuEntry[] {
-  const role = typeof options.role === "string" ? options.role.toUpperCase() : "";
+export function visibleMenu(
+  items: MenuEntry[],
+  options: { role: unknown; enabled: (name: FeatureName) => boolean },
+): MenuEntry[] {
+  const role =
+    typeof options.role === "string" ? options.role.toUpperCase() : "";
   return items.flatMap((item) => {
     if (item.feature && !options.enabled(item.feature)) return [];
     if (item.roles && !item.roles.includes(role as Role)) return [];
