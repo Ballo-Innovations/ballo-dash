@@ -8,6 +8,11 @@ describe("checkSignup", () => {
     expect(checkSignup(valid)).toEqual({});
   });
 
+  it("requires the confirmation to match", () => {
+    expect(checkSignup({ ...valid, confirmPassword: "a long sturdy password" })).toEqual({});
+    expect(checkSignup({ ...valid, confirmPassword: "something else" })).toEqual({ confirmPassword: "The passwords do not match" });
+  });
+
   it("flags each missing or malformed field", () => {
     expect(checkSignup({ companyName: " ", firstName: "", lastName: "", email: "nope", password: "short" })).toEqual({
       companyName: "Enter your company name",
