@@ -5,7 +5,7 @@
 | ID | Title | Priority | Phase | Hours | Status |
 |---|---|---|---|---|---|
 | F-01 | Feature flag helper isFeatureEnabled | P0 | 1 | 2 | DONE (staging) |
-| F-02 | Extend roles to ADMIN MANAGER ANALYST MARKETER COMMS READONLY | P0 | 1 | 4 | TODO |
+| F-02 | Extend roles to ADMIN MANAGER ANALYST MARKETER COMMS READONLY | P0 | 1 | 4 | DONE (staging) |
 | F-03 | Audit log table and withAudit wrapper | P0 | 1 | 5 | TODO |
 | F-04 | Drizzle schema v2: brands and sources | P0 | 1 | 4 | TODO |
 | F-05 | Drizzle schema v2: mentions topics metric_points | P0 | 1 | 5 | TODO |
@@ -36,15 +36,17 @@
 
 ## F-02 Extend roles to ADMIN MANAGER ANALYST MARKETER COMMS READONLY
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 4h
 - **Depends on:** H-12
 
 **Acceptance criteria**
 
-- [ ] Enum migration adds MARKETER, COMMS, READONLY and maps existing CLIENT users to READONLY
-- [ ] RequireRole helper
-- [ ] Capability matrix from kit 02-architecture/05 encoded in one module with a table-driven test for all 6 roles
+- [x] Enum migration adds MARKETER, COMMS, READONLY and maps existing CLIENT users to READONLY
+- [x] RequireRole helper
+- [x] Capability matrix from kit 02-architecture/05 encoded in one module with a table-driven test for all 6 roles
+
+**Notes:** API: migration 0002, `@RequireRole`, matrix in `src/common/rbac.ts`. Web: `src/lib/roles.ts` labels the six roles.
 
 ## F-03 Audit log table and withAudit wrapper
 

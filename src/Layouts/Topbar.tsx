@@ -10,6 +10,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable prefer-const */
 /* eslint-disable no-console */
+import { roleLabel } from "@/lib/roles";
 import { THEME_MODE } from "../Common/layoutConfig";
 import Link from "next/link";
 import Image from "next/image";
@@ -618,11 +619,7 @@ const TopBar = ({
                                         padding: "0.25rem",
                                       }}
                                     >
-                                      {session?.user.role === "ADMIN"
-                                        ? "Admin"
-                                        : session?.user.role === "USER"
-                                        ? ""
-                                        : session?.user.role}
+                                      {roleLabel(session?.user.role)}
                                     </small>
                                   </div>
                                 ) : (

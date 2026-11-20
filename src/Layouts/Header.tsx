@@ -1,4 +1,5 @@
 import React from "react";
+import { roleLabel } from "@/lib/roles";
 import Link from "next/link";
 import Image from "next/image";
 //import images
@@ -152,11 +153,7 @@ const Header = ({ themeMode }: any) => {
                 <div className="flex-grow-1 ms-3 me-2">
                   <h6 className="mb-0">{session?.user.name}</h6>
                   <small className="text-capitalize">
-                    {session?.user.role === "ADMIN"
-                      ? "Administrator"
-                      : session?.user.role === "USER"
-                      ? ""
-                      : session?.user.role}
+                    {roleLabel(session?.user.role)}
                   </small>
                 </div>
                 <Dropdown>
