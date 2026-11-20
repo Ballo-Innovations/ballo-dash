@@ -37,7 +37,7 @@ export const IMPORT_SOURCES: Record<
   },
   x: {
     label: "X post analytics",
-    icon: "ph-duotone ph-x-logo",
+    icon: "ph-duotone ph-twitter-logo",
     description: "Your posts with impressions, likes, reposts and replies.",
     sample: "/samples/imports/x.csv",
   },
