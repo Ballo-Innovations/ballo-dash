@@ -4,7 +4,7 @@
 
 | ID | Title | Priority | Phase | Hours | Status |
 |---|---|---|---|---|---|
-| F-01 | Feature flag helper isFeatureEnabled | P0 | 1 | 2 | TODO |
+| F-01 | Feature flag helper isFeatureEnabled | P0 | 1 | 2 | DONE (staging) |
 | F-02 | Extend roles to ADMIN MANAGER ANALYST MARKETER COMMS READONLY | P0 | 1 | 4 | TODO |
 | F-03 | Audit log table and withAudit wrapper | P0 | 1 | 5 | TODO |
 | F-04 | Drizzle schema v2: brands and sources | P0 | 1 | 4 | TODO |
@@ -20,17 +20,19 @@
 
 ## F-01 Feature flag helper isFeatureEnabled
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 2h
 - **Depends on:** H-08
 
 **Acceptance criteria**
 
-- [ ] NEXT_PUBLIC_FEATURE_* flags
-- [ ] Unset means on in development and off elsewhere
-- [ ] Server and client helpers
-- [ ] Nav items, pages and API routes can be gated by one call
-- [ ] Tests for both defaults
+- [x] NEXT_PUBLIC_FEATURE_* flags
+- [x] Unset means on in development and off elsewhere
+- [x] Server and client helpers
+- [x] Nav items, pages and API routes can be gated by one call
+- [x] Tests for both defaults
+
+**Notes:** Web: `isFeatureEnabled` / `isFeatureEnabledOnServer`, `withFeature(name, Page)` and `<FeatureGate>` (404 while off), `feature` on nav items (Header filters with `withEnabledFeatures`). API: `@RequireFeature(name)` with `FEATURE_*` variables, 404 while off.
 
 ## F-02 Extend roles to ADMIN MANAGER ANALYST MARKETER COMMS READONLY
 

@@ -64,7 +64,8 @@ const generateReportMenuItems = (integrations: any[] = []) => {
 /**
  * Sidebar items. Only real product pages belong here; the template's demo
  * entries were removed with the demo pages (H-07). New modules add their item
- * behind a feature flag (F-10).
+ * behind a feature flag (F-10): give it `feature: "listening"` (a FeatureName)
+ * and Header hides it while that flag is off.
  */
 const menuItems = [
   {

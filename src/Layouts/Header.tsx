@@ -6,6 +6,7 @@ import navCardBg from "../assets/images/layout/nav-card-bg.svg";
 import avatar1 from "../assets/images/user/avatar-1.jpg";
 import SimpleBar from "simplebar-react";
 import { menuItems } from "./MenuData";
+import { withEnabledFeatures } from "@/lib/feature-flags";
 import { useDynamicMenu } from "@/hooks/useDynamicMenu";
 import NestedMenu from "@/Layouts/NestedMenu";
 import { Dropdown } from "react-bootstrap";
@@ -28,7 +29,7 @@ const Header = ({ themeMode }: any) => {
 
   // Create dynamic menu items by replacing the reports item with the dynamic one
   const dynamicMenuItems = React.useMemo(() => {
-    return menuItems.map((item: any) => {
+    return withEnabledFeatures(menuItems as any[]).map((item: any) => {
       if (item.id === "reports") {
         return reportsMenuItem;
       }

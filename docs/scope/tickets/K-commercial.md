@@ -29,7 +29,7 @@
 
 ## K-02 Self-service sign-up, email verification, password reset
 
-- **Status:** DONE (dev)
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 5  **Estimate:** 10h
 - **Depends on:** H-13
 
@@ -42,7 +42,7 @@
 - [x] Duplicate email and weak password rejected with clear messages
 - [x] New company lands in the onboarding wizard (needs an email provider, decision D6)
 
-**Notes:** Email via the BalloAds developer API (decided 2026-11-20). Deployed to dev; staging after review. Passwords need 10+ characters. Rate limits: sign-up 10/hour, resend and forgot-password 5/hour per address.
+**Notes:** Email via the BalloAds developer API (decided 2026-11-20). Deployed to dev and staging (2026-11-20). The email provider refuses example.com addresses, so test with a real inbox. Passwords need 10+ characters. Rate limits: sign-up 10/hour, resend and forgot-password 5/hour per address.
 
 ## K-03 Plan limits for FREE PRO ENTERPRISE
 
