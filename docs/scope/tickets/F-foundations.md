@@ -12,7 +12,7 @@
 | F-06 | Drizzle schema v2: web events, goals, campaigns, media plan lines | P0 | 1 | 4 | DONE (staging) |
 | F-07 | Drizzle schema v2: surveys, alerts, insights, recommendations, forecasts, reports, ai_artifacts | P0 | 1 | 5 | DONE (staging) |
 | F-08 | Tenant isolation guard and tests | P0 | 1 | 6 | TODO |
-| F-09 | Helpers: money, dates, period ranges | P0 | 1 | 4 | TODO |
+| F-09 | Helpers: money, dates, period ranges | P0 | 1 | 4 | DONE (staging) |
 | F-10 | New sidebar navigation in the existing template shell | P0 | 1 | 5 | TODO |
 | F-11 | Top bar: period picker, brand filter, alert bell | P0 | 1 | 6 | TODO |
 | F-12 | Shared components: KpiCard, SourceChip, SentimentPill, Drawer, SeriesChart, DataTable, skeletons, empty and error states | P0 | 1 | 10 | TODO |
@@ -130,14 +130,16 @@
 
 ## F-09 Helpers: money, dates, period ranges
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 4h
 - **Depends on:** none
 
 **Acceptance criteria**
 
-- [ ] FormatMoney (minor units, company currency, ZMW default), UTC storage with company timezone display (Africa/Lusaka default), day/week/month/quarter ranges with prior-period comparison
-- [ ] Unit tests including month and DST boundaries
+- [x] FormatMoney (minor units, company currency, ZMW default), UTC storage with company timezone display (Africa/Lusaka default), day/week/month/quarter ranges with prior-period comparison
+- [x] Unit tests including month and DST boundaries
+
+**Notes:** `src/lib/money.ts` (formatMoney, toMinorUnits; ZMW written K1,234.50 on every engine) and `src/lib/periods.ts` (Intl only, no date library; ranges are half-open UTC instants on local midnights, weeks start Monday). Tests cover leap February, year end, and the Europe/London 23 and 25 hour days. No UI uses them yet; the A and P epics will.
 
 ## F-10 New sidebar navigation in the existing template shell
 
