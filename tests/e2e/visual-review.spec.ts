@@ -19,8 +19,8 @@ test("capture product pages", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/login");
   await page.screenshot({ path: `${dir}/login-1440.png` });
-  await page.getByPlaceholder("Username").fill(process.env.E2E_EMAIL!);
-  await page.getByPlaceholder("Password").fill(process.env.E2E_PASSWORD!);
+  await page.getByLabel("Email").fill(process.env.E2E_EMAIL!);
+  await page.getByLabel("Password", { exact: true }).fill(process.env.E2E_PASSWORD!);
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/login"));
 

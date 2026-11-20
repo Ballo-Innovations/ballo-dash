@@ -1,150 +1,98 @@
-"use client";
-
-import NavBar from "@views/Landing/Navbar";
-import React, { useState } from "react";
-import { Lock, UserRound, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { useState, type FormEvent } from "react";
+import { Lock, Mail } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
+import { AuthField, AuthNotice, AuthShell, PasswordField } from "@/components/auth/AuthShell";
+import { postJson } from "@/lib/api-client";
 import { safeCallbackUrl } from "@/lib/safe-redirect";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [resent, setResent] = useState(false);
   const searchParams = useSearchParams();
   const callbackUrl = safeCallbackUrl(searchParams?.get("callbackUrl"));
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // Read from the form, not React state: values typed or autofilled before
+    // hydration never reach state.
+    const form = new FormData(event.currentTarget);
+    const email = String(form.get("username") ?? "");
+    const password = String(form.get("password") ?? "");
     setLoading(true);
-    const toastId = toast.loading("Logging in...");
+    setUnverifiedEmail(null);
+    setResent(false);
 
-    // Read from the form, not React state: values typed (or autofilled) before
-    // hydration never reach state, and would otherwise be submitted as empty.
-    const form = new FormData(e.currentTarget as HTMLFormElement);
-    let message = "Could not reach the server. Check your connection and try again.";
-    try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({
-          email: String(form.get("username") ?? username),
-          password: String(form.get("password") ?? password),
-        }),
-      });
-      if (response.ok) {
-        toast.success("Signed in", { id: toastId });
-        // Full page load, not router.push: links prefetched while signed out
-        // (for example "Dashboard" in the top bar) are cached as redirects to
-        // /login, and a client-side push would replay that redirect.
-        window.location.assign(callbackUrl);
-        return;
-      }
-      const problem = await response.json().catch(() => null);
-      message =
-        response.status === 401
-          ? "Invalid email or password"
-          : problem?.error?.message ?? "Sign-in failed. Try again in a moment.";
-    } catch {
-      /* network error: keep the default message */
+    const result = await postJson("/api/auth/login", { email, password });
+    if (result.ok) {
+      toast.success("Signed in");
+      // Full page load, not router.push: links prefetched while signed out are
+      // cached as redirects to /login, and a client-side push would replay them.
+      window.location.assign(callbackUrl);
+      return;
     }
-    toast.error(message, { id: toastId });
-
     setLoading(false);
+    const details = result.error.details as { reason?: string } | undefined;
+    if (details?.reason === "email_not_verified") {
+      setUnverifiedEmail(email.trim());
+      return;
+    }
+    toast.error(result.status === 401 ? "Invalid email or password" : result.error.message);
+  };
+
+  const resend = async () => {
+    if (!unverifiedEmail) return;
+    await postJson("/api/auth/resend-verification", { email: unverifiedEmail });
+    setResent(true);
   };
 
   return (
-    <section id="login-section">
-      <NavBar />
-      <div className="home container-fluid">
-        <video
-          className="home-bg-video"
-          muted
-          loop
-          autoPlay
-          playsInline
-          src="/videos/background.mp4"
+    <AuthShell title="Log in">
+      <form className="login-form" method="post" onSubmit={handleLogin}>
+        {unverifiedEmail && (
+          <AuthNotice tone="error">
+            Confirm your email address first. Check your inbox for the link from Ballo Dash.{" "}
+            <button type="button" className="auth-inline-button" onClick={resend} disabled={resent}>
+              {resent ? "Link sent again" : "Send the link again"}
+            </button>
+          </AuthNotice>
+        )}
+        <AuthField
+          id="username"
+          label="Email"
+          type="email"
+          icon={<Mail color="white" size={20} aria-hidden="true" />}
+          placeholder="you@company.com"
+          autoComplete="username"
+          required
         />
-        <div className="home-content-wrapper">
-          <div className="login-container">
-            <h2 className="login-title">Log in</h2>
-            <form className="login-form" method="post" onSubmit={handleLogin}>
-              <div className="form-group">
-                <label className="form-label">Email</label>
-                <div className="form-input-wrapper gap-2">
-                  <UserRound color="white" size={20} />
-                  <input
-                    type="text"
-                    placeholder="Username"
-                    className="form-input"
-                    name="username"
-                    autoComplete="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Password</label>
-                <div
-                  className="form-input-wrapper gap-2"
-                  style={{ position: "relative" }}
-                >
-                  <Lock color="white" size={20} />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Password"
-                    className="form-input"
-                    name="password"
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    className="eye-button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    style={{ background: "none", border: "none" }}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? (
-                      <EyeOff size={20} color="white" />
-                    ) : (
-                      <Eye size={20} color="white" />
-                    )}
-                  </button>
-                </div>
-              </div>
-              <div className="form-options">
-                <label className="remember-me">
-                  <input type="checkbox" />
-                  Remember Me
-                </label>
-                <a href="#" className="forgot-link">
-                  Forgot Password?
-                </a>
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                style={loading ? { opacity: 0.5, cursor: "not-allowed" } : {}}
-                className="login-button"
-              >
-                Sign in
-              </button>
-              {/* <p className="signup-text">
-                or{" "}
-                <a href="#" className="signup-link">
-                  Sign up
-                </a>
-              </p> */}
-            </form>
-          </div>
+        <PasswordField
+          id="password"
+          label="Password"
+          icon={<Lock color="white" size={20} aria-hidden="true" />}
+          placeholder="Password"
+          autoComplete="current-password"
+          required
+        />
+        <div className="form-options">
+          <span />
+          <Link href="/forgot-password" className="forgot-link">
+            Forgot password?
+          </Link>
         </div>
-      </div>
-    </section>
+        <button type="submit" disabled={loading} aria-busy={loading} className="login-button">
+          {loading ? "Signing in..." : "Sign in"}
+        </button>
+        <p className="signup-text">
+          New to Ballo Dash?{" "}
+          <Link href="/signup" className="signup-link">
+            Create an account
+          </Link>
+        </p>
+      </form>
+    </AuthShell>
   );
 };
 

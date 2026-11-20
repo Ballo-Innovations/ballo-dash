@@ -25,16 +25,16 @@ test.describe("access control", () => {
 test.describe("signed in", () => {
   test("wrong password shows a clear error", async ({ page }) => {
     await page.goto("/login");
-    await page.getByPlaceholder("Username").fill(process.env.E2E_EMAIL!);
-    await page.getByPlaceholder("Password").fill("not-the-password");
+    await page.getByLabel("Email").fill(process.env.E2E_EMAIL!);
+    await page.getByLabel("Password", { exact: true }).fill("not-the-password");
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page.getByText("Invalid email or password")).toBeVisible();
   });
 
   test("an admin can sign in, reach the dashboard and call the API", async ({ page }) => {
     await page.goto("/login?callbackUrl=%2Fdashboard");
-    await page.getByPlaceholder("Username").fill(process.env.E2E_EMAIL!);
-    await page.getByPlaceholder("Password").fill(process.env.E2E_PASSWORD!);
+    await page.getByLabel("Email").fill(process.env.E2E_EMAIL!);
+    await page.getByLabel("Password", { exact: true }).fill(process.env.E2E_PASSWORD!);
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/dashboard$/);
 
@@ -48,8 +48,8 @@ test.describe("signed in", () => {
 
   test("every sidebar link opens a real page", async ({ page }) => {
     await page.goto("/login");
-    await page.getByPlaceholder("Username").fill(process.env.E2E_EMAIL!);
-    await page.getByPlaceholder("Password").fill(process.env.E2E_PASSWORD!);
+    await page.getByLabel("Email").fill(process.env.E2E_EMAIL!);
+    await page.getByLabel("Password", { exact: true }).fill(process.env.E2E_PASSWORD!);
     await page.getByRole("button", { name: "Sign in" }).click();
     await page.waitForURL((url) => !url.pathname.startsWith("/login"));
 
@@ -66,8 +66,8 @@ test.describe("signed in", () => {
 
   test("signing out ends the session", async ({ page }) => {
     await page.goto("/login");
-    await page.getByPlaceholder("Username").fill(process.env.E2E_EMAIL!);
-    await page.getByPlaceholder("Password").fill(process.env.E2E_PASSWORD!);
+    await page.getByLabel("Email").fill(process.env.E2E_EMAIL!);
+    await page.getByLabel("Password", { exact: true }).fill(process.env.E2E_PASSWORD!);
     await page.getByRole("button", { name: "Sign in" }).click();
     await page.waitForURL((url) => !url.pathname.startsWith("/login"));
     expect((await page.request.get("/api/auth/me")).status()).toBe(200);
@@ -80,8 +80,8 @@ test.describe("signed in", () => {
 
   test("an external callbackUrl is ignored", async ({ page }) => {
     await page.goto("/login?callbackUrl=https%3A%2F%2Fevil.example");
-    await page.getByPlaceholder("Username").fill(process.env.E2E_EMAIL!);
-    await page.getByPlaceholder("Password").fill(process.env.E2E_PASSWORD!);
+    await page.getByLabel("Email").fill(process.env.E2E_EMAIL!);
+    await page.getByLabel("Password", { exact: true }).fill(process.env.E2E_PASSWORD!);
     await page.getByRole("button", { name: "Sign in" }).click();
     await page.waitForURL((url) => url.origin === new URL(page.url()).origin && !url.pathname.startsWith("/login"));
     expect(new URL(page.url()).hostname).not.toBe("evil.example");

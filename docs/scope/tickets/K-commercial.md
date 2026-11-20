@@ -5,7 +5,7 @@
 | ID | Title | Priority | Phase | Hours | Status |
 |---|---|---|---|---|---|
 | K-01 | Company onboarding wizard | P0 | 5 | 10 | TODO |
-| K-02 | Self-service sign-up, email verification, password reset | P0 | 5 | 10 | TODO |
+| K-02 | Self-service sign-up, email verification, password reset | P0 | 5 | 10 | DONE (dev) |
 | K-03 | Plan limits for FREE PRO ENTERPRISE | P0 | 5 | 8 | TODO |
 | K-04 | Demo workspace seed | P0 | 3 | 10 | TODO |
 | K-05 | Error tracking and health check | P1 | 5 | 5 | TODO |
@@ -29,18 +29,20 @@
 
 ## K-02 Self-service sign-up, email verification, password reset
 
-- **Status:** TODO
+- **Status:** DONE (dev)
 - **Priority:** P0  **Phase:** 5  **Estimate:** 10h
 - **Depends on:** H-13
 
 **Acceptance criteria**
 
-- [ ] Sign-up creates a company and its admin user
-- [ ] Email verified before access
-- [ ] Reset link single use and time limited
-- [ ] Sign-up, login and reset rate limited
-- [ ] Duplicate email and weak password rejected with clear messages
-- [ ] New company lands in the onboarding wizard (needs an email provider, decision D6)
+- [x] Sign-up creates a company and its admin user
+- [x] Email verified before access
+- [x] Reset link single use and time limited
+- [x] Sign-up, login and reset rate limited
+- [x] Duplicate email and weak password rejected with clear messages
+- [x] New company lands in the onboarding wizard (needs an email provider, decision D6)
+
+**Notes:** Email via the BalloAds developer API (decided 2026-11-20). Deployed to dev; staging after review. Passwords need 10+ characters. Rate limits: sign-up 10/hour, resend and forgot-password 5/hour per address.
 
 ## K-03 Plan limits for FREE PRO ENTERPRISE
 
