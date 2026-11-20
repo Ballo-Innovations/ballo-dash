@@ -32,7 +32,7 @@ const BreadcrumbItem: React.FC<BreadcrumbItemProps> = ({
                 </li>
                 {mainTitle && (
                   <li className="breadcrumb-item">
-                    <Link href="#">{mainTitle}</Link>
+                    <span>{mainTitle}</span>
                   </li>
                 )}
                 {subTitle && (
