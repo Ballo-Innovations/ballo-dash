@@ -40,12 +40,12 @@ export default function ResetPasswordPage() {
   if (router.isReady && !token) {
     return (
       <AuthShell title="Reset your password">
-        <AuthNotice tone="error">This link is incomplete.</AuthNotice>
-        <p className="signup-text">
-          <Link href="/forgot-password" className="signup-link">
+        <div className="auth-centered">
+          <AuthNotice tone="error">This link is incomplete.</AuthNotice>
+          <Link href="/forgot-password" className="auth-secondary-button auth-single-action">
             Request a new link
           </Link>
-        </p>
+        </div>
       </AuthShell>
     );
   }

@@ -54,18 +54,20 @@ export default function SignupPage() {
   if (sentTo) {
     return (
       <AuthShell title="Check your inbox">
-        <AuthNotice tone="success">
-          We sent a confirmation link to <strong>{sentTo}</strong>. Open it within 24 hours to finish creating your account.
-        </AuthNotice>
-        <p className="auth-text">Nothing there? Check spam, or send the link again.</p>
-        <button type="button" className="login-button" onClick={resend} disabled={resent}>
-          {resent ? "Link sent again" : "Send the link again"}
-        </button>
-        <p className="signup-text">
-          <Link href="/login" className="signup-link">
-            Back to sign in
-          </Link>
-        </p>
+        <div className="auth-centered">
+          <AuthNotice tone="success">
+            We sent a confirmation link to <strong>{sentTo}</strong>. Open it within 24 hours to finish creating your account.
+          </AuthNotice>
+          <p className="auth-text">Nothing there? Check spam, or send the link again.</p>
+          <div className="auth-actions">
+            <Link href="/login" className="auth-secondary-button">
+              Back to sign in
+            </Link>
+            <button type="button" className="login-button" onClick={resend} disabled={resent}>
+              {resent ? "Link sent again" : "Send the link again"}
+            </button>
+          </div>
+        </div>
       </AuthShell>
     );
   }
