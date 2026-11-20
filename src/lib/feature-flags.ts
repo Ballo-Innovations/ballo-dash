@@ -131,3 +131,13 @@ export function isFeatureEnabled(name: FeatureName): boolean {
 export function isFeatureEnabledOnServer(name: FeatureName): boolean {
   return resolveFlag({ env: envValues()[name], isDevelopment });
 }
+
+/** Drops items (and submenu items) whose `feature` flag is off. Items without a `feature` always stay. */
+export function withEnabledFeatures<T extends { feature?: FeatureName; submenu?: T[] }>(
+  items: T[],
+  enabled: (name: FeatureName) => boolean = isFeatureEnabled
+): T[] {
+  return items
+    .filter((item) => !item.feature || enabled(item.feature))
+    .map((item) => (item.submenu ? { ...item, submenu: withEnabledFeatures(item.submenu, enabled) } : item));
+}

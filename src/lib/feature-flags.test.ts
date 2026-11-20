@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { FEATURES, FEATURE_ENV_VARS, isFeatureEnabledOnServer, parseFeatureParam, resolveFlag } from "./feature-flags";
+import { FEATURES, FEATURE_ENV_VARS, isFeatureEnabledOnServer, parseFeatureParam, resolveFlag, withEnabledFeatures, type FeatureName } from "./feature-flags";
 
 afterEach(() => vi.unstubAllEnvs());
 
@@ -42,5 +42,31 @@ describe("isFeatureEnabledOnServer", () => {
 
   it("has an env var for every feature", () => {
     for (const name of FEATURES) expect(FEATURE_ENV_VARS[name]).toMatch(/^NEXT_PUBLIC_FEATURE_[A-Z0-9_]+$/);
+  });
+});
+
+describe("withEnabledFeatures", () => {
+  type Item = { id: string; feature?: FeatureName; submenu?: Item[] };
+  const items: Item[] = [
+    { id: "dashboard" },
+    { id: "listening", feature: "listening" },
+    { id: "reports", submenu: [{ id: "overview" }, { id: "v2", feature: "reportsV2" }] },
+  ];
+
+  it("keeps everything when every flag is on", () => {
+    const result = withEnabledFeatures(items, () => true);
+    expect(result.map((item) => item.id)).toEqual(["dashboard", "listening", "reports"]);
+    expect(result[2].submenu?.map((item) => item.id)).toEqual(["overview", "v2"]);
+  });
+
+  it("drops gated items and gated submenu items when flags are off", () => {
+    const result = withEnabledFeatures(items, () => false);
+    expect(result.map((item) => item.id)).toEqual(["dashboard", "reports"]);
+    expect(result[1].submenu?.map((item) => item.id)).toEqual(["overview"]);
+  });
+
+  it("follows the environment by default", () => {
+    vi.stubEnv("NEXT_PUBLIC_FEATURE_LISTENING", "false");
+    expect(withEnabledFeatures(items).map((item) => item.id)).not.toContain("listening");
   });
 });
