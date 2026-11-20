@@ -29,7 +29,7 @@
 
   --bs-heading-color: #fafafa;
   --bs-body-color: #bfbfbf;
-  --bs-body-color-rgb: to-rgb(#bfbfbf);
+  --bs-body-color-rgb: #{to-rgb(#bfbfbf)};
   --bs-border-color: #{lighten($dark-layout-color, 15%)};
 
   --ck-color-image-caption-background: #{lighten($dark-layout-color, 4%)};

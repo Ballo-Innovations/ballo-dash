@@ -29,7 +29,7 @@ File: style.css
     --bs-link-color: #{$pc-primary};
     --bs-link-color-rgb: #{$color-rgb};
     --bs-link-hover-color: #{shift-color($pc-primary, $link-shade-percentage)};
-    --bs-link-hover-color-rgb: to-rgb(shift-color($pc-primary, $link-shade-percentage));
+    --bs-link-hover-color-rgb: #{to-rgb(shift-color($pc-primary, $link-shade-percentage))};
 
     --dt-row-selected: #{to-rgb($pc-primary)};
 

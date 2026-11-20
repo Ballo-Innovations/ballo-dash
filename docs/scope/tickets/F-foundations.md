@@ -15,7 +15,7 @@
 | F-09 | Helpers: money, dates, period ranges | P0 | 1 | 4 | DONE (staging) |
 | F-10 | New sidebar navigation in the existing template shell | P0 | 1 | 5 | DONE (staging) |
 | F-11 | Top bar: period picker, brand filter, alert bell | P0 | 1 | 6 | DONE (staging) |
-| F-12 | Shared components: KpiCard, SourceChip, SentimentPill, Drawer, SeriesChart, DataTable, skeletons, empty and error states | P0 | 1 | 10 | TODO |
+| F-12 | Shared components: KpiCard, SourceChip, SentimentPill, Drawer, SeriesChart, DataTable, skeletons, empty and error states | P0 | 1 | 10 | DONE (staging) |
 | F-13 | Global search (Cmd+K) across mentions topics campaigns surveys | P2 | 5 | 5 | TODO |
 
 ## F-01 Feature flag helper isFeatureEnabled
@@ -175,16 +175,18 @@
 
 ## F-12 Shared components: KpiCard, SourceChip, SentimentPill, Drawer, SeriesChart, DataTable, skeletons, empty and error states
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 10h
 - **Depends on:** F-10
 
 **Acceptance criteria**
 
-- [ ] Built on template cards, badges, react-bootstrap Offcanvas and ApexCharts
-- [ ] SeriesChart supports a dashed forecast line with a band
-- [ ] Semantic colour tokens for sentiment, alert severity, billing status and source kind added to the SCSS variables for both themes with AA contrast
-- [ ] A /dev/components page renders every component in every state
+- [x] Built on template cards, badges, react-bootstrap Offcanvas and ApexCharts
+- [x] SeriesChart supports a dashed forecast line with a band
+- [x] Semantic colour tokens for sentiment, alert severity, billing status and source kind added to the SCSS variables for both themes with AA contrast
+- [x] A /dev/components page renders every component in every state
+
+**Notes:** `src/components/ui` (KpiCard with definition tooltip and source chip, SourceChip, SentimentPill, SeverityBadge, BillingBadge, Drawer on Offcanvas, SeriesChart on ApexCharts with dashed forecast and band, sortable DataTable, Skeleton, EmptyState, ErrorState). Tokens in `_semantic-tokens.scss`; `tokens.test.ts` checks all 15 pairs at 4.5:1 in both themes. `/dev/components` renders every state in development only (404 elsewhere unless NEXT_PUBLIC_SHOW_DEV_PAGES=true). Also fixed the template dark theme, which set `--bs-body-color-rgb` to the literal text `to-rgb(#bfbfbf)`. Checked in Playwright at 1280 and 375 px, light and dark, keyboard (sort, open row, Escape).
 
 ## F-13 Global search (Cmd+K) across mentions topics campaigns surveys
 
