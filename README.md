@@ -48,6 +48,11 @@ npm run dev               # http://localhost:3000
 | `npm test` | Unit tests (Vitest) |
 | `npm run build` | Production build |
 | `npm run test:e2e` | Playwright against `next start` and a local API (build first) |
+| `npm run check` | Lint, types, unit tests, production build |
+| `npm run deploy:staging -- <branch>` | Full checks on a clean copy of the pushed branch, then deploy to https://ballo-dash-staging.vercel.app |
+
+There is no GitHub Actions CI. A pre-push hook (`.githooks/pre-push`, enabled by `npm install`) runs lint,
+types and unit tests; the staging deploy runs the full suite on the exact commit it deploys.
 
 ## Project layout
 

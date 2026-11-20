@@ -11,7 +11,10 @@
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build",
+    "deploy:staging": "scripts/deploy-staging.sh",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

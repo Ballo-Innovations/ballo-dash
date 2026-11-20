@@ -203,12 +203,13 @@ The backend has its own copy and appendix in `ballo-dash-api/docs/QUALITY_ASSURA
 | Unit | `npm test` | Vitest, `src/**/*.test.ts`. |
 | End-to-end | `npm run build && npm run test:e2e` | Playwright against `next start` and a running local API. |
 | Build | `npm run build` | Turbopack. Invalid CSS fails the build. |
-| Dependencies | `npm audit --omit=dev --audit-level=high` | Runs in CI. |
-| Secrets | gitleaks CLI | Runs in CI. |
+| Dependencies | `npm audit --omit=dev --audit-level=high` | Runs in `npm run deploy:staging`. |
+| Secrets | gitleaks | Run `gitleaks git --redact` before pushing (no hosted CI). |
 
 ### Known gaps (2026-11-20)
 
-- End-to-end tests are not in CI yet (they need the API running); run them locally before merging UI changes.
+- No hosted CI (decided 2026-11-20): checks run in the pre-push hook and in `npm run deploy:staging`.
+- End-to-end tests need the API running; run them locally before merging UI changes.
 - Visual review is manual (Playwright screenshot helper `tests/e2e/visual-review.spec.ts`); no baselines.
 - No automated accessibility scan yet (ticket Q-03). Known: statistics figures have low contrast in dark mode.
 - 11 React Compiler lint findings in template-era components are warnings, not errors, until rebuilt.

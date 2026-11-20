@@ -25,5 +25,10 @@ implement, test, then set the ticket's **Status** and tick verified criteria in 
 - **Global CSS** may only be imported from `src/pages/_app.tsx`. Turbopack's CSS parser is strict: invalid
   CSS fails the build.
 
+## Checks and deploys
+No GitHub Actions. The pre-push hook runs lint, types and unit tests. Before merging, run
+`npm run deploy:staging -- <branch>` (full checks on the pushed commit, then a staging deploy) and put the
+result in the PR. Never run `vercel deploy` by hand against the live project.
+
 ## Commands
 `npm run lint && npm run typecheck && npm test && npm run build`
