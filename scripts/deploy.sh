@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Deploy the web app to the Vercel staging project (ballo-dash-staging,
-# team ballo-innovations) from a PUSHED ref, after the full check suite.
+# Deploy the web app to a Vercel environment (team ballo-innovations) from a
+# PUSHED ref, after the full check suite.
 #
-#   scripts/deploy-staging.sh                       # origin/main
-#   scripts/deploy-staging.sh feat/platform-split   # a pushed branch, for review
-#   DRY_RUN=1 scripts/deploy-staging.sh ...          # checks only
+#   scripts/deploy.sh dev                        # origin/dev   -> ballo-dash-dev
+#   scripts/deploy.sh staging                    # origin/main  -> ballo-dash-staging
+#   scripts/deploy.sh staging feat/some-branch   # a pushed branch, for review
+#   DRY_RUN=1 scripts/deploy.sh dev ...          # checks only
 #
 # Never deploys your working tree: it checks out the exact pushed commit into a
 # temporary worktree, runs lint, types, unit tests, the production build and the
@@ -12,10 +13,14 @@
 # The live project (ballo-dash, team balloinnovations-projects) is NOT touched.
 set -euo pipefail
 
-REF="${1:-main}"
+ENVIRONMENT="${1:-}"
 SCOPE="ballo-innovations"
-PROJECT="ballo-dash-staging"
-API_ORIGIN_STAGING="https://api-dash-staging.169-58-121-60.sslip.io"
+case "$ENVIRONMENT" in
+  dev)     PROJECT="ballo-dash-dev";     DEFAULT_REF="dev";  API_ORIGIN_ENV="https://api-dash-dev.169-58-121-60.sslip.io" ;;
+  staging) PROJECT="ballo-dash-staging"; DEFAULT_REF="main"; API_ORIGIN_ENV="https://api-dash-staging.169-58-121-60.sslip.io" ;;
+  *) echo "usage: scripts/deploy.sh dev|staging [pushed-branch]" >&2; exit 2 ;;
+esac
+REF="${2:-$DEFAULT_REF}"
 
 repo="$(git rev-parse --show-toplevel)"
 cd "$repo"
@@ -34,7 +39,7 @@ npm ci --no-audit --no-fund --loglevel=error
 echo "checks: lint";       npm run --silent lint >/dev/null
 echo "checks: types";      npm run --silent typecheck
 echo "checks: unit tests"; npx vitest run --reporter=dot | tail -3
-echo "checks: build";      API_ORIGIN="$API_ORIGIN_STAGING" npx next build >/dev/null
+echo "checks: build";      API_ORIGIN="$API_ORIGIN_ENV" npx next build >/dev/null
 echo "checks: audit";      npm audit --omit=dev --audit-level=high
 echo "checks: PASSED for $commit"
 
