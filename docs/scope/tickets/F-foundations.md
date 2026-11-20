@@ -14,7 +14,7 @@
 | F-08 | Tenant isolation guard and tests | P0 | 1 | 6 | DONE (staging) |
 | F-09 | Helpers: money, dates, period ranges | P0 | 1 | 4 | DONE (staging) |
 | F-10 | New sidebar navigation in the existing template shell | P0 | 1 | 5 | DONE (staging) |
-| F-11 | Top bar: period picker, brand filter, alert bell | P0 | 1 | 6 | TODO |
+| F-11 | Top bar: period picker, brand filter, alert bell | P0 | 1 | 6 | DONE (staging) |
 | F-12 | Shared components: KpiCard, SourceChip, SentimentPill, Drawer, SeriesChart, DataTable, skeletons, empty and error states | P0 | 1 | 10 | TODO |
 | F-13 | Global search (Cmd+K) across mentions topics campaigns surveys | P2 | 5 | 5 | TODO |
 
@@ -160,16 +160,18 @@
 
 ## F-11 Top bar: period picker, brand filter, alert bell
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 6h
 - **Depends on:** F-10
 
 **Acceptance criteria**
 
-- [ ] 7d/30d/90d/custom period and brand filter stored in the URL and shared by all pages
-- [ ] Bell shows the open alert count
-- [ ] Built from the template's Topbar and dropdown styles
-- [ ] Keyboard accessible
+- [x] 7d/30d/90d/custom period and brand filter stored in the URL and shared by all pages
+- [x] Bell shows the open alert count
+- [x] Built from the template's Topbar and dropdown styles
+- [x] Keyboard accessible
+
+**Notes:** `?period=7d|30d|90d|custom&from&to&brand=` parsed by `src/lib/filters.ts` (unit tested; invalid values fall back to 30 days) and shared through `useFilters`. API: GET /api/brands and GET /api/alerts/open. The bell replaces the template's demo notifications and refreshes every minute and on focus. Checked in Playwright at 1280 and 375 px, light and dark, keyboard, custom range, filters carried across pages, no hydration errors.
 
 ## F-12 Shared components: KpiCard, SourceChip, SentimentPill, Drawer, SeriesChart, DataTable, skeletons, empty and error states
 

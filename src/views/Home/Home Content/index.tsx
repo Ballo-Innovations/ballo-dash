@@ -1,5 +1,6 @@
 "use client";
 
+import { formatRange, periodRange } from "@/lib/periods";
 import { useState } from "react";
 import {
   DndContext,
@@ -254,7 +255,7 @@ const initialData: Record<TimeFrame, TabContent> = {
 
 function getWeekNumber(date: Date): number {
   const d = new Date(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
   );
   const dayNum = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
@@ -262,19 +263,9 @@ function getWeekNumber(date: Date): number {
   return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 }
 
+/** "16 to 22 Nov 2026": the Monday-to-Sunday week in the company zone, identical on server and browser. */
 function getWeekDateRange(date: Date): string {
-  const day = date.getDay();
-  const diffToMonday = date.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(date.setDate(diffToMonday));
-  const sunday = new Date(date.setDate(monday.getDate() + 6));
-  const options: Intl.DateTimeFormatOptions = {
-    month: "short",
-    day: "numeric",
-  };
-  return `${monday.toLocaleDateString(
-    undefined,
-    options
-  )} – ${sunday.toLocaleDateString(undefined, options)}`;
+  return formatRange("week", periodRange("week", date));
 }
 
 function SortableRow({
@@ -452,7 +443,7 @@ export default function WeeklyPlanTabs() {
   const getTimeframeLabel = (frame: TimeFrame): string => {
     const now = new Date();
     const year = now.getFullYear();
-    const month = now.toLocaleString("default", { month: "long" });
+    const month = now.toLocaleString("en-GB", { month: "long", timeZone: "Africa/Lusaka" });
     const weekNumber = getWeekNumber(now);
     const quarter = Math.floor(now.getMonth() / 3) + 1;
 
@@ -468,13 +459,22 @@ export default function WeeklyPlanTabs() {
     }
   };
 
+  /**
+   * Replaces the current timeframe's task list without mutating earlier state. Mutating in place made
+   * React's double-invoked updaters (development) add new tasks twice and undo checkbox toggles.
+   */
+  const updateToday = (change: (today: Task[]) => Task[]) => {
+    setPlanData((prev) => ({
+      ...prev,
+      [selectedTimeFrame]: {
+        ...prev[selectedTimeFrame],
+        plan: { ...prev[selectedTimeFrame].plan, today: change(prev[selectedTimeFrame].plan.today) },
+      },
+    }));
+  };
+
   const toggleTaskCompletion = (taskIndex: number) => {
-    setPlanData((prev) => {
-      const updated = { ...prev };
-      const task = updated[selectedTimeFrame].plan.today[taskIndex];
-      task.completed = !task.completed;
-      return updated;
-    });
+    updateToday((today) => today.map((task, idx) => (idx === taskIndex ? { ...task, completed: !task.completed } : task)));
   };
 
   const handleDragEnd = (event: any) => {
@@ -485,11 +485,7 @@ export default function WeeklyPlanTabs() {
     const newIndex = framePlan.today.findIndex((t) => t.id === over.id);
 
     const newTasks = arrayMove(framePlan.today, oldIndex, newIndex);
-    setPlanData((prev) => {
-      const updated = { ...prev };
-      updated[selectedTimeFrame].plan.today = newTasks;
-      return updated;
-    });
+    updateToday(() => newTasks);
   };
 
   const handleEdit = (idx: number, task: Task) => {
@@ -515,23 +511,13 @@ export default function WeeklyPlanTabs() {
   };
 
   const handleSave = (idx: number) => {
-    setPlanData((prev) => {
-      const updated = { ...prev };
-      updated[selectedTimeFrame].plan.today[idx] = { ...editFormData };
-      return updated;
-    });
+    updateToday((today) => today.map((task, i) => (i === idx ? { ...editFormData } : task)));
     handleCancel();
   };
 
   const confirmDeleteTask = () => {
     if (deleteIndex === null) return;
-    setPlanData((prev) => {
-      const updated = { ...prev };
-      updated[selectedTimeFrame].plan.today = updated[
-        selectedTimeFrame
-      ].plan.today.filter((_, idx) => idx !== deleteIndex);
-      return updated;
-    });
+    updateToday((today) => today.filter((_, idx) => idx !== deleteIndex));
     setShowDeleteModal(false);
     setDeleteIndex(null);
     handleCancel();
@@ -557,11 +543,7 @@ export default function WeeklyPlanTabs() {
       budget: "",
       kpi: "",
     };
-    setPlanData((prev) => {
-      const updated = { ...prev };
-      updated[selectedTimeFrame].plan.today.unshift(newTask);
-      return updated;
-    });
+    updateToday((today) => [newTask, ...today]);
     setEditRowIndex(0);
     setEditFormData(newTask);
   };
@@ -604,31 +586,34 @@ export default function WeeklyPlanTabs() {
             </button> */}
           </div>
 
-          <div className="table-responsive">
-            <table className="table table-bordered">
-              <thead className="table-light">
-                <tr>
-                  <th>
-                    <CirclePlus
-                      onClick={handleAddTask}
-                      // color="forestgreen"
-                      className=""
-                    />
-                  </th>
-                  <th>Plan</th>
-                  <th>Content Type</th>
-                  <th>Platform</th>
-                  <th>Budget</th>
-                  <th>KPIs</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
+          {/* DndContext sits outside the table: it renders a screen-reader <div>, which is invalid inside <tbody>.
+              The fixed id keeps its aria ids the same on the server and in the browser (no hydration mismatch). */}
+          <DndContext
+            id="weekly-plan-dnd"
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="table-responsive">
+              <table className="table table-bordered">
+                <thead className="table-light">
+                  <tr>
+                    <th>
+                      <CirclePlus
+                        onClick={handleAddTask}
+                        // color="forestgreen"
+                        className=""
+                      />
+                    </th>
+                    <th>Plan</th>
+                    <th>Content Type</th>
+                    <th>Platform</th>
+                    <th>Budget</th>
+                    <th>KPIs</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
                   <SortableContext
                     items={framePlan.today.map((task) => task.id)}
                     strategy={verticalListSortingStrategy}
@@ -651,10 +636,10 @@ export default function WeeklyPlanTabs() {
                       />
                     ))}
                   </SortableContext>
-                </DndContext>
-              </tbody>
-            </table>
-          </div>
+                </tbody>
+              </table>
+            </div>
+          </DndContext>
         </div>
       </div>
 

@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/periods";
 import React from "react";
 import { Row, Col, Card, Button } from "react-bootstrap";
 
@@ -44,7 +45,7 @@ const RecentPostsTable: React.FC<RecentPostsTableProps> = ({ posts }) => {
                                                     {post.engagement.toLocaleString()}
                                                 </span>
                                             </td>
-                                            <td>{new Date(post.date).toLocaleDateString()}</td>
+                                            <td>{formatDate(post.date)}</td>
                                             <td>
                                                 <Button variant="outline-primary" size="sm" className="action-btn">
                                                     View Details
