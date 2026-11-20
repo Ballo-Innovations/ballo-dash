@@ -283,7 +283,7 @@ function ImportsPage() {
                     type="button"
                     role="radio"
                     aria-checked={selected}
-                    className={`btn btn-outline-secondary w-100 h-100 text-start p-3 position-relative ${selected ? "border-primary border-2" : ""}`}
+                    className={`btn w-100 h-100 text-start p-3 position-relative border ${selected ? "border-primary border-2" : ""}`}
                     onClick={() => {
                       if (t !== type) {
                         reset();
@@ -293,7 +293,7 @@ function ImportsPage() {
                   >
                     {selected && (
                       <i
-                        className="ph-fill ph-check-circle text-primary f-20 position-absolute top-0 end-0 m-2"
+                        className="ph-duotone ph-check-circle text-primary f-20 position-absolute top-0 end-0 m-2"
                         aria-hidden="true"
                       />
                     )}
