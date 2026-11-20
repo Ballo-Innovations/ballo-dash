@@ -11,7 +11,7 @@
 | C-05 | First-party web tracker: /t.js, /api/collect, sessionisation | P0 | 2 | 8 | TODO |
 | C-06 | CSV import wizard: GA4, Meta, Mailchimp, X exports | P0 | 2 | 10 | TODO |
 | C-07 | Keyword rules per brand (include and exclude) | P1 | 2 | 4 | TODO |
-| C-08 | Sandbox data generator with scenarios | P0 | 2 | 10 | TODO |
+| C-08 | Sandbox data generator with scenarios | P0 | 2 | 10 | DONE (staging) |
 | C-09 | TikTok and YouTube connectors | P2 | 5 | 10 | TODO |
 | C-10 | Nightly materialisation of web sessions and conversions into metric_points | P1 | 3 | 3 | TODO |
 
@@ -116,16 +116,18 @@
 
 ## C-08 Sandbox data generator with scenarios
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 10h
 - **Depends on:** C-01
 
 **Acceptance criteria**
 
-- [ ] Deterministic generator with scenarios baseline, outage, positive launch and competitor price cut
-- [ ] Writes sourceKind SIMULATED only
-- [ ] Can only run in a company marked as sandbox
-- [ ] Same seed gives the same output
+- [x] Deterministic generator with scenarios baseline, outage, positive launch and competitor price cut
+- [x] Writes sourceKind SIMULATED only
+- [x] Can only run in a company marked as sandbox
+- [x] Same seed gives the same output
+
+**Notes:** ballo-dash-api `src/connectors/simulator`. Source config `{ "connector": "simulator", "scenario": "outage", "seed": 42, "intervalMinutes": 5 }`. Posts are generated per minute from (seed, scenario, minute), so a window always gives the same rows. The runner refuses SIMULATED sources outside `companies.is_sandbox` companies and any connector whose kind differs from its source. `npm run sim:backfill -- --company <id> --scenario <id> --days <1-30>` fills history (it never sets the sandbox flag). Volume guide: outage is about 7,500 posts a day, baseline about 1,900. Staging QA company is a sandbox with 14 days of baseline.
 
 ## C-09 TikTok and YouTube connectors
 
