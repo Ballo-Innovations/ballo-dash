@@ -28,6 +28,8 @@ export const integrationStatus = {
 export const userRoles = {
   admin: "ADMIN", // Full access to company data & settings
   manager: "MANAGER", // Can view & manage campaigns, analytics
-  analyst: "ANALYST", // Read-only access to analytics
-  client: "CLIENT", // Basic access, e.g. view reports
+  analyst: "ANALYST",
+  marketer: "MARKETER",
+  comms: "COMMS",
+  readonly: "READONLY",
 };
