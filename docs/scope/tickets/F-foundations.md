@@ -6,11 +6,11 @@
 |---|---|---|---|---|---|
 | F-01 | Feature flag helper isFeatureEnabled | P0 | 1 | 2 | DONE (staging) |
 | F-02 | Extend roles to ADMIN MANAGER ANALYST MARKETER COMMS READONLY | P0 | 1 | 4 | DONE (staging) |
-| F-03 | Audit log table and withAudit wrapper | P0 | 1 | 5 | TODO |
-| F-04 | Drizzle schema v2: brands and sources | P0 | 1 | 4 | TODO |
-| F-05 | Drizzle schema v2: mentions topics metric_points | P0 | 1 | 5 | TODO |
-| F-06 | Drizzle schema v2: web events, goals, campaigns, media plan lines | P0 | 1 | 4 | TODO |
-| F-07 | Drizzle schema v2: surveys, alerts, insights, recommendations, forecasts, reports, ai_artifacts | P0 | 1 | 5 | TODO |
+| F-03 | Audit log table and withAudit wrapper | P0 | 1 | 5 | DONE (staging) |
+| F-04 | Drizzle schema v2: brands and sources | P0 | 1 | 4 | DONE (staging) |
+| F-05 | Drizzle schema v2: mentions topics metric_points | P0 | 1 | 5 | DONE (staging) |
+| F-06 | Drizzle schema v2: web events, goals, campaigns, media plan lines | P0 | 1 | 4 | DONE (staging) |
+| F-07 | Drizzle schema v2: surveys, alerts, insights, recommendations, forecasts, reports, ai_artifacts | P0 | 1 | 5 | DONE (staging) |
 | F-08 | Tenant isolation guard and tests | P0 | 1 | 6 | TODO |
 | F-09 | Helpers: money, dates, period ranges | P0 | 1 | 4 | TODO |
 | F-10 | New sidebar navigation in the existing template shell | P0 | 1 | 5 | TODO |
@@ -50,62 +50,72 @@
 
 ## F-03 Audit log table and withAudit wrapper
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 5h
 - **Depends on:** H-12
 
 **Acceptance criteria**
 
-- [ ] Audit_logs table (company, actor, entity, entityId, action, before, after, at)
-- [ ] WithAudit writes a diff row in the same transaction as the change
-- [ ] Test proves a failed write leaves no audit row
+- [x] Audit_logs table (company, actor, entity, entityId, action, before, after, at)
+- [x] WithAudit writes a diff row in the same transaction as the change
+- [x] Test proves a failed write leaves no audit row
+
+**Notes:** API `audit_logs` (migration 0003) and `withAudit` in `src/common/audit.ts`; PATCH /api/company uses it. Checked on staging: renaming the company wrote one row per change with only the changed field. The logo upload UI is commented out in Header, so no screen edits company data yet.
 
 ## F-04 Drizzle schema v2: brands and sources
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 4h
 - **Depends on:** none
 
 **Acceptance criteria**
 
-- [ ] Brands (companyId, name, isSelf, handles, keywords, color), sources and connector_runs tables with companyId on each
-- [ ] One self brand created per existing company by the migration
-- [ ] Migration runs clean on a copy of current data
+- [x] Brands (companyId, name, isSelf, handles, keywords, color), sources and connector_runs tables with companyId on each
+- [x] One self brand created per existing company by the migration
+- [x] Migration runs clean on a copy of current data
+
+**Notes:** Tables in ballo-dash-api `src/db/schema-v2.ts`, migration 0004. Tested on a copy of the staging database; staging now has a self brand per company. Sign-up creates one too.
 
 ## F-05 Drizzle schema v2: mentions topics metric_points
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 5h
 - **Depends on:** F-04
 
 **Acceptance criteria**
 
-- [ ] Tables per kit schema with companyId, sourceKind enum (LIVE IMPORT SIMULATED STUB), unique (companyId, externalId) on mentions, unique (brand, channel, metric, date, campaign) on metric_points, indexes on (brandId, occurredAt), (sentiment, occurredAt), (channel, occurredAt)
+- [x] Tables per kit schema with companyId, sourceKind enum (LIVE IMPORT SIMULATED STUB), unique (companyId, externalId) on mentions, unique (brand, channel, metric, date, campaign) on metric_points, indexes on (brandId, occurredAt), (sentiment, occurredAt), (channel, occurredAt)
+
+**Notes:** Migration 0005. Unique keys use coalesce over nullable brand and campaign so empty values count as equal (works on Postgres 14 and 16).
 
 ## F-06 Drizzle schema v2: web events, goals, campaigns, media plan lines
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 4h
 - **Depends on:** F-04
 
 **Acceptance criteria**
 
-- [ ] Tables per kit schema with companyId
-- [ ] Money stored as integer minor units with the currency on the company
-- [ ] Billing status enum PLANNED BOOKED INVOICED PAID DISPUTED
+- [x] Tables per kit schema with companyId
+- [x] Money stored as integer minor units with the currency on the company
+- [x] Billing status enum PLANNED BOOKED INVOICED PAID DISPUTED
+
+**Notes:** Migration 0006. Money is bigint minor units; `companies.currency` defaults to ZMW.
 
 ## F-07 Drizzle schema v2: surveys, alerts, insights, recommendations, forecasts, reports, ai_artifacts
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 1  **Estimate:** 5h
 - **Depends on:** F-04
 
 **Acceptance criteria**
 
-- [ ] Tables per kit schema with companyId
-- [ ] Survey slug unique globally
-- [ ] Alert evidence stored as mention ids
-- [ ] All foreign keys and cascade rules defined
+- [x] Tables per kit schema with companyId
+- [x] Survey slug unique globally
+- [x] Alert evidence stored as mention ids
+- [x] All foreign keys and cascade rules defined
+
+**Notes:** Migration 0007. A catalog test checks every v2 table has a required company_id that cascades with the company.
 
 ## F-08 Tenant isolation guard and tests
 
