@@ -17,6 +17,10 @@ test.describe("account pages", () => {
     const email = `e2e-${Date.now()}@example.test`;
     await page.getByLabel("Work email").fill(email);
     await page.getByLabel("Password", { exact: true }).fill("a long sturdy password");
+    await page.getByLabel("Confirm password").fill("a different password");
+    await page.getByRole("button", { name: "Create account" }).click();
+    await expect(page.getByText("The passwords do not match")).toBeVisible();
+    await page.getByLabel("Confirm password").fill("a long sturdy password");
     await page.getByRole("button", { name: "Create account" }).click();
     await expect(page.getByRole("heading", { name: "Check your inbox" })).toBeVisible();
     await expect(page.getByText(email)).toBeVisible();

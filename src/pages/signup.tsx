@@ -24,10 +24,11 @@ export default function SignupPage() {
       email: String(form.get("email") ?? ""),
       password: String(form.get("password") ?? ""),
     };
+    const confirmPassword = String(form.get("confirmPassword") ?? "");
     setErrors({});
     setProblem(null);
     // Catch obvious mistakes here so they do not use up the server's sign-up limit.
-    const local = checkSignup(body);
+    const local = checkSignup({ ...body, confirmPassword });
     if (Object.keys(local).length > 0) {
       setErrors(local);
       return;
@@ -96,6 +97,14 @@ export default function SignupPage() {
           hint="At least 10 characters."
           required
           error={errors.password}
+        />
+        <PasswordField
+          id="confirmPassword"
+          label="Confirm password"
+          icon={icon(Lock)}
+          autoComplete="new-password"
+          required
+          error={errors.confirmPassword}
         />
         <button type="submit" className="login-button" disabled={submitting} aria-busy={submitting}>
           {submitting ? "Creating account..." : "Create account"}
