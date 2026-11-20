@@ -9,7 +9,7 @@
 | C-03 | Adapt existing Facebook Instagram LinkedIn and X integrations to the connector interface | P0 | 2 | 12 | TODO |
 | C-04 | RSS and news connector with outlet reach table | P0 | 2 | 6 | DONE (staging) |
 | C-05 | First-party web tracker: /t.js, /api/collect, sessionisation | P0 | 2 | 8 | TODO |
-| C-06 | CSV import wizard: GA4, Meta, Mailchimp, X exports | P0 | 2 | 10 | TODO |
+| C-06 | CSV import wizard: GA4, Meta, Mailchimp, X exports | P0 | 2 | 10 | DONE (staging) |
 | C-07 | Keyword rules per brand (include and exclude) | P1 | 2 | 4 | DONE (staging) |
 | C-08 | Sandbox data generator with scenarios | P0 | 2 | 10 | DONE (staging) |
 | C-09 | TikTok and YouTube connectors | P2 | 5 | 10 | TODO |
@@ -92,17 +92,19 @@
 
 ## C-06 CSV import wizard: GA4, Meta, Mailchimp, X exports
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 10h
 - **Depends on:** C-01, F-12
 
 **Acceptance criteria**
 
-- [ ] Upload, column mapping, preview, import into metric_points or mentions with sourceKind IMPORT
-- [ ] Re-importing the same file adds 0 rows
-- [ ] Bad rows reported with line numbers
-- [ ] 10 MB limit
-- [ ] Sample files in the repo
+- [x] Upload, column mapping, preview, import into metric_points or mentions with sourceKind IMPORT
+- [x] Re-importing the same file adds 0 rows
+- [x] Bad rows reported with line numbers
+- [x] 10 MB limit
+- [x] Sample files in the repo
+
+**Notes:** API (ballo-dash-api #34): `POST /api/imports/{ga4|meta|mailchimp|x}/preview` and `POST /api/imports/{type}` take the file as the body (gzipped by the browser), with mapping and date order in the query; capability `data.import` (ADMIN, MANAGER, ANALYST); behind `adminConsole` (`FEATURE_ADMIN_CONSOLE=true` set on the staging API). GA4, Meta and Mailchimp become daily metric points for the self brand (same-day rows add up, upserted); X posts become mentions keyed by post id. Each import is a run on a per-company IMPORT source. Web: `/admin/imports` wizard and a Data imports menu item. Sample files: API `samples/imports`, web `public/samples/imports` (downloadable from the wizard). Verified on staging 2026-11-20 in a browser: all four samples imported, re-import added 0, bad rows listed by line, oversized and non-CSV files refused, 375 to 1440 px in light and dark.
 
 ## C-07 Keyword rules per brand (include and exclude)
 
