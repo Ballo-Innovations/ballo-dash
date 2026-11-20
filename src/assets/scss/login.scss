@@ -731,6 +731,8 @@
 
 .home {
   min-height: 100vh;
+  // Shown until the background video loads (it is ~20 MB), so white text stays readable.
+  background: radial-gradient(120% 90% at 80% 10%, #2443c9 0%, #0f2a78 55%, #050d2e 100%);
 
   * {
     color: white !important;
