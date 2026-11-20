@@ -7,7 +7,7 @@
 | C-01 | Connector interface, registry and run logging | P0 | 2 | 6 | DONE (staging) |
 | C-02 | Worker service on the Ballo backend server: scheduler and job runner | P0 | 2 | 8 | DONE (staging) |
 | C-03 | Adapt existing Facebook Instagram LinkedIn and X integrations to the connector interface | P0 | 2 | 12 | TODO |
-| C-04 | RSS and news connector with outlet reach table | P0 | 2 | 6 | TODO |
+| C-04 | RSS and news connector with outlet reach table | P0 | 2 | 6 | DONE (staging) |
 | C-05 | First-party web tracker: /t.js, /api/collect, sessionisation | P0 | 2 | 8 | TODO |
 | C-06 | CSV import wizard: GA4, Meta, Mailchimp, X exports | P0 | 2 | 10 | TODO |
 | C-07 | Keyword rules per brand (include and exclude) | P1 | 2 | 4 | TODO |
@@ -62,16 +62,18 @@
 
 ## C-04 RSS and news connector with outlet reach table
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 6h
 - **Depends on:** C-01
 
 **Acceptance criteria**
 
-- [ ] Feeds configured per company
-- [ ] Articles matched against brand and competitor keywords become NEWS mentions with outlet, headline and reach estimate
-- [ ] Duplicates skipped
-- [ ] Feed timeout or bad XML logs a failed run without crashing
+- [x] Feeds configured per company
+- [x] Articles matched against brand and competitor keywords become NEWS mentions with outlet, headline and reach estimate
+- [x] Duplicates skipped
+- [x] Feed timeout or bad XML logs a failed run without crashing
+
+**Notes:** ballo-dash-api `src/connectors/news` (parse, outlets, connector). A LIVE/NEWS source with `config.connector = "news"` and `config.feeds` (urls, or `{url, outlet, reach}`) polls RSS 2.0, RSS 1.0 and Atom every 10 minutes. Only articles naming a brand or competitor are kept (no self-brand fallback). Reach comes from the outlet table, overridable per feed, default 2,000. Ids are a hash of guid or link. Each feed has a timeout (15s default) and a 5 MB cap; a failing feed is logged and skipped, and the run fails only if every feed fails. Integration tests run against a local HTTP server. On staging since 2026-11-20 with Lusaka Times, News Diggers, TechCabal and ZNBC (ZNBC's certificate chain is incomplete, so it is logged as failed).
 
 ## C-05 First-party web tracker: /t.js, /api/collect, sessionisation
 
