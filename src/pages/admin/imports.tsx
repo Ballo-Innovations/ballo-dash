@@ -234,7 +234,7 @@ function ImportsPage() {
   if (!ALLOWED_ROLES.includes(role))
     return (
       <>
-        <BreadcrumbItem mainTitle="Data imports" subTitle="Admin" />
+        <BreadcrumbItem mainTitle="Admin" subTitle="Data imports" />
         <div className="card">
           <EmptyState
             icon="ph-duotone ph-lock"
@@ -266,7 +266,7 @@ function ImportsPage() {
       <Head>
         <title>Data imports | Ballo Dash</title>
       </Head>
-      <BreadcrumbItem mainTitle="Data imports" subTitle="Admin" />
+      <BreadcrumbItem mainTitle="Admin" subTitle="Data imports" />
 
       <div className="card">
         <div className="card-header">
@@ -283,7 +283,7 @@ function ImportsPage() {
                     type="button"
                     role="radio"
                     aria-checked={selected}
-                    className={`btn w-100 h-100 text-start p-3 ${selected ? "btn-light-primary border-primary" : "btn-outline-secondary"}`}
+                    className={`btn btn-outline-secondary w-100 h-100 text-start p-3 position-relative ${selected ? "border-primary border-2" : ""}`}
                     onClick={() => {
                       if (t !== type) {
                         reset();
@@ -291,6 +291,12 @@ function ImportsPage() {
                       }
                     }}
                   >
+                    {selected && (
+                      <i
+                        className="ph-fill ph-check-circle text-primary f-20 position-absolute top-0 end-0 m-2"
+                        aria-hidden="true"
+                      />
+                    )}
                     <i
                       className={`${s.icon} f-24 d-block mb-2`}
                       aria-hidden="true"
