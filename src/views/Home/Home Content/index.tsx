@@ -570,7 +570,7 @@ export default function WeeklyPlanTabs() {
   const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
 
   return (
-    <div className="container text-center py-5 home-content-wrapper">
+    <div className="container text-center py-5 weekly-plan-wrapper">
       <h2 className="heading">
         VISION WITHOUT EXECUTION <br /> IS HALLUCINATION!
       </h2>
