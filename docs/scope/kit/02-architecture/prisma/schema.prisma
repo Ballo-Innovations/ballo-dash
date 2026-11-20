@@ -1,0 +1,94 @@
+// Lens — Prisma schema v1. Money in ngwee. Dates UTC.
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql"; url = env("DATABASE_URL") }
+
+enum Role { ADMIN MANAGER ANALYST MARKETER COMMS READONLY }
+enum Channel { X FACEBOOK INSTAGRAM LINKEDIN TIKTOK YOUTUBE NEWS BLOG FORUM REVIEW SURVEY WEB EMAIL }
+enum Sentiment { NEG NEU POS }
+enum SourceKind { LIVE IMPORT SIMULATED STUB }
+enum AlertSeverity { WATCH WARNING CRISIS }
+enum AlertStatus { OPEN ACKNOWLEDGED RESOLVED }
+enum BillingStatus { PLANNED BOOKED INVOICED PAID DISPUTED }
+enum SurveyType { CSAT NPS PERCEPTION }
+enum RecStatus { NEW PLANNED RUNNING DONE DISMISSED }
+enum CampaignStatus { DRAFT ACTIVE PAUSED COMPLETED }
+
+model User { id String @id @default(cuid()); email String @unique; name String; password String; role Role @default(ANALYST); createdAt DateTime @default(now()); audits AuditLog[]; alerts Alert[] }
+
+model Brand { id String @id @default(cuid()); name String; isSelf Boolean @default(false); handles Json; keywords String[]; color String?; mentions Mention[]; metrics MetricPoint[]; }
+
+model Source { id String @id @default(cuid()); name String; kind SourceKind; channel Channel; config Json; enabled Boolean @default(true); lastRunAt DateTime?; runs ConnectorRun[] }
+model ConnectorRun { id String @id @default(cuid()); sourceId String; source Source @relation(fields:[sourceId], references:[id]); startedAt DateTime @default(now()); finishedAt DateTime?; status String; itemsIn Int @default(0); itemsNew Int @default(0); error String? }
+
+model Mention {
+  id String @id @default(cuid())
+  externalId String @unique
+  brandId String; brand Brand @relation(fields:[brandId], references:[id])
+  channel Channel
+  sourceKind SourceKind
+  author String?; authorHandle String?; authorFollowers Int?; verified Boolean @default(false)
+  text String; url String?; lang String @default("en")
+  occurredAt DateTime
+  reach Int @default(0); likes Int @default(0); shares Int @default(0); comments Int @default(0)
+  region String?; city String?
+  sentimentScore Float @default(0); sentiment Sentiment @default(NEU); confidence Float @default(0); matchedTerms String[]
+  aspects Json?   // [{aspect, sentiment}]
+  topics String[]
+  outlet String?; headline String?   // news
+  createdAt DateTime @default(now())
+  @@index([brandId, occurredAt]) @@index([sentiment, occurredAt]) @@index([channel, occurredAt])
+}
+
+model Topic { id String @id @default(cuid()); name String @unique; terms String[]; firstSeen DateTime @default(now()); lastSeen DateTime @default(now()); score Float @default(0); mentionCount Int @default(0) }
+
+model MetricPoint {
+  id String @id @default(cuid())
+  brandId String?; brand Brand? @relation(fields:[brandId], references:[id])
+  channel Channel; metric String   // followers impressions engagement posts sessions pageviews conversions sends opens clicks unsubscribes
+  value Float; date DateTime; sourceKind SourceKind
+  campaignId String?; campaign Campaign? @relation(fields:[campaignId], references:[id])
+  @@unique([brandId, channel, metric, date, campaignId]) @@index([metric, date])
+}
+
+model WebEvent { id String @id @default(cuid()); siteId String; sessionId String; event String; path String; referrer String?; utmSource String?; utmMedium String?; utmCampaign String?; ts DateTime @default(now()); ua String?; @@index([siteId, ts]) @@index([sessionId]) }
+model Goal { id String @id @default(cuid()); name String; matchEvent String; matchPath String?; value Int @default(0) }
+
+model Campaign {
+  id String @id @default(cuid()); name String; objective String?; status CampaignStatus @default(DRAFT)
+  startDate DateTime; endDate DateTime?; channels Channel[]; utmCampaign String?
+  budget Int @default(0)
+  metrics MetricPoint[]; lines MediaPlanLine[]; recommendationId String?
+}
+
+model MediaPlanLine {
+  id String @id @default(cuid())
+  campaignId String; campaign Campaign @relation(fields:[campaignId], references:[id], onDelete: Cascade)
+  channel Channel; vendor String?; periodStart DateTime; periodEnd DateTime
+  budget Int; actualSpend Int @default(0)
+  billingStatus BillingStatus @default(PLANNED); invoiceRef String?; invoiceDate DateTime?; paidDate DateTime?
+  notes String?; updatedAt DateTime @updatedAt
+  @@index([campaignId])
+}
+
+model Survey { id String @id @default(cuid()); slug String @unique; title String; type SurveyType; intro String?; questions Json; channelTag String?; active Boolean @default(true); createdAt DateTime @default(now()); responses SurveyResponse[] }
+model SurveyResponse { id String @id @default(cuid()); surveyId String; survey Survey @relation(fields:[surveyId], references:[id], onDelete: Cascade); answers Json; score Int?; verbatim String?; verbatimSentiment Float?; aspects Json?; region String?; channelTag String?; contact String?; consent Boolean @default(false); followUpStatus String?; submittedAt DateTime @default(now()); @@index([surveyId, submittedAt]) }
+
+model Alert {
+  id String @id @default(cuid()); brandId String; severity AlertSeverity; status AlertStatus @default(OPEN)
+  topic String?; aspect String?; region String?
+  zScore Float; velocity Float; negVolume Int; reachNeg Int
+  evidenceMentionIds String[]; recommendedResponse String?; narrative String?
+  assigneeId String?; assignee User? @relation(fields:[assigneeId], references:[id])
+  openedAt DateTime @default(now()); acknowledgedAt DateTime?; resolvedAt DateTime?
+  @@index([status, openedAt])
+}
+
+model Insight { id String @id @default(cuid()); type String; severity String; title String; narrative String?; evidence Json; metrics Json?; linkHref String?; dismissed Boolean @default(false); createdAt DateTime @default(now()); @@index([createdAt]) }
+model Recommendation { id String @id @default(cuid()); insightId String?; title String; rationale String; channels Channel[]; suggestedBudget Int?; projectedReach Int?; projectedSentimentDelta Float?; effort String?; status RecStatus @default(NEW); narrative String?; createdAt DateTime @default(now()) }
+model Forecast { id String @id @default(cuid()); metric String; brandId String?; horizonDays Int; points Json; method String; generatedAt DateTime @default(now()) }
+
+model ReportTemplate { id String @id @default(cuid()); name String; sections Json; cadence String? }
+model Report { id String @id @default(cuid()); templateId String; title String; periodStart DateTime; periodEnd DateTime; pdfKey String?; generatedAt DateTime @default(now()); scheduledTo String[] }
+
+model AuditLog { id String @id @default(cuid()); actorId String?; actor User? @relation(fields:[actorId], references:[id]); entity String; entityId String; action String; before Json?; after Json?; at DateTime @default(now()); @@index([entity, entityId]) }
+model AiArtifact { id String @id @default(cuid()); kind String; refId String; prompt String; output String; model String; createdAt DateTime @default(now()); @@index([kind, refId]) }

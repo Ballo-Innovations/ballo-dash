@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 interface FacebookPageInfo {
   id: string;
   name: string;
@@ -38,16 +39,16 @@ class FacebookService {
     return FacebookService.instance;
   }
 
-  public async getPageInfo(pageId: string, platform: string = 'facebook'): Promise<MetaPageInfo | null> {
+  public async getPageInfo(pageId: string, platform: string = 'facebook'): Promise<FacebookPageInfo | null> {
     const cacheKey = `pageInfo_${platform}_${pageId}`;
     
     if (this.pageInfo[cacheKey] && this.isDataFresh(cacheKey)) {
-      console.log('FacebookService: Returning cached page info');
+      logger.debug('FacebookService: Returning cached page info');
       return this.pageInfo[cacheKey];
     }
 
     if (this.isLoading[cacheKey]) {
-      console.log('FacebookService: Page info request already in progress, waiting...');
+      logger.debug('FacebookService: Page info request already in progress, waiting...');
       while (this.isLoading[cacheKey]) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
@@ -55,7 +56,7 @@ class FacebookService {
     }
 
     try {
-      console.log('FacebookService: Fetching page info...');
+      logger.debug('FacebookService: Fetching page info...');
       this.isLoading[cacheKey] = true;
       
       const response = await fetch(`/api/data/facebook/pageInfo?pageId=${pageId}&platform=${platform}`);
@@ -68,26 +69,26 @@ class FacebookService {
       this.pageInfo[cacheKey] = data;
       this.lastFetch[cacheKey] = Date.now();
       
-      console.log('FacebookService: Page info stored in cache');
+      logger.debug('FacebookService: Page info stored in cache');
       return this.pageInfo[cacheKey];
     } catch (error) {
-      console.error('❌ FacebookService: Error fetching page info:', error);
+      logger.error('❌ FacebookService: Error fetching page info:', error);
       return null;
     } finally {
       this.isLoading[cacheKey] = false;
     }
   }
 
-  public async getPosts(pageId: string, platform: string = 'facebook'): Promise<MetaPost[] | null> {
+  public async getPosts(pageId: string, platform: string = 'facebook'): Promise<FacebookPost[] | null> {
     const cacheKey = `posts_${platform}_${pageId}`;
     
     if (this.posts[cacheKey] && this.isDataFresh(cacheKey)) {
-      console.log('FacebookService: Returning cached posts');
+      logger.debug('FacebookService: Returning cached posts');
       return this.posts[cacheKey];
     }
 
     if (this.isLoading[cacheKey]) {
-      console.log('FacebookService: Posts request already in progress, waiting...');
+      logger.debug('FacebookService: Posts request already in progress, waiting...');
       while (this.isLoading[cacheKey]) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
@@ -95,7 +96,7 @@ class FacebookService {
     }
 
     try {
-      console.log('FacebookService: Fetching posts...');
+      logger.debug('FacebookService: Fetching posts...');
       this.isLoading[cacheKey] = true;
       
       const response = await fetch(`/api/data/facebook/posts?pageId=${pageId}&platform=${platform}`);
@@ -108,26 +109,26 @@ class FacebookService {
       this.posts[cacheKey] = data.posts || [];
       this.lastFetch[cacheKey] = Date.now();
       
-      console.log('FacebookService: Posts stored in cache');
+      logger.debug('FacebookService: Posts stored in cache');
       return this.posts[cacheKey];
     } catch (error) {
-      console.error('❌ FacebookService: Error fetching posts:', error);
+      logger.error('❌ FacebookService: Error fetching posts:', error);
       return null;
     } finally {
       this.isLoading[cacheKey] = false;
     }
   }
 
-  public async getMetrics(pageId: string, metric: string, platform: string = 'facebook'): Promise<MetaMetrics | null> {
+  public async getMetrics(pageId: string, metric: string, platform: string = 'facebook'): Promise<FacebookMetrics | null> {
     const cacheKey = `metrics_${platform}_${pageId}_${metric}`;
     
     if (this.metrics[cacheKey] && this.isDataFresh(cacheKey)) {
-      console.log(`FacebookService: Returning cached ${metric} metrics`);
+      logger.debug(`FacebookService: Returning cached ${metric} metrics`);
       return this.metrics[cacheKey];
     }
 
     try {
-      console.log(`FacebookService: Fetching ${metric} metrics...`);
+      logger.debug(`FacebookService: Fetching ${metric} metrics...`);
       
       const response = await fetch(`/api/data/facebook/metric?pageId=${pageId}&metric=${metric}&platform=${platform}`);
       
@@ -139,16 +140,16 @@ class FacebookService {
       this.metrics[cacheKey] = data;
       this.lastFetch[cacheKey] = Date.now();
       
-      console.log(`FacebookService: ${metric} metrics stored in cache`);
+      logger.debug(`FacebookService: ${metric} metrics stored in cache`);
       return this.metrics[cacheKey];
     } catch (error) {
-      console.error(`❌ FacebookService: Error fetching ${metric} metrics:`, error);
+      logger.error(`❌ FacebookService: Error fetching ${metric} metrics:`, error);
       return null;
     }
   }
 
     public async getMultipleMetrics(pageId: string, metrics: string[], platform: string = 'facebook'): Promise<Record<string, FacebookMetrics>> {
-    console.log(`FacebookService: Fetching multiple metrics: ${metrics.join(', ')}`);
+    logger.debug(`FacebookService: Fetching multiple metrics: ${metrics.join(', ')}`);
     
     const results: Record<string, FacebookMetrics> = {};
     
@@ -169,12 +170,12 @@ class FacebookService {
     const cacheKey = `stats_${platform}_${pageId}`;
     
     if (this.isDataFresh(cacheKey)) {
-      console.log('FacebookService: Returning cached stats');
+      logger.debug('FacebookService: Returning cached stats');
       return null; // Stats are usually not cached for long
     }
 
     try {
-      console.log('FacebookService: Fetching stats...');
+      logger.debug('FacebookService: Fetching stats...');
       
       const response = await fetch(`/api/data/facebook/stats?pageId=${pageId}&platform=${platform}`);
       
@@ -185,17 +186,17 @@ class FacebookService {
       const data = await response.json();
       this.lastFetch[cacheKey] = Date.now();
       
-      console.log('FacebookService: Stats fetched successfully');
+      logger.debug('FacebookService: Stats fetched successfully');
       return data;
     } catch (error) {
-      console.error('❌ FacebookService: Error fetching stats:', error);
+      logger.error('❌ FacebookService: Error fetching stats:', error);
       return null;
     }
   }
 
   private isDataFresh(cacheKey: string): boolean {
     const lastFetch = this.lastFetch[cacheKey];
-    return lastFetch && (Date.now() - lastFetch < this.CACHE_DURATION);
+    return lastFetch !== undefined && Date.now() - lastFetch < this.CACHE_DURATION;
   }
 
   public clearCache(): void {

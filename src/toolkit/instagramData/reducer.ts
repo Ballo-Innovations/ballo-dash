@@ -99,7 +99,7 @@ export const fetchInstagramStats = createAsyncThunk<
 >(
   "instagram/fetchStats",
   async ({ platform, since = "", until = "", datePreset = "" }, { dispatch, getState }) => {
-    let state = getState();
+    const state = getState();
 
     try {
       // First, try to get cached data immediately for instant display

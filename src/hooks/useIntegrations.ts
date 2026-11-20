@@ -11,6 +11,7 @@ import {
   clearIntegrations
 } from '@/toolkit/Integrations/reducer';
 import { AppDispatch } from '@/toolkit';
+import { logger } from "@/lib/logger";
 
 interface UseIntegrationsReturn {
   integrations: any[];
@@ -55,11 +56,11 @@ export const useIntegrations = (): UseIntegrationsReturn => {
       if (!hasCachedIntegrations) {
         dispatch(clearIntegrations({}));
         setIsInitialized(false);
-        console.log('🧹 useIntegrations: Company changed, clearing stale data');
+        logger.debug('🧹 useIntegrations: Company changed, clearing stale data');
       } else {
         // We have cached data, mark as initialized
         setIsInitialized(true);
-        console.log('✅ useIntegrations: Using cached integrations data');
+        logger.debug('✅ useIntegrations: Using cached integrations data');
       }
     }
   }, [company?.id, dispatch, isStoreReady, hasCachedIntegrations]);
@@ -72,13 +73,13 @@ export const useIntegrations = (): UseIntegrationsReturn => {
         clearTimeout(fetchTimeoutRef.current);
       }
       dispatch(clearIntegrations({}));
-      console.log('🧹 useIntegrations: Component unmounting, clearing data');
+      logger.debug('🧹 useIntegrations: Component unmounting, clearing data');
     };
   }, [dispatch]);
   
   // Debug logging - only log when values actually change
   useEffect(() => {
-    console.log('🔍 useIntegrations hook state:', {
+    logger.debug('🔍 useIntegrations hook state:', {
       isStoreReady,
       isInitialized,
       hasCachedIntegrations,
@@ -94,12 +95,12 @@ export const useIntegrations = (): UseIntegrationsReturn => {
 
   const refreshIntegrations = useCallback(async () => {
     if (company?.id) {
-      console.log('🔄 useIntegrations: refreshIntegrations called for company:', company.id);
+      logger.debug('🔄 useIntegrations: refreshIntegrations called for company:', company.id);
       setIsInitialized(false); // Reset initialization state
       await dispatch(fetchIntegrations(company.id));
       setIsInitialized(true); // Mark as initialized after refresh
     } else {
-      console.warn('⚠️ useIntegrations: Cannot refresh integrations - no company ID');
+      logger.warn('⚠️ useIntegrations: Cannot refresh integrations - no company ID');
     }
   }, [company?.id, dispatch]);
 
@@ -110,7 +111,7 @@ export const useIntegrations = (): UseIntegrationsReturn => {
     const minInterval = 1000; // Minimum 1 second between attempts
     
     if (timeSinceLastAttempt < minInterval) {
-      console.log(`⏳ useIntegrations: Debouncing fetch request (${minInterval - timeSinceLastAttempt}ms remaining)`);
+      logger.debug(`⏳ useIntegrations: Debouncing fetch request (${minInterval - timeSinceLastAttempt}ms remaining)`);
       
       if (fetchTimeoutRef.current) {
         clearTimeout(fetchTimeoutRef.current);
@@ -118,7 +119,7 @@ export const useIntegrations = (): UseIntegrationsReturn => {
       
       fetchTimeoutRef.current = setTimeout(() => {
         if (company?.id) {
-          console.log('🚀 useIntegrations: Debounced fetch executing for company:', company.id);
+          logger.debug('🚀 useIntegrations: Debounced fetch executing for company:', company.id);
           dispatch(fetchIntegrations(company.id));
           setIsInitialized(true);
         }
@@ -130,7 +131,7 @@ export const useIntegrations = (): UseIntegrationsReturn => {
     lastFetchAttempt.current = now;
     
     if (company?.id) {
-      console.log('🚀 useIntegrations: Immediate fetch for company:', company.id);
+      logger.debug('🚀 useIntegrations: Immediate fetch for company:', company.id);
       dispatch(fetchIntegrations(company.id));
       setIsInitialized(true);
     }
@@ -138,32 +139,32 @@ export const useIntegrations = (): UseIntegrationsReturn => {
 
   useEffect(() => {
     if (!isStoreReady) {
-      console.log('⏳ useIntegrations: Store not ready yet, waiting...');
+      logger.debug('⏳ useIntegrations: Store not ready yet, waiting...');
       return;
     }
     
     // If we already have cached integrations data, don't fetch again
     if (hasCachedIntegrations && isInitialized) {
-      console.log('⏳ useIntegrations: Using cached integrations, skipping fetch');
+      logger.debug('⏳ useIntegrations: Using cached integrations, skipping fetch');
       return;
     }
     
     if (isInitialized) {
-      console.log('⏳ useIntegrations: Already initialized, skipping...');
+      logger.debug('⏳ useIntegrations: Already initialized, skipping...');
       return;
     }
     
     // If already fetching, don't start another request
     if (isFetching) {
-      console.log('⏳ useIntegrations: Already fetching, skipping...');
+      logger.debug('⏳ useIntegrations: Already fetching, skipping...');
       return;
     }
     
-    console.log('🔄 useIntegrations: useEffect triggered, company?.id:', company?.id);
+    logger.debug('🔄 useIntegrations: useEffect triggered, company?.id:', company?.id);
     if (company?.id) {
       debouncedFetch();
     } else {
-      console.warn('⚠️ useIntegrations: No company ID available, skipping integrations fetch');
+      logger.warn('⚠️ useIntegrations: No company ID available, skipping integrations fetch');
     }
   }, [company?.id, isStoreReady, isInitialized, hasCachedIntegrations, isFetching, debouncedFetch]);
 

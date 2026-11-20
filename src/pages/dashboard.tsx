@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 import Layout from "@layout/index";
 import BreadcrumbItem from "@common/BreadcrumbItem";
 import Widgets from "@views/Dashboard/widgets";
-import { widgetData, socialWidgetsData } from "@data/index";
+import { widgetData, socialWidgetsData } from "@data/dashboard";
 import UsersCharts from "@views/Dashboard/UsersCharts";
 import SocialWidgets from "@views/Dashboard/SocialWidgets";
 

@@ -7,17 +7,18 @@ import avatar1 from "../assets/images/user/avatar-1.jpg";
 import SimpleBar from "simplebar-react";
 import { menuItems } from "./MenuData";
 import { useDynamicMenu } from "@/hooks/useDynamicMenu";
-import NestedMenu from "@/Layouts/Moduler/NestedMenu";
+import NestedMenu from "@/Layouts/NestedMenu";
 import { Dropdown } from "react-bootstrap";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/toolkit/hooks";
 import { fetchCompany, selectCompany } from "@/toolkit/Company/reducer";
 import UploadPopup from "@/views/ImageUpload";
 import { selectUsers } from "@/toolkit/User/reducer";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/contexts/SessionContext";
 import balloLogo from "@/assets/images/logos/Ballo logo white.png";
 import { Play } from "lucide-react";
 import Skeleton from "@mui/material/Skeleton";
+import { logger } from "@/lib/logger";
 
 const Header = ({ themeMode }: any) => {
   const dispatch = useAppDispatch();
@@ -40,7 +41,7 @@ const Header = ({ themeMode }: any) => {
   }, [dispatch]);
 
   // useEffect(() => {
-  //   console.log("user:", session?.user);
+  //   logger.debug("user:", session?.user);
   // }, [session]);
 
   return (

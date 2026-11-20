@@ -1,0 +1,8 @@
+{
+ "domain": {"outage":-3,"downtime":-3,"down":-2,"slow":-2,"lag":-2,"buffering":-2,"overpriced":-3,"expensive":-2,"scam":-4,"refund":-1,"unreliable":-3,"reliable":3,"fast":2,"stable":2,"affordable":2,"excellent":3,"upgrade":1,"installed":1,"responsive":2,"ignored":-3,"waiting":-1,"finally":1,"thank":2,"thanks":2,"worst":-4,"best":3},
+ "local": {"zikomo":2,"natotela":2,"chabwino":2,"bwino":2,"mwabombeni":2,"ayi":-1,"zoona":0,"ba":0,"boma":0,"iwe":0,"kaya":-1,"eish":-2,"aah":-1},
+ "emoji": {"😤":-2,"😡":-3,"🙄":-1,"😭":-2,"👎":-2,"🔥":2,"👏":2,"🙏":1,"❤️":2,"👍":2,"💯":2,"🤡":-3},
+ "negators": ["not","no","never","isn't","wasn't","aren't","don't","didn't","hardly"],
+ "intensifiers": {"very":1.5,"so":1.3,"really":1.4,"too":1.3,"extremely":1.8,"super":1.4},
+ "thresholds": {"neg":-0.15,"pos":0.15}
+}

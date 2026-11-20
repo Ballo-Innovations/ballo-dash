@@ -1,7 +1,6 @@
 import React from "react";
 import { Card, Col } from "react-bootstrap";
 // import { VectorMap } from '@south-paw/react-vector-maps';
-import "./style.scss";
 
 const ZambianMap = () => {
   return (

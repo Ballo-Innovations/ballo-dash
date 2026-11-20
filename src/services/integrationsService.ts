@@ -1,4 +1,5 @@
 import { companyService } from "./companyService";
+import { logger } from "@/lib/logger";
 
 interface Integration {
   id: string;
@@ -49,12 +50,12 @@ class IntegrationsService {
     const cacheKey = 'integrations';
     
     if (this.integrations.length > 0 && this.isDataFresh(cacheKey)) {
-      console.log('IntegrationsService: Returning cached integrations');
+      logger.debug('IntegrationsService: Returning cached integrations');
       return this.integrations;
     }
 
     if (this.isLoading) {
-      console.log('IntegrationsService: Request already in progress, waiting...');
+      logger.debug('IntegrationsService: Request already in progress, waiting...');
       while (this.isLoading) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
@@ -62,7 +63,7 @@ class IntegrationsService {
     }
 
     try {
-      console.log('IntegrationsService: Fetching integrations...');
+      logger.debug('IntegrationsService: Fetching integrations...');
       this.isLoading = true;
       
       // Get company first, then integrations
@@ -71,7 +72,7 @@ class IntegrationsService {
         throw new Error('Company not found');
       }
       
-      const response = await fetch(`/api/integrations?companyId=${company.id}`);
+      const response = await fetch("/api/integrations");
       
       if (!response.ok) {
         throw new Error(`Failed to fetch integrations: ${response.status}`);
@@ -81,10 +82,10 @@ class IntegrationsService {
       this.integrations = data || [];
       this.lastFetch[cacheKey] = Date.now();
       
-      console.log('IntegrationsService: Integrations stored in cache');
+      logger.debug('IntegrationsService: Integrations stored in cache');
       return this.integrations;
     } catch (error) {
-      console.error('❌ IntegrationsService: Error fetching integrations:', error);
+      logger.error('❌ IntegrationsService: Error fetching integrations:', error);
       return [];
     } finally {
       this.isLoading = false;
@@ -94,7 +95,7 @@ class IntegrationsService {
   public async getIntegrationsForModal(): Promise<Integration[]> {
     // This method bypasses cache and gets fresh data with access tokens
     try {
-      console.log('IntegrationsService: Fetching integrations for modal (bypassing cache)...');
+      logger.debug('IntegrationsService: Fetching integrations for modal (bypassing cache)...');
       
       const response = await fetch('/api/integrations/modal-data');
       
@@ -103,11 +104,11 @@ class IntegrationsService {
       }
 
       const data = await response.json();
-      console.log('IntegrationsService: Modal integrations fetched:', data.length);
+      logger.debug('IntegrationsService: Modal integrations fetched:', data.length);
       
       return data || [];
     } catch (error) {
-      console.error('❌ IntegrationsService: Error fetching integrations for modal:', error);
+      logger.error('❌ IntegrationsService: Error fetching integrations for modal:', error);
       return [];
     }
   }
@@ -116,12 +117,12 @@ class IntegrationsService {
     const cacheKey = 'socialProfiles';
     
     if (this.socialProfiles.length > 0 && this.isDataFresh(cacheKey)) {
-      console.log('IntegrationsService: Returning cached social profiles');
+      logger.debug('IntegrationsService: Returning cached social profiles');
       return this.socialProfiles;
     }
 
     try {
-      console.log('IntegrationsService: Fetching social profiles...');
+      logger.debug('IntegrationsService: Fetching social profiles...');
       
       const response = await fetch('/api/social-profiles/routes');
       
@@ -133,10 +134,10 @@ class IntegrationsService {
       this.socialProfiles = data || [];
       this.lastFetch[cacheKey] = Date.now();
       
-      console.log('IntegrationsService: Social profiles stored in cache');
+      logger.debug('IntegrationsService: Social profiles stored in cache');
       return this.socialProfiles;
     } catch (error) {
-      console.error('❌ IntegrationsService: Error fetching social profiles:', error);
+      logger.error('❌ IntegrationsService: Error fetching social profiles:', error);
       return [];
     }
   }
@@ -155,7 +156,7 @@ class IntegrationsService {
     companyId: string;
   }): Promise<Integration> {
     try {
-      console.log('IntegrationsService: Creating new integration:', integrationData);
+      logger.debug('IntegrationsService: Creating new integration:', integrationData);
       
       const response = await fetch('/api/integrations', {
         method: 'POST',
@@ -178,10 +179,10 @@ class IntegrationsService {
       // Clear cache to force refresh on next get
       delete this.lastFetch['integrations'];
       
-      console.log('✅ IntegrationsService: Integration created successfully');
+      logger.debug('✅ IntegrationsService: Integration created successfully');
       return newIntegration;
     } catch (error) {
-      console.error('❌ IntegrationsService: Error creating integration:', error);
+      logger.error('❌ IntegrationsService: Error creating integration:', error);
       throw error;
     }
   }
@@ -197,8 +198,8 @@ class IntegrationsService {
     accountId?: string;
   }): Promise<Integration> {
     try {
-      console.log('IntegrationsService: Updating integration:', integrationId);
-      console.log('IntegrationsService: Update data:', updateData);
+      logger.debug('IntegrationsService: Updating integration:', integrationId);
+      logger.debug('IntegrationsService: Update data:', updateData);
       
       const response = await fetch(`/api/integrations/${integrationId}`, {
         method: 'PUT',
@@ -225,10 +226,10 @@ class IntegrationsService {
       // Clear cache to force refresh on next get
       delete this.lastFetch['integrations'];
       
-      console.log('✅ IntegrationsService: Integration updated successfully');
+      logger.debug('✅ IntegrationsService: Integration updated successfully');
       return updatedIntegration;
     } catch (error) {
-      console.error('❌ IntegrationsService: Error updating integration:', error);
+      logger.error('❌ IntegrationsService: Error updating integration:', error);
       throw error;
     }
   }
@@ -244,8 +245,8 @@ class IntegrationsService {
     accountId?: string;
   }): Promise<Integration> {
     try {
-      console.log('IntegrationsService: Updating integration for modal:', integrationId);
-      console.log('IntegrationsService: Update data:', updateData);
+      logger.debug('IntegrationsService: Updating integration for modal:', integrationId);
+      logger.debug('IntegrationsService: Update data:', updateData);
       
       const response = await fetch(`/api/integrations/modal-update?id=${integrationId}`, {
         method: 'PUT',
@@ -262,17 +263,17 @@ class IntegrationsService {
 
       const result = await response.json();
       
-      console.log('✅ IntegrationsService: Integration updated successfully for modal');
+      logger.debug('✅ IntegrationsService: Integration updated successfully for modal');
       return result;
     } catch (error) {
-      console.error('❌ IntegrationsService: Error updating integration for modal:', error);
+      logger.error('❌ IntegrationsService: Error updating integration for modal:', error);
       throw error;
     }
   }
 
   public async deleteIntegration(integrationId: string): Promise<void> {
     try {
-      console.log('IntegrationsService: Deleting integration:', integrationId);
+      logger.debug('IntegrationsService: Deleting integration:', integrationId);
       
       const response = await fetch(`/api/integrations/${integrationId}`, {
         method: 'DELETE',
@@ -289,16 +290,16 @@ class IntegrationsService {
       // Clear cache to force refresh on next get
       delete this.lastFetch['integrations'];
       
-      console.log('✅ IntegrationsService: Integration deleted successfully');
+      logger.debug('✅ IntegrationsService: Integration deleted successfully');
     } catch (error) {
-      console.error('❌ IntegrationsService: Error deleting integration:', error);
+      logger.error('❌ IntegrationsService: Error deleting integration:', error);
       throw error;
     }
   }
 
   public async refreshFacebookTokenInfo(integrationId: string): Promise<any> {
     try {
-      console.log('IntegrationsService: Refreshing Facebook token info for integration:', integrationId);
+      logger.debug('IntegrationsService: Refreshing Facebook token info for integration:', integrationId);
       
       const response = await fetch('/api/integrations/facebook-token-info', {
         method: 'POST',
@@ -318,10 +319,10 @@ class IntegrationsService {
       // Clear cache to force refresh on next get
       delete this.lastFetch['integrations'];
       
-      console.log('✅ IntegrationsService: Facebook token info refreshed successfully');
+      logger.debug('✅ IntegrationsService: Facebook token info refreshed successfully');
       return result;
     } catch (error) {
-      console.error('❌ IntegrationsService: Error refreshing Facebook token info:', error);
+      logger.error('❌ IntegrationsService: Error refreshing Facebook token info:', error);
       throw error;
     }
   }

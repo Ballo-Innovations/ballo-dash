@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "..";
+import { logger } from "@/lib/logger";
 
 type TimeFrame = "weekly" | "monthly" | "quarterly" | "annual";
 
@@ -55,7 +56,7 @@ export const fetchMarketingPlan = createAsyncThunk(
     timeframe: TimeFrame;
     periodStart: string;
   }) => {
-    console.log("fetching plan data");
+    logger.debug("fetching plan data");
     const res = await fetch(
       `/api/plan?companyId=${companyId}&timeframe=${timeframe}&periodStart=${periodStart}`
     );

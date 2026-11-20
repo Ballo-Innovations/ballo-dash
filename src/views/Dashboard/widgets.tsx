@@ -1,7 +1,6 @@
 import Image from "next/image";
 import React from "react";
 import { Card, Col } from "react-bootstrap";
-import "./style.scss";
 
 interface WidgetstProps {
   widgetData: Array<object>;

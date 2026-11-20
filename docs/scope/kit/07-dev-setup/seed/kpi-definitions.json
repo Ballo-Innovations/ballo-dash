@@ -1,0 +1,12 @@
+{"reach":{"formula":"sum(impressions)+sum(sessions)+sum(email_delivered)","unit":"count","target":1200000},
+ "engagementRate":{"formula":"(likes+comments+shares)/impressions","unit":"%","target":3.5},
+ "followerGrowth":{"formula":"delta(followers)","unit":"count","target":2500},
+ "sessions":{"formula":"count(sessions)","unit":"count","target":40000},
+ "conversions":{"formula":"count(goal completions)","unit":"count","target":900},
+ "emailCtr":{"formula":"clicks/delivered","unit":"%","target":4.0},
+ "mentions":{"formula":"count(mentions where brand=self)","unit":"count"},
+ "sentimentIndex":{"formula":"reach-weighted mean(score)*100","unit":"index","target":15},
+ "shareOfVoice":{"formula":"self mentions / all tracked brand mentions","unit":"%","target":45},
+ "nps":{"formula":"%promoters-%detractors","unit":"pts","target":25},
+ "csat":{"formula":"responses>=4 / total","unit":"%","target":85},
+ "paidVariance":{"formula":"(spend-budget)/budget","unit":"%","target":0}}

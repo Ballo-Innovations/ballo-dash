@@ -18,7 +18,7 @@ import { Button, Dropdown, DropdownToggle } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import SimpleBar from "simplebar-react";
 import { chanageLanguage } from "src/toolkit/themeLayouts/thunk";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "@/contexts/SessionContext";
 import Avatar from "@mui/material/Avatar";
 import Skeleton from "@mui/material/Skeleton";
 
@@ -67,7 +67,7 @@ const TopBar = ({
     setDropdownOpen(false);
   };
 
-  const { data: session } = useSession();
+  const { data: session, signOut } = useSession();
 
   return (
     <React.Fragment>
@@ -325,16 +325,6 @@ const TopBar = ({
                 <Dropdown.Menu className="dropdown-notification dropdown-menu-end pc-h-dropdown">
                   <div className="dropdown-header d-flex align-items-center justify-content-between">
                     <h4 className="m-0">Notifications</h4>
-                    <ul className="list-inline ms-auto mb-0">
-                      <li className="list-inline-item">
-                        <Link
-                          href="/application/mail"
-                          className="avtar avtar-s btn-link-hover-primary"
-                        >
-                          <i className="ti ti-link f-18"></i>
-                        </Link>
-                      </li>
-                    </ul>
                   </div>
                   <SimpleBar
                     className="dropdown-body text-wrap header-notification-scroll position-relative h-100"

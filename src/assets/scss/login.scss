@@ -762,7 +762,7 @@
 .home {
   position: relative;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
 
   &-bg-video {
@@ -778,7 +778,8 @@
   &-content-wrapper {
     position: relative;
     z-index: 2;
-    height: 100%;
+    min-height: calc(100vh - 90px);
+    padding: 1.5rem 0 3rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -921,4 +922,135 @@
   align-items: center;
   position: absolute;
   right: 0.75rem;
+}
+
+/* Account pages (K-02): sign-up, verify, forgot and reset password. */
+.auth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  @media (max-width: 575.98px) {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.auth-hint,
+.auth-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+}
+
+.home .auth-error {
+  color: #ffd2d2 !important;
+}
+
+.auth-notice {
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  background: rgba(255, 255, 255, 0.12);
+
+  &-error {
+    background: rgba(220, 38, 38, 0.25);
+  }
+
+  &-success {
+    background: rgba(22, 163, 74, 0.22);
+  }
+}
+
+// Centred confirmation screens: notice, hint, then two equal buttons side by side.
+.auth-centered {
+  text-align: center;
+}
+
+.auth-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+
+  .login-button,
+  .auth-secondary-button {
+    width: 100%;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 420px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.auth-single-action {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.auth-secondary-button {
+  display: block;
+  background: transparent;
+  color: #ffffff !important;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.auth-text {
+  font-size: 0.9375rem;
+  margin-bottom: 1rem;
+}
+
+.auth-password {
+  position: relative;
+
+  .auth-eye {
+    position: absolute;
+    right: 0.75rem;
+    top: 2.35rem;
+    background: none;
+    border: none;
+    padding: 0.25rem;
+  }
+
+  .form-input {
+    padding-right: 2.5rem;
+  }
+}
+
+.auth-inline-button {
+  background: none;
+  border: none;
+  padding: 0;
+  text-decoration: underline;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#login-section {
+  .login-button:disabled,
+  .auth-inline-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  .form-input:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+  }
 }

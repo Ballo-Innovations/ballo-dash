@@ -107,7 +107,7 @@ export const fetchXStats = createAsyncThunk<
 >(
   "x/fetchStats",
   async ({ username, platform, since = "", until = "", datePreset = "" }, { dispatch, getState }) => {
-    let state = getState();
+    const state = getState();
 
 
 

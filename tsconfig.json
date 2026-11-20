@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -10,10 +14,10 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -22,15 +26,33 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@pages/*": ["src/pages/*"],
-      "@assets/*": ["src/assets/*"],
-      "@layout/*": ["src/Layouts/*"],
-      "@common/*": ["src/Common/*"],
-      "@data/*": ["src/Common/JsonData/*"],
-      "@slices/*": ["src/slices/*"],
-      "@views/*": ["src/views/*"],
-      "@helpers/*": ["src/helpers/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@pages/*": [
+        "src/pages/*"
+      ],
+      "@assets/*": [
+        "src/assets/*"
+      ],
+      "@layout/*": [
+        "src/Layouts/*"
+      ],
+      "@common/*": [
+        "src/Common/*"
+      ],
+      "@data/*": [
+        "src/Common/JsonData/*"
+      ],
+      "@slices/*": [
+        "src/slices/*"
+      ],
+      "@views/*": [
+        "src/views/*"
+      ],
+      "@helpers/*": [
+        "src/helpers/*"
+      ]
     }
   },
   "include": [
@@ -42,5 +64,7 @@
     "postcss.config.ts",
     "src/db/seed.js"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

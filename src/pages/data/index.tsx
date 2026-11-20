@@ -3,15 +3,14 @@ import Layout from "@layout/index";
 import React, { ReactElement } from "react";
 import { useAppSelector } from "@/toolkit/hooks";
 import { selectCompany } from "@/toolkit/Company/reducer";
-import "@/assets/scss/data-page.scss";
-import Overview from "./Overview";
-import Posts from "./Posts";
+import Overview from "@/components/data-tables/DataOverview";
+import Posts from "@/components/data-tables/DataPosts";
 import NoIntegrations from "@/components/NoIntegrations";
 import { useAutoDataRefresh } from "@/hooks/useAutoDataRefresh";
 import { useIntegrations } from "@/hooks/useIntegrations";
-import Loading from "@/pages/pages/loading";  
+import Loading from "@/components/PageLoading";  
 
-const dataTables = () => {
+const DataPage = () => {
   const company = useAppSelector(selectCompany);
   const { hasIntegrations, error, isInitialized } = useIntegrations();
   
@@ -40,8 +39,8 @@ const dataTables = () => {
   );
 };
 
-dataTables.getLayout = (page: ReactElement) => {
+DataPage.getLayout = (page: ReactElement) => {
   return <Layout>{page}</Layout>;
 };
 
-export default dataTables;
+export default DataPage;

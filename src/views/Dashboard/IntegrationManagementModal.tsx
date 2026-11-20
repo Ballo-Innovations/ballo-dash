@@ -9,7 +9,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable prefer-const */
-/* eslint-disable no-console */
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Table, Form, Spinner, Row, Col } from 'react-bootstrap';
 import { Cable, Pencil, Save, X, RefreshCw, Plus, Trash2, Info, Building2 } from 'lucide-react';
@@ -28,6 +27,7 @@ import {
 import { useIntegrationModal } from '@/hooks/useIntegrationModal';
 
 import toast from 'react-hot-toast';
+import { logger } from "@/lib/logger";
 
 interface Integration {
   id: string;
@@ -42,6 +42,10 @@ interface Integration {
   expiresAt: string | null;
   accountId?: string; // Platform-specific account ID
   metadata?: any;
+  /** Secrets are never sent to the browser; these flags say whether one is saved. */
+  hasAccessToken?: boolean;
+  hasRefreshToken?: boolean;
+  hasAppSecret?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -111,15 +115,7 @@ const IntegrationManagementModal: React.FC = () => {
     try {
       // Use the modal-specific endpoint that includes access tokens
       const data = await integrationsService.getIntegrationsForModal();
-      console.log('Modal: Fetched integrations:', data);
-      console.log('Modal: Integration details:', data.map(i => ({
-        id: i.id,
-        type: i.type,
-        status: i.status,
-        hasAccessToken: !!i.accessToken,
-        accessTokenLength: i.accessToken?.length || 0,
-        accessTokenPreview: i.accessToken ? `${i.accessToken.substring(0, 20)}...` : 'NONE'
-      })));
+      logger.debug('Modal: Fetched integrations:', data);
       
       const editableIntegrations: EditableIntegration[] = data.map((integration: any) => ({
         ...integration,
@@ -130,7 +126,7 @@ const IntegrationManagementModal: React.FC = () => {
       setIntegrations(editableIntegrations);
     } catch (error) {
       toast.error('Failed to fetch integrations');
-      console.error('Error fetching integrations:', error);
+      logger.error('Error fetching integrations:', error);
     } finally {
       setLoading(false);
     }
@@ -159,8 +155,8 @@ const IntegrationManagementModal: React.FC = () => {
     setSaving(true);
 
     try {
-      console.log('Saving integration:', id);
-      console.log('Integration data to save:', {
+      logger.debug('Saving integration:', id);
+      logger.debug('Integration data to save:', {
         accessToken: integration.accessToken ? '***' : 'empty',
         refreshToken: integration.refreshToken ? '***' : 'empty',
         status: integration.status,
@@ -183,7 +179,7 @@ const IntegrationManagementModal: React.FC = () => {
         accountId: integration.accountId
       });
 
-      console.log('✅ Save successful, result:', result);
+      logger.debug('✅ Save successful, result:', result);
 
       // Update local state
       setIntegrations(prev => prev.map(i => 
@@ -223,9 +219,9 @@ const IntegrationManagementModal: React.FC = () => {
       toast.success('Integration updated successfully');
       
     } catch (error: any) {
-      console.error('❌ Save failed with error:', error);
-      console.error('❌ Error message:', error.message);
-      console.error('❌ Error stack:', error.stack);
+      logger.error('❌ Save failed with error:', error);
+      logger.error('❌ Error message:', error.message);
+      logger.error('❌ Error stack:', error.stack);
       
       toast.error(`Failed to update integration: ${error.message}`);
     } finally {
@@ -286,7 +282,7 @@ const IntegrationManagementModal: React.FC = () => {
   };
 
   const getTypeIcon = (type: string) => {
-    const icons: { [key: string]: JSX.Element } = {
+    const icons: { [key: string]: React.JSX.Element } = {
       'LINKEDIN': (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
@@ -430,7 +426,7 @@ const IntegrationManagementModal: React.FC = () => {
             toast.success('Meta data fetched successfully for new integration!');
           }
         } catch (error) {
-          console.error('Failed to fetch data for new integration:', error);
+          logger.error('Failed to fetch data for new integration:', error);
           toast.error('Integration created but failed to fetch data');
         }
       }
@@ -541,12 +537,12 @@ const IntegrationManagementModal: React.FC = () => {
           ...prev,
           status: 'CONNECTED'
         }));
-        console.log('✅ Access token validated, status updated to CONNECTED');
+        logger.debug('✅ Access token validated, status updated to CONNECTED');
       }
       
       return isValid;
     } catch (error) {
-      console.error('❌ Error validating access token:', error);
+      logger.error('❌ Error validating access token:', error);
       return false;
     }
   };
@@ -591,9 +587,9 @@ const IntegrationManagementModal: React.FC = () => {
           }
 
           const result = await response.json();
-          console.log('Facebook token info response in frontend:', result);
+          logger.debug('Facebook token info response in frontend:', result);
           expiryDate = result.tokenInfo?.expiresAt;
-          console.log('Extracted expiry date:', expiryDate);
+          logger.debug('Extracted expiry date:', expiryDate);
           break;
 
         case 'LINKEDIN':
@@ -627,8 +623,8 @@ const IntegrationManagementModal: React.FC = () => {
       if (expiryDate) {
         // Convert ISO date string to YYYY-MM-DD format for the date input
         const dateForInput = new Date(expiryDate).toISOString().split('T')[0];
-        console.log('Original expiry date:', expiryDate);
-        console.log('Converted to date input format:', dateForInput);
+        logger.debug('Original expiry date:', expiryDate);
+        logger.debug('Converted to date input format:', dateForInput);
         
         setNewIntegration(prev => ({
           ...prev,
@@ -851,13 +847,13 @@ const IntegrationManagementModal: React.FC = () => {
                           value={integration.appSecret || ''}
                           onChange={(e) => handleInputChange(integration.id, 'appSecret', e.target.value)}
                           size="sm"
-                          placeholder="Enter app secret"
+                          placeholder={integration.hasAppSecret ? "Saved. Enter a new value to replace it" : "Enter app secret"}
                           autoComplete="new-password"
                           data-lpignore="true"
                           data-form-type="other"
                         />
                       ) : (
-                        <small className="text-muted">{integration.appSecret ? maskToken(integration.appSecret) : 'Not set'}</small>
+                        <small className="text-muted">{integration.hasAppSecret ? 'Saved' : 'Not set'}</small>
                       )}
                     </td>
                     <td>
@@ -867,13 +863,13 @@ const IntegrationManagementModal: React.FC = () => {
                           value={integration.accessToken || ''}
                           onChange={(e) => handleInputChange(integration.id, 'accessToken', e.target.value)}
                           size="sm"
-                          placeholder="Enter access token"
+                          placeholder={integration.hasAccessToken ? "Saved. Enter a new value to replace it" : "Enter access token"}
                           autoComplete="off"
                           data-lpignore="true"
                           data-form-type="other"
                         />
                       ) : (
-                        <small className="text-muted">{integration.accessToken ? maskToken(integration.accessToken) : 'Not set'}</small>
+                        <small className="text-muted">{integration.hasAccessToken ? 'Saved' : 'Not set'}</small>
                       )}
                     </td>
                     <td>
@@ -883,11 +879,11 @@ const IntegrationManagementModal: React.FC = () => {
                           value={integration.refreshToken || ''}
                           onChange={(e) => handleInputChange(integration.id, 'refreshToken', e.target.value)}
                           size="sm"
-                          placeholder="Enter refresh token (optional)"
+                          placeholder={integration.hasRefreshToken ? "Saved. Enter a new value to replace it" : "Enter refresh token (optional)"}
                         />
                       ) : (
                         <small className="text-muted">
-                          {integration.refreshToken ? maskToken(integration.refreshToken) : 'N/A'}
+                          {integration.hasRefreshToken ? 'Saved' : 'N/A'}
                         </small>
                       )}
                     </td>

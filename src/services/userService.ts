@@ -1,4 +1,5 @@
 import { User } from "@/types";
+import { logger } from "@/lib/logger";
 
 class UserService {
   private static instance: UserService;
@@ -19,13 +20,13 @@ class UserService {
   public async getUser(): Promise<User | null> {
     // Return cached data if it's still valid
     if (this.userData && this.isDataFresh()) {
-      console.log('UserService: Returning cached user data');
+      logger.debug('UserService: Returning cached user data');
       return this.userData;
     }
 
     // Prevent multiple simultaneous requests
     if (this.isLoading) {
-      console.log('UserService: Request already in progress, waiting...');
+      logger.debug('UserService: Request already in progress, waiting...');
       // Wait for the current request to complete
       while (this.isLoading) {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -34,26 +35,26 @@ class UserService {
     }
 
     try {
-      console.log('UserService: Fetching user data from API...');
+      logger.debug('UserService: Fetching user data from API...');
       this.isLoading = true;
       const response = await fetch('/api/user');
       
-      console.log('UserService: API response status:', response.status);
+      logger.debug('UserService: API response status:', response.status);
       
       if (!response.ok) {
         throw new Error(`Failed to fetch user data: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('UserService: API response data:', data);
+      logger.debug('UserService: API response data:', data);
       
       this.userData = data.user;
       this.lastFetch = Date.now();
       
-      console.log('UserService: User data stored in cache');
+      logger.debug('UserService: User data stored in cache');
       return this.userData;
     } catch (error) {
-      console.error('❌ UserService: Error fetching user data:', error);
+      logger.error('❌ UserService: Error fetching user data:', error);
       // Don't throw - just return null to prevent app crashes
       return null;
     } finally {

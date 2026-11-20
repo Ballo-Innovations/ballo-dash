@@ -9,7 +9,6 @@ import facebookIcon from "@/assets/images/socials/facebook.png";
 import instaIcon from "@/assets/images/socials/instagram.png";
 import linkedinIcon from "@/assets/images/socials/linkedin.png";
 import xIcon from "@/assets/images/socials/X_icon.png";
-import "@/assets/scss/statistics-page.scss";
 import AudienceChart from "@/views/Chart/AudienceChart";
 import {
     PlatformSelector,
@@ -20,6 +19,7 @@ import {
     MetricsPanel,
     RecentPostsTable
 } from "@/components/statistics";
+import { logger } from "@/lib/logger";
 
 const StatisticsIndex = () => {
     const company = useAppSelector(selectCompany);
@@ -49,7 +49,7 @@ const StatisticsIndex = () => {
 
     const handleExportPDF = () => {
         // TODO: Implement PDF export functionality
-        console.log('Exporting statistics as PDF for platform:', platform);
+        logger.debug('Exporting statistics as PDF for platform:', platform);
         // This would typically generate a PDF report of the current statistics
     };
 

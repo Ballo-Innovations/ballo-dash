@@ -38,3 +38,15 @@ coverage/
 *.tgz
 *.zip
 *.tar
+# Build and test output
+test-results/
+playwright-report/
+*.tsbuildinfo
+
+
+
+# Vercel CLI link and local env files (the template stays tracked)
+.vercel
+.env*
+!.env.example
+.playwright-mcp/

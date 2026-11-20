@@ -15,6 +15,7 @@ import { setCompany } from "@/toolkit/Company/reducer";
 import { setSelectedUser } from "@/toolkit/User/reducer";
 import { AppDispatch } from "@/toolkit";
 import toast from "react-hot-toast";
+import { logger } from "@/lib/logger";
 
 
 interface AppContextType {
@@ -42,7 +43,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
 
     if (!dispatch) {
-      console.error('❌ AppContext: Dispatch is not available');
+      logger.error('❌ AppContext: Dispatch is not available');
       return;
     }
     
@@ -71,7 +72,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             const autoFetchDataForIntegration = async (integration: any) => {
               try {
                 
-                console.log(`🔍 Processing integration: ${integration.type} (status: ${integration.status})`);
+                logger.debug(`🔍 Processing integration: ${integration.type} (status: ${integration.status})`);
                 
                 if (integration.type === 'LINKEDIN') {
                   // For now, we'll use a default organization ID since we don't have social profiles set up yet
@@ -130,7 +131,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                     
                     toast.success('Facebook data and posts loaded successfully');
                   } catch (error: any) {
-                    console.error(`❌ Facebook error:`, error);
+                    logger.error(`❌ Facebook error:`, error);
                     if (error.message?.includes('access token not found')) {
                       toast.error(`Facebook integration not set up. Please configure your Facebook integration first.`);
                     } else if (error.message?.includes('Unauthorized')) {
@@ -140,7 +141,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                     }
                   }
                 } else if (integration.type === 'INSTAGRAM') {
-                  console.log(`📸 Processing Instagram integration for: ${integration.type}, accountId: ${integration.accountId}`);
+                  logger.debug(`📸 Processing Instagram integration for: ${integration.type}, accountId: ${integration.accountId}`);
                   try {
                     // First fetch Instagram stats to get the username
                     const statsResult = await dispatch(fetchInstagramStats({
@@ -158,7 +159,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                     
                     toast.success('Instagram data and posts loaded successfully');
                   } catch (error: any) {
-                    console.error(`❌ Instagram error:`, error);
+                    logger.error(`❌ Instagram error:`, error);
                     if (error.message?.includes('access token not found')) {
                       toast.error(`Instagram integration not set up. Please configure your Instagram integration first.`);
                     } else if (error.message?.includes('Unauthorized')) {
@@ -205,10 +206,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                     // Continue with other integrations even if X fails
                   }
                 } else {
-                  console.log(`ℹ️ AppContext: Auto-fetch not implemented for platform: ${integration.type}`);
+                  logger.debug(`ℹ️ AppContext: Auto-fetch not implemented for platform: ${integration.type}`);
                 }
               } catch (error) {
-                console.warn(`⚠️ AppContext: Auto-fetch failed for ${integration.type}:`, error);
+                logger.warn(`⚠️ AppContext: Auto-fetch failed for ${integration.type}:`, error);
               }
             };
 
@@ -218,7 +219,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
               (integration.type === 'LINKEDIN' || integration.type === 'FACEBOOK' || integration.type === 'INSTAGRAM' || integration.type === 'X')
             );
 
-            console.log(`🔍 Found ${connectedIntegrations.length} connected integrations:`, connectedIntegrations.map(i => ({ type: i.type, status: i.status })));
+            logger.debug(`🔍 Found ${connectedIntegrations.length} connected integrations:`, connectedIntegrations.map(i => ({ type: i.type, status: i.status })));
 
             // Auto-fetch data for all CONNECTED integrations in parallel
             if (connectedIntegrations.length > 0) {

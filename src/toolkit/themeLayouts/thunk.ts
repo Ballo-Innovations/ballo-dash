@@ -8,6 +8,7 @@ import {
     changeLayoutThemeAction,
     changeLanguageAction,
 } from './reducer';
+import { logger } from "@/lib/logger";
 
 /**
  * Changes the layout type
@@ -107,7 +108,7 @@ export const changeLayoutTheme = (layoutTheme: any) => async (dispatch: any) => 
 //     try {
 //         dispatch({ type: "CHANGE_LANGUAGE", payload: language });
 //     } catch (error) {
-//         console.error(error);
+//         logger.error(error);
 //     }
 // }
 

@@ -12,7 +12,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAppSelector } from "@/toolkit/hooks";
 import { selectCompany } from "@/toolkit/Company/reducer";
 import { ArrowRightLeft } from "lucide-react";
-import "./style.scss";
 
 const HomeBanner = () => {
   const company = useAppSelector(selectCompany);

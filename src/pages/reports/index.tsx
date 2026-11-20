@@ -17,7 +17,6 @@ import instaIcon from "@/assets/images/socials/instagram.png";
 import linkedinIcon from "@/assets/images/socials/linkedin.png";
 import xIcon from "@/assets/images/socials/X_icon.png";
 import allPlatformsIcon from "@/assets/images/all-platforms.png";
-import "@/assets/scss/reports-page.scss";
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/router";
 

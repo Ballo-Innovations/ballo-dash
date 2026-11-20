@@ -95,8 +95,7 @@ const RightCustomizer = ({
                                             <button
 
                                                 onClick={() => {
-                                                    isLanding ? console.log("dark")
-                                                        : dispatch(changeSidebarTheme(SIDEBAR_THEME.LIGHT));
+                                                    if (!isLanding) dispatch(changeSidebarTheme(SIDEBAR_THEME.LIGHT));
                                                 }}
                                                 className={`preset-btn btn ${sidebarTheme === SIDEBAR_THEME.LIGHT ? 'active' : ''}`}
                                                 data-value="false">
@@ -110,7 +109,7 @@ const RightCustomizer = ({
                                         <div className="d-grid">
                                             <button
                                                 onClick={() => {
-                                                    isLanding ? console.log("light") : dispatch(changeSidebarTheme(SIDEBAR_THEME.DARK));
+                                                    if (!isLanding) dispatch(changeSidebarTheme(SIDEBAR_THEME.DARK));
                                                 }}
                                                 className={`preset-btn btn ${sidebarTheme === SIDEBAR_THEME.DARK ? 'active' : ''}`}
                                                 data-value="true">

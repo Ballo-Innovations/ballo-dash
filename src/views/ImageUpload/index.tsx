@@ -1,17 +1,14 @@
 import { Pencil } from "lucide-react";
 import React, { useState } from "react";
-import "./style.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { updateLogoUrl, selectCompany } from "@/toolkit/Company/reducer";
 
 type UploadPopupProps = {
-  folder?: string; // optional folder path for S3
   onUploadComplete?: (fileUrl: string) => void; // callback with uploaded file URL
   id?: string;
 };
 
 const UploadPopup: React.FC<UploadPopupProps> = ({
-  folder,
   onUploadComplete,
 }) => {
   const dispatch = useDispatch();
@@ -49,30 +46,33 @@ const UploadPopup: React.FC<UploadPopupProps> = ({
     setError(null);
 
     try {
-      const query = new URLSearchParams({
-        fileName: file.name,
-        fileType: file.type,
-        companyId: company?.id || "",
+      // 1. Ask the server for a signed upload URL (it chooses the storage key).
+      const signRes = await fetch("/api/uploads/company-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "logo", contentType: file.type, size: file.size }),
       });
-      if (folder) {
-        query.append("folder", folder);
+      if (!signRes.ok) {
+        const problem = await signRes.json().catch(() => null);
+        throw new Error(problem?.error?.message ?? "Could not start the upload");
       }
+      const { uploadUrl, fileUrl } = await signRes.json();
 
-      // Get signed URL from backend
-      const res = await fetch(`/api/upload-url?${query.toString()}`);
-      if (!res.ok) throw new Error("Failed to get upload URL");
-
-      const { url, fileUrl } = await res.json();
-
-      // Upload file to S3
-      const uploadRes = await fetch(url, {
+      // 2. Upload the file straight to storage.
+      const uploadRes = await fetch(uploadUrl, {
         method: "PUT",
-        headers: {
-          "Content-Type": file.type,
-        },
+        headers: { "Content-Type": file.type },
         body: file,
       });
       if (!uploadRes.ok) throw new Error("Upload failed");
+
+      // 3. Save it on the company.
+      const saveRes = await fetch("/api/company", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ logoUrl: fileUrl }),
+      });
+      if (!saveRes.ok) throw new Error("Could not save the logo");
 
       setSuccessUrl(fileUrl);
       onUploadComplete?.(fileUrl);
@@ -99,14 +99,19 @@ const UploadPopup: React.FC<UploadPopupProps> = ({
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2 className="modal-title">Update company logo</h2>
 
+            <label htmlFor="company-logo-file" className="form-label">
+              PNG, JPG or WebP, up to 2 MB
+            </label>
             <input
+              id="company-logo-file"
               type="file"
+              accept="image/png,image/jpeg,image/webp"
               onChange={handleFileChange}
               disabled={uploading}
               className="file-input"
             />
 
-            {error && <p className="error-text">{error}</p>}
+            {error && <p className="error-text" role="alert">{error}</p>}
 
             {successUrl && (
               <p className="success-text">

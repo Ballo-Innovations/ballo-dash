@@ -169,7 +169,7 @@ const TableContainer = ({
   } = table;
 
   useEffect(() => {
-    Number(customPageSize) && setPageSize(Number(customPageSize));
+    if (Number(customPageSize)) setPageSize(Number(customPageSize));
   }, [customPageSize, setPageSize]);
 
   const onChangeInSelect = (event: any) => {
