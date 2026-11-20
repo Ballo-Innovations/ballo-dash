@@ -1,0 +1,173 @@
+// Semantic colours (F-12), from docs/scope/kit/03-design/01-design-system.md.
+// Every state has a text colour (-fg) and a tint (-bg); the pair meets WCAG AA (4.5:1) in both
+// themes. src/components/ui/tokens.test.ts parses this file and checks every pair.
+// Solid accents (-solid) are for lines, dots and chart series, not for text.
+
+:root,
+[data-pc-theme="light"] {
+  --sentiment-neg-fg: #b91c1c;
+  --sentiment-neg-bg: #fee2e2;
+  --sentiment-neu-fg: #475569;
+  --sentiment-neu-bg: #f1f5f9;
+  --sentiment-pos-fg: #15803d;
+  --sentiment-pos-bg: #dcfce7;
+
+  --severity-watch-fg: #92400e;
+  --severity-watch-bg: #fef3c7;
+  --severity-warning-fg: #9a3412;
+  --severity-warning-bg: #ffedd5;
+  --severity-crisis-fg: #b91c1c;
+  --severity-crisis-bg: #fee2e2;
+
+  --billing-planned-fg: #475569;
+  --billing-planned-bg: #f1f5f9;
+  --billing-booked-fg: #1d4ed8;
+  --billing-booked-bg: #dbeafe;
+  --billing-invoiced-fg: #92400e;
+  --billing-invoiced-bg: #fef3c7;
+  --billing-paid-fg: #15803d;
+  --billing-paid-bg: #dcfce7;
+  --billing-disputed-fg: #b91c1c;
+  --billing-disputed-bg: #fee2e2;
+
+  --source-live-fg: #0369a1;
+  --source-live-bg: #e0f2fe;
+  --source-import-fg: #6d28d9;
+  --source-import-bg: #ede9fe;
+  --source-simulated-fg: #92400e;
+  --source-simulated-bg: #fef3c7;
+  --source-stub-fg: #475569;
+  --source-stub-bg: #f1f5f9;
+
+  --sentiment-neg-solid: #dc2626;
+  --sentiment-neu-solid: #64748b;
+  --sentiment-pos-solid: #16a34a;
+  --severity-crisis-solid: #dc2626;
+}
+
+[data-pc-theme="dark"] {
+  --sentiment-neg-fg: #fca5a5;
+  --sentiment-neg-bg: #3b1219;
+  --sentiment-neu-fg: #cbd5e1;
+  --sentiment-neu-bg: #1e293b;
+  --sentiment-pos-fg: #86efac;
+  --sentiment-pos-bg: #0f2e1d;
+
+  --severity-watch-fg: #fcd34d;
+  --severity-watch-bg: #33240a;
+  --severity-warning-fg: #fdba74;
+  --severity-warning-bg: #3a1d0b;
+  --severity-crisis-fg: #fca5a5;
+  --severity-crisis-bg: #3b1219;
+
+  --billing-planned-fg: #cbd5e1;
+  --billing-planned-bg: #1e293b;
+  --billing-booked-fg: #93c5fd;
+  --billing-booked-bg: #172554;
+  --billing-invoiced-fg: #fcd34d;
+  --billing-invoiced-bg: #33240a;
+  --billing-paid-fg: #86efac;
+  --billing-paid-bg: #0f2e1d;
+  --billing-disputed-fg: #fca5a5;
+  --billing-disputed-bg: #3b1219;
+
+  --source-live-fg: #7dd3fc;
+  --source-live-bg: #0c2a3e;
+  --source-import-fg: #c4b5fd;
+  --source-import-bg: #2a1c4d;
+  --source-simulated-fg: #fcd34d;
+  --source-simulated-bg: #33240a;
+  --source-stub-fg: #cbd5e1;
+  --source-stub-bg: #1e293b;
+
+  --sentiment-neg-solid: #f87171;
+  --sentiment-neu-solid: #94a3b8;
+  --sentiment-pos-solid: #4ade80;
+  --severity-crisis-solid: #f87171;
+}
+
+// Pills and chips share one shape; the modifier picks the colour pair.
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  color: var(--pill-fg);
+  background: var(--pill-bg);
+
+  @each $group, $states in (
+    sentiment: (neg, neu, pos),
+    severity: (watch, warning, crisis),
+    billing: (planned, booked, invoiced, paid, disputed),
+    source: (live, import, simulated, stub)
+  ) {
+    @each $state in $states {
+      &.ui-#{$group}-#{$state} {
+        --pill-fg: var(--#{$group}-#{$state}-fg);
+        --pill-bg: var(--#{$group}-#{$state}-bg);
+      }
+    }
+  }
+}
+
+// Crisis alerts pulse their border (design system micro-rule); calm when motion is reduced.
+.ui-crisis-pulse {
+  border: 2px solid var(--severity-crisis-solid);
+  animation: ui-crisis-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes ui-crisis-pulse {
+  50% {
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.25);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-crisis-pulse {
+    animation: none;
+  }
+}
+
+// Skeletons, not spinners.
+.ui-skeleton {
+  display: block;
+  border-radius: 6px;
+  // Tints of the text colour, so it works in both themes (the template keeps --bs-secondary-bg light in dark mode).
+  background: linear-gradient(90deg, rgba(var(--bs-body-color-rgb), 0.08) 25%, rgba(var(--bs-body-color-rgb), 0.16) 50%, rgba(var(--bs-body-color-rgb), 0.08) 75%);
+  background-size: 200% 100%;
+  animation: ui-skeleton 1.4s ease-in-out infinite;
+}
+
+@keyframes ui-skeleton {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-skeleton {
+    animation: none;
+  }
+}
+
+.ui-kpi-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-delta-up {
+  color: var(--sentiment-pos-fg);
+}
+
+.ui-delta-down {
+  color: var(--sentiment-neg-fg);
+}
+
+// Right-hand detail drawer: 480px on larger screens, full width on phones.
+.offcanvas.ui-drawer {
+  --bs-offcanvas-width: min(480px, 100vw);
+}
