@@ -117,6 +117,20 @@
     }
   }
 
+  // Group toggles are buttons (keyboard reachable) styled like links (F-10).
+  .pc-link-button {
+    width: 100%;
+    background: none;
+    border: 0;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .pc-link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
+  }
+
   .pc-navbar > .pc-item {
     margin: 0 10px;
 
