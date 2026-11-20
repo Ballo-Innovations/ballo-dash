@@ -13,9 +13,10 @@ import "@/views/Home/Home Content/style.scss";
 import "@/views/Dashboard/style.scss";
 import React, { ReactElement, ReactNode, useEffect, useState } from "react";
 import Head from "next/head";
+import { Ubuntu } from "next/font/google";
 import { Provider as ReduxProvider } from "react-redux";
 import { RootState, wrapper } from "../toolkit/index";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider } from "@/contexts/SessionContext";
 import { AppProps } from "next/app";
 import type { NextPage } from "next";
 import { appWithTranslation } from "next-i18next";
@@ -25,6 +26,14 @@ import { useRouter } from "next/router";
 import Loading from "@/components/PageLoading";
 import AppInitializer from "@/Common/AppInitializer";
 import ErrorBoundary from "@/components/ErrorBoundary";
+
+// Self-hosted at build time: no request to Google at runtime.
+const appFont = Ubuntu({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -37,7 +46,7 @@ type AppPropsWithLayout = AppProps & {
 
 const MyApp = ({
   Component,
-  pageProps: { session, ...pageProps },
+  pageProps,
   ...rest
 }: AppPropsWithLayout) => {
   const { store } = wrapper.useWrappedStore(rest);
@@ -62,6 +71,12 @@ const MyApp = ({
 
   return (
     <>
+      {/* Expose the self-hosted font to global.css as --font-app. */}
+      <style jsx global>{`
+        :root {
+          --font-app: ${appFont.style.fontFamily};
+        }
+      `}</style>
       <Head>
         <link rel="icon" href="/favicon.ico" />
         <meta
@@ -70,7 +85,7 @@ const MyApp = ({
         />
         <title>Ballo Dashboard</title>
       </Head>
-      <SessionProvider session={session}>
+      <SessionProvider>
         <ReduxProvider store={store}>
           <ErrorBoundary>
             <AppProvider>

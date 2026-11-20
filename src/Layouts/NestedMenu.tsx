@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import Link from "next/link";
 import React, { useCallback, useEffect, useState } from "react";
-import FeatherIcon from "feather-icons-react";
+import { ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 interface MenuItem {
@@ -85,7 +85,7 @@ const NestedMenu: React.FC<{ menuItems: MenuItem[] }> = ({ menuItems }) => {
             </span>
             <span className="pc-mtext">{t(item.label)}</span>
             <span className="pc-arrow">
-              <FeatherIcon icon="chevron-right" />
+              <ChevronRight size={16} aria-hidden="true" />
             </span>
           </span>
           <ul
