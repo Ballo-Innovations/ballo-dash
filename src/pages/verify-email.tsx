@@ -51,7 +51,9 @@ export default function VerifyEmailPage() {
   return (
     <AuthShell title="Confirm your email">
       {state === "resent" ? (
-        <AuthNotice tone="success">If that address has an unconfirmed account, a new link is on its way.</AuthNotice>
+        <div className="auth-centered">
+          <AuthNotice tone="success">If that address has an unconfirmed account, a new link is on its way.</AuthNotice>
+        </div>
       ) : (
         <>
           <AuthNotice tone="error">{message}</AuthNotice>

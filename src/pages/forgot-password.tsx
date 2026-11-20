@@ -23,10 +23,16 @@ export default function ForgotPasswordPage() {
   return (
     <AuthShell title="Reset your password">
       {sent ? (
-        <AuthNotice tone="success">
-          If an account uses that address, we have sent a link to choose a new password. It works for one hour.
-        </AuthNotice>
+        <div className="auth-centered">
+          <AuthNotice tone="success">
+            If an account uses that address, we have sent a link to choose a new password. It works for one hour.
+          </AuthNotice>
+          <Link href="/login" className="auth-secondary-button auth-single-action">
+            Back to sign in
+          </Link>
+        </div>
       ) : (
+        <>
         <form className="login-form" method="post" onSubmit={handleSubmit} noValidate>
           <p className="auth-text">Enter the email you sign in with and we will send you a reset link.</p>
           <AuthField
@@ -43,12 +49,13 @@ export default function ForgotPasswordPage() {
             {submitting ? "Sending..." : "Send reset link"}
           </button>
         </form>
+          <p className="signup-text">
+            <Link href="/login" className="signup-link">
+              Back to sign in
+            </Link>
+          </p>
+        </>
       )}
-      <p className="signup-text">
-        <Link href="/login" className="signup-link">
-          Back to sign in
-        </Link>
-      </p>
     </AuthShell>
   );
 }
