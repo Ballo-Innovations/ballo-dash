@@ -8,7 +8,7 @@
 | C-02 | Worker service on the Ballo backend server: scheduler and job runner | P0 | 2 | 8 | DONE (staging) |
 | C-03 | Adapt existing Facebook Instagram LinkedIn and X integrations to the connector interface | P0 | 2 | 12 | TODO |
 | C-04 | RSS and news connector with outlet reach table | P0 | 2 | 6 | DONE (staging) |
-| C-05 | First-party web tracker: /t.js, /api/collect, sessionisation | P0 | 2 | 8 | TODO |
+| C-05 | First-party web tracker: /t.js, /api/collect, sessionisation | P0 | 2 | 8 | DONE (staging) |
 | C-06 | CSV import wizard: GA4, Meta, Mailchimp, X exports | P0 | 2 | 10 | DONE (staging) |
 | C-07 | Keyword rules per brand (include and exclude) | P1 | 2 | 4 | DONE (staging) |
 | C-08 | Sandbox data generator with scenarios | P0 | 2 | 10 | DONE (staging) |
@@ -77,18 +77,20 @@
 
 ## C-05 First-party web tracker: /t.js, /api/collect, sessionisation
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 8h
 - **Depends on:** F-06, H-13
 
 **Acceptance criteria**
 
-- [ ] Snippet under 3 KB posts { event, path, referrer, utm, sessionId, ts } with a per-site public key
-- [ ] 30 minute sessions
-- [ ] Rate limited
-- [ ] Rejects unknown site keys and oversized payloads
-- [ ] Respects Do Not Track
-- [ ] No cookies beyond a first-party session id
+- [x] Snippet under 3 KB posts { event, path, referrer, utm, sessionId, ts } with a per-site public key
+- [x] 30 minute sessions
+- [x] Rate limited
+- [x] Rejects unknown site keys and oversized payloads
+- [x] Respects Do Not Track
+- [x] No cookies beyond a first-party session id
+
+**Notes:** ballo-dash-api `src/tracker` (#36). Embed `<script async src="https://<api host>/api/t.js" data-key="bs_..."></script>`; custom events with `ballo("event", "signup")`. The snippet is 1.5 KB, sends via sendBeacon (text/plain, no preflight), keeps one first-party cookie `_bsid` (30 minutes, sliding) and sends nothing under Do Not Track or Global Privacy Control. `/api/collect` is public, limited to 120 events a minute per IP and 3,000 per site, 4 KB max, rejects unknown or disabled keys and, for domain-locked sites, other origins; no IP is stored. Site keys live in `tracker_sites`; create one with `npm run tracker:site` until the Admin console exists. Raw events only: sessions and conversions are derived in C-10. Verified on staging 2026-11-20 with a real browser: pageview with UTM, in-page navigation and a custom event stored under one session; with Do Not Track nothing was sent and no cookie set.
 
 ## C-06 CSV import wizard: GA4, Meta, Mailchimp, X exports
 
