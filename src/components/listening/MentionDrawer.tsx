@@ -24,6 +24,10 @@ export interface MentionDetail extends Mention {
   summaryModel: string | null;
 }
 
+function count(n: number, noun: string): string {
+  return `${compact(n)} ${noun}${n === 1 ? "" : "s"}`;
+}
+
 function signed(n: number): string {
   return n > 0 ? `+${n.toFixed(2)}` : n.toFixed(2);
 }
@@ -222,8 +226,8 @@ export function MentionDrawer({
               <dd className="col-7">{compact(m.reach)}</dd>
               <dt className="col-5 fw-normal text-muted">Engagement</dt>
               <dd className="col-7">
-                {compact(m.likes)} likes, {compact(m.shares)} shares,{" "}
-                {compact(m.comments)} comments
+                {count(m.likes, "like")}, {count(m.shares, "share")},{" "}
+                {count(m.comments, "comment")}
               </dd>
               {m.topics.length > 0 && (
                 <>
