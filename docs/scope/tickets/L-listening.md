@@ -7,7 +7,7 @@
 | L-01 | Mentions query service and list page with filters | P0 | 2 | 6 | DONE (staging) |
 | L-02 | Live wall over server-sent events | P0 | 2 | 8 | DONE (staging) |
 | L-03 | Mention drawer with explanation | P0 | 2 | 5 | DONE (staging) |
-| L-04 | Rising topics panel and topic page | P0 | 3 | 5 | TODO |
+| L-04 | Rising topics panel and topic page | P0 | 3 | 5 | DONE (staging) |
 | L-05 | Media page: news table, outlet ranking, coverage over time | P0 | 3 | 5 | DONE (staging) |
 | L-06 | Alerts: banner, list, drawer, acknowledge, assign, resolve | P0 | 3 | 8 | TODO |
 | L-07 | Alert delivery by email | P1 | 5 | 5 | TODO |
@@ -62,15 +62,17 @@
 
 ## L-04 Rising topics panel and topic page
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 3  **Estimate:** 5h
 - **Depends on:** I-04
 - **Feature flag:** `NEXT_PUBLIC_FEATURE_LISTENING`
 
 **Acceptance criteria**
 
-- [ ] Top 10 rising topics with z score, sparkline and example mentions
-- [ ] Topic page lists its mentions
+- [x] Top 10 rising topics with z score, sparkline and example mentions
+- [x] Topic page lists its mentions
+
+**Notes:** API `GET /api/topics` and `/api/topics/:id` (ballo-dash-api #70). Web: Rising topics panel beside the mentions on wide screens and below them on narrow ones (name, 15 day sparkline, mentions in 24 h, times the usual volume, z score, two examples); `/listening/topics/[id]` with the counts chart, terms and the topic's mentions from the last 15 days, paged, with the drawer. Verified on staging 2026-11-21 with the topics the detector found; no horizontal scroll at 375 px.
 
 ## L-05 Media page: news table, outlet ranking, coverage over time
 
