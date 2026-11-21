@@ -1,3 +1,4 @@
+import { AlertBanner } from "@/components/alerts/AlertBanner";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
@@ -30,7 +31,7 @@ const selectLayoutProperties = createSelector(
     themeLayout: layout.themeLayout,
     sidebarTheme: layout.sidebarTheme,
     sidebarThemeCaptions: layout.sidebarThemeCaptions,
-  })
+  }),
 );
 
 /**
@@ -66,7 +67,9 @@ const Layout = ({ children }: LayoutProps) => {
   ]);
 
   const toogleSidebarHide = useCallback(() => {
-    document.getElementById("pc-sidebar-hide")?.classList.toggle("pc-sidebar-hide");
+    document
+      .getElementById("pc-sidebar-hide")
+      ?.classList.toggle("pc-sidebar-hide");
   }, []);
 
   const toogleMobileSidebarHide = useCallback(() => {
@@ -76,7 +79,9 @@ const Layout = ({ children }: LayoutProps) => {
 
     const overlay = document.createElement("div");
     overlay.className = "pc-menu-overlay";
-    document.querySelector(".navbar-wrapper")?.insertAdjacentElement("afterend", overlay);
+    document
+      .querySelector(".navbar-wrapper")
+      ?.insertAdjacentElement("afterend", overlay);
     overlay.addEventListener("click", () => {
       sidebar.classList.remove("mob-sidebar-active");
       overlay.remove();
@@ -99,6 +104,7 @@ const Layout = ({ children }: LayoutProps) => {
       />
       <div className="pc-container">
         <div className={"pc-content " + (isLayoutWidth ? "container" : "")}>
+          <AlertBanner />
           {children}
         </div>
       </div>

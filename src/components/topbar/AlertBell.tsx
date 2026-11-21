@@ -52,7 +52,7 @@ export default function AlertBell() {
     count === 0
       ? "No open alerts"
       : `${count} open alert${count === 1 ? "" : "s"}`;
-  const alertsPage = isFeatureEnabled("listening") ? "/listening#alerts" : null;
+  const alertsPage = isFeatureEnabled("listening") ? "/listening/alerts" : null;
 
   return (
     <Dropdown as="li" className="pc-h-item">
@@ -81,12 +81,21 @@ export default function AlertBell() {
         ) : (
           <ul className="list-group list-group-flush">
             {data!.alerts.map((alert) => (
-              <li key={alert.id} className="list-group-item">
+              <li key={alert.id} className="list-group-item position-relative">
                 <div className="d-flex align-items-center gap-2 mb-1">
                   <span className={`badge ${SEVERITY_CLASS[alert.severity]}`}>
                     {alert.severity.toLowerCase()}
                   </span>
-                  <span className="fw-semibold">{alert.brandName}</span>
+                  {alertsPage ? (
+                    <Link
+                      href={`${alertsPage}?alert=${alert.id}`}
+                      className="fw-semibold stretched-link"
+                    >
+                      {alert.brandName}
+                    </Link>
+                  ) : (
+                    <span className="fw-semibold">{alert.brandName}</span>
+                  )}
                 </div>
                 <p className="mb-1">
                   {[alert.topic, alert.aspect, alert.region]
