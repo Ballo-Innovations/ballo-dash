@@ -42,7 +42,7 @@
 - [x] Scheduled execution per source with a per-source lock so runs never overlap
 - [x] Failures retried with backoff and visible in connector_runs
 - [x] Restarts cleanly after a crash or reboot
-- [ ] Heartbeat visible on the Sources page
+- [x] Heartbeat visible on the Sources page (M-03, 2026-11-21)
 
 **Notes:** ballo-dash-api `src/worker`: 30 second tick, per-source pg advisory lock, backoff doubling to a 6 hour cap, `worker_heartbeats`. Runs as the `worker` service in deploy/docker-compose.yml; deploy.sh starts it after the API. On staging: heartbeat fresh, and after killing the node process Docker restarted it. The heartbeat is served by GET /api/sources/health; the Sources page that shows it is built with the admin console (M epic).
 

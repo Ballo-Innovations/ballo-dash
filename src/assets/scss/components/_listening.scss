@@ -184,3 +184,11 @@
   padding: 0.25rem 0 0.25rem 0.75rem;
   border-left: 2px solid var(--bs-border-color);
 }
+
+// Sources page (M-03): worker heartbeat dot.
+.live-dot.worker-ok {
+  background: var(--sentiment-pos-solid, #16a34a);
+}
+.live-dot.worker-down {
+  background: var(--sentiment-neg-solid, #dc2626);
+}
