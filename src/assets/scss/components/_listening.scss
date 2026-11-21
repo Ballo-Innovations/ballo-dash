@@ -122,3 +122,22 @@
     background: var(--sentiment-pos-solid, #16a34a);
   }
 }
+
+// Rising topics (L-04)
+.rising-topics li:last-child {
+  border-bottom: 0 !important;
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (min-width: 1200px) {
+  .listening-side {
+    position: sticky;
+    top: 5.5rem;
+  }
+}

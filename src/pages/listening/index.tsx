@@ -12,6 +12,7 @@ import Layout from "@layout/index";
 import { withFeature } from "@/components/FeatureGate";
 import { FilterBar } from "@/components/listening/FilterBar";
 import { ListeningTabs } from "@/components/listening/ListeningTabs";
+import { RisingTopics } from "@/components/listening/RisingTopics";
 import { MentionCard } from "@/components/listening/MentionCard";
 import { MentionDrawer } from "@/components/listening/MentionDrawer";
 import { EmptyState, ErrorState, SkeletonCard } from "@/components/ui";
@@ -133,111 +134,134 @@ function ListeningPage() {
       </Head>
       <BreadcrumbItem mainTitle="Listening" subTitle="Mentions" />
       <ListeningTabs />
-      <FilterBar
-        filters={filters}
-        options={options}
-        counts={data?.counts ?? null}
-        onChange={setFilters}
-      />
+      <div className="row g-3">
+        <div className="col-12 col-xl-8">
+          <FilterBar
+            filters={filters}
+            options={options}
+            counts={data?.counts ?? null}
+            onChange={setFilters}
+          />
 
-      <div className="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
-        <p className="mb-0 text-muted" aria-live="polite">
-          {loading && !data
-            ? "Loading mentions"
-            : `${total.toLocaleString("en")} mention${total === 1 ? "" : "s"}`}
-          {total > 0 &&
-            ` · showing ${firstShown.toLocaleString("en")} to ${lastShown.toLocaleString("en")}`}
-        </p>
+          <div className="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
+            <p className="mb-0 text-muted" aria-live="polite">
+              {loading && !data
+                ? "Loading mentions"
+                : `${total.toLocaleString("en")} mention${total === 1 ? "" : "s"}`}
+              {total > 0 &&
+                ` · showing ${firstShown.toLocaleString("en")} to ${lastShown.toLocaleString("en")}`}
+            </p>
+          </div>
+
+          {error ? (
+            <div className="card">
+              <ErrorState
+                message={error}
+                onRetry={() => {
+                  setResult(null);
+                  setAttempt((a) => a + 1);
+                }}
+              />
+            </div>
+          ) : loading && !data ? (
+            <div className="d-grid gap-2">
+              <SkeletonCard lines={2} label="Loading mentions" />
+              <SkeletonCard lines={2} label="Loading mentions" />
+              <SkeletonCard lines={2} label="Loading mentions" />
+            </div>
+          ) : total === 0 ? (
+            <div className="card">
+              <EmptyState
+                icon="ph-duotone ph-ear"
+                title={
+                  filtered
+                    ? "No mentions match these filters"
+                    : "No mentions in this period"
+                }
+                message={
+                  filtered
+                    ? "Try fewer filters or a longer period."
+                    : "Mentions appear here as sources bring them in."
+                }
+                action={
+                  filtered ? (
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary btn-sm"
+                      onClick={() =>
+                        setFilters({
+                          sentiment: [],
+                          channel: [],
+                          topic: [],
+                          region: [],
+                          q: "",
+                        })
+                      }
+                    >
+                      Clear filters
+                    </button>
+                  ) : undefined
+                }
+              />
+            </div>
+          ) : (
+            <div style={{ opacity: loading ? 0.6 : 1 }} aria-busy={loading}>
+              {data?.mentions.map((m) => (
+                <MentionCard
+                  key={m.id}
+                  mention={m}
+                  onOpen={(x) => setOpen(x.id)}
+                />
+              ))}
+            </div>
+          )}
+
+          {total > PAGE_SIZE && !error && (
+            <nav
+              className="d-flex justify-content-between align-items-center my-3"
+              aria-label="Pages"
+            >
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                disabled={filters.page <= 1 || loading}
+                onClick={() =>
+                  setFilters({ ...filters, page: filters.page - 1 })
+                }
+              >
+                <i
+                  className="ph-duotone ph-caret-left me-1"
+                  aria-hidden="true"
+                />
+                Newer
+              </button>
+              <span className="small text-muted">
+                Page {filters.page.toLocaleString("en")} of{" "}
+                {pages.toLocaleString("en")}
+              </span>
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                disabled={filters.page >= pages || loading}
+                onClick={() =>
+                  setFilters({ ...filters, page: filters.page + 1 })
+                }
+              >
+                Older
+                <i
+                  className="ph-duotone ph-caret-right ms-1"
+                  aria-hidden="true"
+                />
+              </button>
+            </nav>
+          )}
+        </div>
+        <div className="col-12 col-xl-4">
+          <div className="listening-side">
+            <RisingTopics />
+          </div>
+        </div>
       </div>
-
-      {error ? (
-        <div className="card">
-          <ErrorState
-            message={error}
-            onRetry={() => {
-              setResult(null);
-              setAttempt((a) => a + 1);
-            }}
-          />
-        </div>
-      ) : loading && !data ? (
-        <div className="d-grid gap-2">
-          <SkeletonCard lines={2} label="Loading mentions" />
-          <SkeletonCard lines={2} label="Loading mentions" />
-          <SkeletonCard lines={2} label="Loading mentions" />
-        </div>
-      ) : total === 0 ? (
-        <div className="card">
-          <EmptyState
-            icon="ph-duotone ph-ear"
-            title={
-              filtered
-                ? "No mentions match these filters"
-                : "No mentions in this period"
-            }
-            message={
-              filtered
-                ? "Try fewer filters or a longer period."
-                : "Mentions appear here as sources bring them in."
-            }
-            action={
-              filtered ? (
-                <button
-                  type="button"
-                  className="btn btn-outline-primary btn-sm"
-                  onClick={() =>
-                    setFilters({
-                      sentiment: [],
-                      channel: [],
-                      topic: [],
-                      region: [],
-                      q: "",
-                    })
-                  }
-                >
-                  Clear filters
-                </button>
-              ) : undefined
-            }
-          />
-        </div>
-      ) : (
-        <div style={{ opacity: loading ? 0.6 : 1 }} aria-busy={loading}>
-          {data?.mentions.map((m) => (
-            <MentionCard key={m.id} mention={m} onOpen={(x) => setOpen(x.id)} />
-          ))}
-        </div>
-      )}
-
-      {total > PAGE_SIZE && !error && (
-        <nav
-          className="d-flex justify-content-between align-items-center my-3"
-          aria-label="Pages"
-        >
-          <button
-            type="button"
-            className="btn btn-outline-secondary btn-sm"
-            disabled={filters.page <= 1 || loading}
-            onClick={() => setFilters({ ...filters, page: filters.page - 1 })}
-          >
-            <i className="ph-duotone ph-caret-left me-1" aria-hidden="true" />
-            Newer
-          </button>
-          <span className="small text-muted">
-            Page {filters.page.toLocaleString("en")} of{" "}
-            {pages.toLocaleString("en")}
-          </span>
-          <button
-            type="button"
-            className="btn btn-outline-secondary btn-sm"
-            disabled={filters.page >= pages || loading}
-            onClick={() => setFilters({ ...filters, page: filters.page + 1 })}
-          >
-            Older
-            <i className="ph-duotone ph-caret-right ms-1" aria-hidden="true" />
-          </button>
-        </nav>
-      )}
       <MentionDrawer id={openId} onClose={() => setOpen(null)} />
     </>
   );
