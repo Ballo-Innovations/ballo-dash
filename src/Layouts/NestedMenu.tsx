@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import Link from "next/link";
 import React, { useCallback, useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
@@ -25,11 +25,18 @@ const NestedMenu: React.FC<{ menuItems: MenuItem[] }> = ({ menuItems }) => {
 
   const initializeOpenMenu = (
     items: MenuItem[],
-    path: string
+    path: string,
   ): number | string | null => {
     // Opens the group that contains the current page.
     for (const item of items) {
-      if (item.submenu && item.submenu.some((child) => child.link === path || initializeOpenMenu(child.submenu ?? [], path))) {
+      if (
+        item.submenu &&
+        item.submenu.some(
+          (child) =>
+            child.link === path ||
+            initializeOpenMenu(child.submenu ?? [], path),
+        )
+      ) {
         return item.id;
       }
     }
@@ -45,7 +52,7 @@ const NestedMenu: React.FC<{ menuItems: MenuItem[] }> = ({ menuItems }) => {
   }, [router.pathname, menuItems]);
 
   const handleMenuClick = useCallback((id: number | string) => {
-    setOpenMenuId(prevId => prevId === id ? null : id);
+    setOpenMenuId((prevId) => (prevId === id ? null : id));
   }, []);
 
   const isMenuActive = (item: MenuItem) => {

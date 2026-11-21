@@ -79,7 +79,7 @@ function RunStatus({ run }: { run: SourceRow["lastRun"] }) {
       >
         {ago(run.startedAt)}
         {!failed &&
-          ` · ${run.itemsNew.toLocaleString("en")} new of ${run.itemsIn.toLocaleString("en")}`}
+          ` · ${run.itemsNew.toLocaleString("en")} new, ${run.itemsIn.toLocaleString("en")} read`}
       </span>
       {failed && run.error && (
         <span
@@ -488,7 +488,7 @@ function SourcesPage() {
       r.data.status === "SUCCEEDED"
         ? {
             tone: "success",
-            text: `${s.name} ran: ${r.data.itemsNew.toLocaleString("en")} new of ${r.data.itemsIn.toLocaleString("en")}.`,
+            text: `${s.name} ran: ${r.data.itemsNew.toLocaleString("en")} new, ${r.data.itemsIn.toLocaleString("en")} read.`,
           }
         : {
             tone: "danger",
@@ -547,7 +547,7 @@ function SourcesPage() {
               message="Connect a social account, add news feeds below, or import a file."
             />
           ) : (
-            <div className="table-responsive">
+            <div className="table-responsive position-relative">
               <table className="table align-middle mb-0">
                 <caption className="visually-hidden">
                   Sources with their last run

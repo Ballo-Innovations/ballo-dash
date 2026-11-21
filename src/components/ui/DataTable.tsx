@@ -59,7 +59,7 @@ export function DataTable<T>({
   }
 
   return (
-    <div className="table-responsive">
+    <div className="table-responsive position-relative">
       <table className="table table-hover align-middle mb-0">
         <caption className="visually-hidden">{caption}</caption>
         <thead>

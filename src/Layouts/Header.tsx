@@ -7,7 +7,10 @@ import navCardBg from "../assets/images/layout/nav-card-bg.svg";
 import avatar1 from "../assets/images/user/avatar-1.jpg";
 import SimpleBar from "simplebar-react";
 import { menuItems, visibleMenu } from "./MenuData";
-import { isFeatureEnabled, isFeatureEnabledOnServer } from "@/lib/feature-flags";
+import {
+  isFeatureEnabled,
+  isFeatureEnabledOnServer,
+} from "@/lib/feature-flags";
 import { useDynamicMenu } from "@/hooks/useDynamicMenu";
 import NestedMenu from "@/Layouts/NestedMenu";
 import { Dropdown } from "react-bootstrap";
@@ -35,12 +38,14 @@ const Header = ({ themeMode }: any) => {
     // Role and flag filtering (F-10). The first render uses environment flags only so it matches the
     // server HTML; browser QA overrides (?features=) apply once mounted.
     const enabled = mounted ? isFeatureEnabled : isFeatureEnabledOnServer;
-    return visibleMenu(menuItems, { role: session?.user.role, enabled }).map((item: any) => {
-      if (item.id === "reports") {
-        return reportsMenuItem;
-      }
-      return item;
-    });
+    return visibleMenu(menuItems, { role: session?.user.role, enabled }).map(
+      (item: any) => {
+        if (item.id === "reports") {
+          return reportsMenuItem;
+        }
+        return item;
+      },
+    );
   }, [reportsMenuItem, session?.user.role, mounted]);
 
   useEffect(() => {

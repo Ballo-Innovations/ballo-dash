@@ -48,7 +48,7 @@ const TopBar = ({
   toogleMobileSidebarHide,
 }: HeaderProps) => {
   const dispatch = useDispatch<any>();
-  const { openIntegrationModal } = useIntegrationModal();  
+  const { openIntegrationModal } = useIntegrationModal();
   const handleLanguageChange = (language: string) => {
     dispatch(chanageLanguage(language));
     i18n.changeLanguage(language);
@@ -79,12 +79,24 @@ const TopBar = ({
           <div className="me-auto pc-mob-drp">
             <ul className="list-unstyled">
               <li className="pc-h-item pc-sidebar-collapse">
-                <button type="button" className="pc-head-link ms-0" id="sidebar-hide" onClick={toogleSidebarHide} aria-label="Show or hide the menu">
+                <button
+                  type="button"
+                  className="pc-head-link ms-0"
+                  id="sidebar-hide"
+                  onClick={toogleSidebarHide}
+                  aria-label="Show or hide the menu"
+                >
                   <i className="ti ti-menu-2" aria-hidden="true"></i>
                 </button>
               </li>
               <li className="pc-h-item pc-sidebar-popup">
-                <button type="button" className="pc-head-link ms-0" id="mobile-collapse" onClick={toogleMobileSidebarHide} aria-label="Open the menu">
+                <button
+                  type="button"
+                  className="pc-head-link ms-0"
+                  id="mobile-collapse"
+                  onClick={toogleMobileSidebarHide}
+                  aria-label="Open the menu"
+                >
                   <i className="ti ti-menu-2" aria-hidden="true"></i>
                 </button>
               </li>
@@ -390,7 +402,7 @@ const TopBar = ({
                           </div>
                         </li>
                         <li className="list-group-item">
-                        <Dropdown.Item>
+                          <Dropdown.Item>
                             <span className="d-flex align-items-center">
                               <i className="ph-duotone ph-user-circle"></i>
                               <span>Edit profile</span>
@@ -399,29 +411,29 @@ const TopBar = ({
                           <Dropdown.Item>
                             <Button
                               variant="none"
-                              onClick={() => openIntegrationModal('view')}
+                              onClick={() => openIntegrationModal("view")}
                               className="d-flex align-items-center p-0"
                               id="manage-integrations-button"
                             >
                               <Cable size={32} />
                               <span className="ms-2">Manage Integrations</span>
                             </Button>
-                            </Dropdown.Item>
-                            <Dropdown.Item style={{ paddingBlock: 0 }}>
+                          </Dropdown.Item>
+                          <Dropdown.Item style={{ paddingBlock: 0 }}>
                             {/* <span className="d-flex align-items-center">
                               <i className="ph-duotone ph-gear-six"></i>
                               <span>Settings</span>
                             </span> */}
-                              <button
-                                className="pc-head-link pct-c-btn ph-gear-six d-flex justify-content-start border-0"
-                                style={{ padding: 0, margin: 0, width: '100%' }}
-                                onClick={handleOffcanvasToggle}
-                                data-bs-toggle="offcanvas"
-                                data-bs-target="#offcanvas_pc_layout"
-                              >
-                                <i className="ph-duotone ph-gear-six"></i>
-                                <span>Settings</span>
-                              </button>
+                            <button
+                              className="pc-head-link pct-c-btn ph-gear-six d-flex justify-content-start border-0"
+                              style={{ padding: 0, margin: 0, width: "100%" }}
+                              onClick={handleOffcanvasToggle}
+                              data-bs-toggle="offcanvas"
+                              data-bs-target="#offcanvas_pc_layout"
+                            >
+                              <i className="ph-duotone ph-gear-six"></i>
+                              <span>Settings</span>
+                            </button>
                           </Dropdown.Item>
                         </li>
                         {/* <li className="list-group-item">
