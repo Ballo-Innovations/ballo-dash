@@ -4,7 +4,7 @@
 
 | ID | Title | Priority | Phase | Hours | Status |
 |---|---|---|---|---|---|
-| L-01 | Mentions query service and list page with filters | P0 | 2 | 6 | TODO |
+| L-01 | Mentions query service and list page with filters | P0 | 2 | 6 | DONE (staging) |
 | L-02 | Live wall over server-sent events | P0 | 2 | 8 | TODO |
 | L-03 | Mention drawer with explanation | P0 | 2 | 5 | TODO |
 | L-04 | Rising topics panel and topic page | P0 | 3 | 5 | TODO |
@@ -14,18 +14,20 @@
 
 ## L-01 Mentions query service and list page with filters
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 6h
 - **Depends on:** F-05, F-12
 - **Feature flag:** `NEXT_PUBLIC_FEATURE_LISTENING`
 
 **Acceptance criteria**
 
-- [ ] Filters for sentiment, channel, topic, region, brand and period combine
-- [ ] Server pagination
-- [ ] Counts match the list
-- [ ] Loading, empty and error states
-- [ ] Usable at 375px
+- [x] Filters for sentiment, channel, topic, region, brand and period combine
+- [x] Server pagination
+- [x] Counts match the list
+- [x] Loading, empty and error states
+- [x] Usable at 375px
+
+**Notes:** API `GET /api/mentions` and `/api/mentions/options` (ballo-dash-api #48; index `mentions (company_id, occurred_at)`), behind `FEATURE_LISTENING` (set on the staging API). Web `/listening`: sentiment chips with counts (they leave out the sentiment filter, so each shows what choosing it gives), channel, topic and region menus, search, period and brand from the top bar; all in the URL; 25 per page from the server. Verified on staging 2026-11-21 with 27,156 mentions: chips add up to the total, Negative alone gives exactly its chip count, filters combine (Negative + X + region 327), empty state on no match, Clear filters, page 2 survives reload, no horizontal scroll at 375 to 1280 px in light and dark.
 
 ## L-02 Live wall over server-sent events
 
