@@ -29,3 +29,21 @@
     border-color: var(--sentiment-pos-fg);
   }
 }
+
+// Matched terms in the mention drawer (L-03).
+.listening-mark {
+  padding: 0 0.15em;
+  border-radius: 0.2em;
+  &.listening-mark-neg {
+    color: var(--sentiment-neg-fg);
+    background: var(--sentiment-neg-bg);
+  }
+  &.listening-mark-neu {
+    color: var(--sentiment-neu-fg);
+    background: var(--sentiment-neu-bg);
+  }
+  &.listening-mark-pos {
+    color: var(--sentiment-pos-fg);
+    background: var(--sentiment-pos-bg);
+  }
+}
