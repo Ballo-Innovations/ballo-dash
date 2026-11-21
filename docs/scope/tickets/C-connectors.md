@@ -13,7 +13,7 @@
 | C-07 | Keyword rules per brand (include and exclude) | P1 | 2 | 4 | DONE (staging) |
 | C-08 | Sandbox data generator with scenarios | P0 | 2 | 10 | DONE (staging) |
 | C-09 | TikTok and YouTube connectors | P2 | 5 | 10 | TODO |
-| C-10 | Nightly materialisation of web sessions and conversions into metric_points | P1 | 3 | 3 | TODO |
+| C-10 | Nightly materialisation of web sessions and conversions into metric_points | P1 | 3 | 3 | DONE (staging) |
 
 ## C-01 Connector interface, registry and run logging
 
@@ -150,11 +150,14 @@
 
 ## C-10 Nightly materialisation of web sessions and conversions into metric_points
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P1  **Phase:** 3  **Estimate:** 3h
 - **Depends on:** C-05, C-02
 
 **Acceptance criteria**
 
-- [ ] Daily sessions, pageviews and conversions per site written idempotently
-- [ ] Backfill command for a date range
+- [x] Daily sessions, pageviews and conversions per site written idempotently
+- [x] Backfill command for a date range
+
+**Notes:** ballo-dash-api `src/web-analytics` (#38). Metrics `sessions`, `pageviews`, `conversions` and `conversion_value` (goal value in minor units) per company, tracker site (`metric_points.site_id`, migration 0012) and local day in the company's time zone (Lusaka by default); channel WEB, source LIVE. A session is a visit: a new one starts after 30 minutes idle and counts on the day it starts. Each run replaces its date range in one transaction. The worker rebuilds yesterday and today every hour (so yesterday is final after the night); backfill with `npm run web:materialise -- --from YYYY-MM-DD --to YYYY-MM-DD [--company <uuid>]`. Verified on staging 2026-11-21: the C-05 browser visit became 1 session and 2 pageviews, and after adding a signup goal worth 5,000 a rerun gave 1 conversion worth 5,000; repeated backfills left the same 4 rows.
+
