@@ -10,7 +10,7 @@
 | I-04 | Trend detector | P0 | 3 | 6 | DONE (staging) |
 | I-05 | Crisis detector and recommended response templates | P0 | 3 | 8 | DONE (staging) |
 | I-06 | Alert narrative from the LLM | P1 | 3 | 3 | DONE (staging) |
-| I-07 | Sentiment aggregates by aspect, channel, region and topic | P0 | 3 | 4 | TODO |
+| I-07 | Sentiment aggregates by aspect, channel, region and topic | P0 | 3 | 4 | DONE (staging) |
 
 ## I-01 Tier 1 lexicon sentiment
 
@@ -109,12 +109,15 @@
 
 ## I-07 Sentiment aggregates by aspect, channel, region and topic
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 3  **Estimate:** 4h
 - **Depends on:** I-01
 
 **Acceptance criteria**
 
-- [ ] Reach-weighted sentiment index per day and per dimension
-- [ ] Bars on the Listening page
-- [ ] Values match a SQL spot check
+- [x] Reach-weighted sentiment index per day and per dimension
+- [x] Bars on the Listening page
+- [x] Values match a SQL spot check
+
+**Notes:** API `GET /api/sentiment/summary` (ballo-dash-api #80): reach-weighted mean sentiment (weight greatest(reach, 1)) overall, per local day, and per channel, region, topic (top 10) and aspect. Web: Sentiment card under Rising topics on Listening, -100 to +100 diverging bars with mention counts; opens on Channel until the AI reading has produced aspects. Verified on staging 2026-11-21: the page's figures equal the API's, and a plain SQL spot check over the same 30 days gives the same index (-0.0284 over 28,383 mentions).
+

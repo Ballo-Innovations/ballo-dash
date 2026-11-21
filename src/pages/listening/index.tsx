@@ -13,6 +13,7 @@ import { withFeature } from "@/components/FeatureGate";
 import { FilterBar } from "@/components/listening/FilterBar";
 import { ListeningTabs } from "@/components/listening/ListeningTabs";
 import { RisingTopics } from "@/components/listening/RisingTopics";
+import { SentimentBars } from "@/components/listening/SentimentBars";
 import { MentionCard } from "@/components/listening/MentionCard";
 import { MentionDrawer } from "@/components/listening/MentionDrawer";
 import { EmptyState, ErrorState, SkeletonCard } from "@/components/ui";
@@ -259,6 +260,7 @@ function ListeningPage() {
         <div className="col-12 col-xl-4">
           <div className="listening-side">
             <RisingTopics />
+            <SentimentBars />
           </div>
         </div>
       </div>
