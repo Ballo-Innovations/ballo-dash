@@ -186,12 +186,22 @@ const menuItems: MenuEntry[] = [
     roles: ["ADMIN", "MANAGER", "ANALYST"],
   },
   {
+    // A group: it shows when the user can see at least one admin page (M epic).
     id: "admin",
     label: "Admin",
     icon: "ph-duotone ph-shield-check",
-    link: "/admin",
+    type: "HASHMENU",
     feature: "adminConsole",
-    roles: ["ADMIN"],
+    submenu: [
+      {
+        id: "sources",
+        label: "Sources",
+        icon: "ph-duotone ph-plugs-connected",
+        link: "/admin/sources",
+        roles: ["ADMIN", "MANAGER"],
+        parentId: "admin",
+      },
+    ],
   },
 ];
 
