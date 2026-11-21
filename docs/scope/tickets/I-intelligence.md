@@ -5,7 +5,7 @@
 | ID | Title | Priority | Phase | Hours | Status |
 |---|---|---|---|---|---|
 | I-01 | Tier 1 lexicon sentiment | P0 | 2 | 8 | DONE (staging) |
-| I-02 | LLM client with cache and fallback | P0 | 2 | 6 | TODO |
+| I-02 | LLM client with cache and fallback | P0 | 2 | 6 | DONE (staging) |
 | I-03 | Tier 2 aspect sentiment | P0 | 2 | 5 | TODO |
 | I-04 | Trend detector | P0 | 3 | 6 | TODO |
 | I-05 | Crisis detector and recommended response templates | P0 | 3 | 8 | TODO |
@@ -30,19 +30,21 @@
 
 ## I-02 LLM client with cache and fallback
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 6h
 - **Depends on:** F-07
 
 **Acceptance criteria**
 
-- [ ] Single server-only client for the Claude API
-- [ ] Every call cached in ai_artifacts by kind and ref
-- [ ] Timeouts and retry with backoff
-- [ ] Template fallback when the key is unset or the call fails
-- [ ] Never throws to callers
-- [ ] Token usage logged
-- [ ] No PII beyond the mention text sent
+- [x] Single server-only client for the Claude API
+- [x] Every call cached in ai_artifacts by kind and ref
+- [x] Timeouts and retry with backoff
+- [x] Template fallback when the key is unset or the call fails
+- [x] Never throws to callers
+- [x] Token usage logged
+- [x] No PII beyond the mention text sent
+
+**Notes:** ballo-dash-api `src/intelligence/llm` (#44), official `@anthropic-ai/sdk`, default model `claude-opus-5-5` (`ANTHROPIC_MODEL` overrides). Cached in `ai_artifacts` by company, kind and ref; 30s timeout with two retries; template fallback on no key, error, refusal or empty answer (failures are not cached); server-side refusal fallbacks on; usage logged as `usage.input/output/cacheRead`; emails and phone numbers redacted before sending. Staging has no `ANTHROPIC_API_KEY`, so it runs in fallback mode until one is added to `/var/apps/ballo-dash-staging/deploy/.env`.
 
 ## I-03 Tier 2 aspect sentiment
 
