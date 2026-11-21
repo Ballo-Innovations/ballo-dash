@@ -47,3 +47,55 @@
     background: var(--sentiment-pos-bg);
   }
 }
+
+// Live wall (L-02)
+.live-wall .listening-card {
+  // Off-screen cards skip layout and paint, so 200 cards stay smooth.
+  content-visibility: auto;
+  contain-intrinsic-size: auto 140px;
+  animation: live-in 0.25s ease-out;
+}
+
+@keyframes live-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-wall .listening-card {
+    animation: none;
+  }
+}
+
+.live-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.live-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--bs-secondary);
+}
+
+.live-status-live .live-dot {
+  background: var(--sentiment-pos-solid, #16a34a);
+}
+
+.live-status-reconnecting .live-dot {
+  background: var(--bs-warning);
+}
+
+.live-status-closed .live-dot {
+  background: var(--sentiment-neg-solid, #dc2626);
+}
