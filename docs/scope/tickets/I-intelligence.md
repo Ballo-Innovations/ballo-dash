@@ -4,7 +4,7 @@
 
 | ID | Title | Priority | Phase | Hours | Status |
 |---|---|---|---|---|---|
-| I-01 | Tier 1 lexicon sentiment | P0 | 2 | 8 | TODO |
+| I-01 | Tier 1 lexicon sentiment | P0 | 2 | 8 | DONE (staging) |
 | I-02 | LLM client with cache and fallback | P0 | 2 | 6 | TODO |
 | I-03 | Tier 2 aspect sentiment | P0 | 2 | 5 | TODO |
 | I-04 | Trend detector | P0 | 3 | 6 | TODO |
@@ -14,17 +14,19 @@
 
 ## I-01 Tier 1 lexicon sentiment
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 8h
 - **Depends on:** none
 
 **Acceptance criteria**
 
-- [ ] Pure function returning score in [-1, 1], label with thresholds -0.15 and 0.15, confidence and matched terms
-- [ ] Domain, local-language and emoji lexicons
-- [ ] Negation and intensifiers
-- [ ] Lexicon editable per company
-- [ ] At least 40 table-driven test sentences including the kit's TC-11 and TC-12
+- [x] Pure function returning score in [-1, 1], label with thresholds -0.15 and 0.15, confidence and matched terms
+- [x] Domain, local-language and emoji lexicons
+- [x] Negation and intensifiers
+- [x] Lexicon editable per company
+- [x] At least 40 table-driven test sentences including the kit's TC-11 and TC-12
+
+**Notes:** ballo-dash-api `src/intelligence/sentiment` (#42). 223 built-in terms (general, telco, Nyanja and Bemba, emoji), phrases up to three words, negation within three words and intensifiers, neither crossing punctuation or "but". Company terms in `sentiment_terms` via `GET/PUT /api/sentiment/lexicon` (`company.edit`, audited; weight 0 switches a built-in term off). Mentions without sentiment are scored at ingest; `npm run sentiment:backfill` scores stored ones. The Nyanja and Bemba list needs a native speaker's review. On staging 2026-11-21: backfill scored 16 stored news and imported X mentions with sensible labels.
 
 ## I-02 LLM client with cache and fallback
 
