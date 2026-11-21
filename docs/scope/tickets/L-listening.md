@@ -5,7 +5,7 @@
 | ID | Title | Priority | Phase | Hours | Status |
 |---|---|---|---|---|---|
 | L-01 | Mentions query service and list page with filters | P0 | 2 | 6 | DONE (staging) |
-| L-02 | Live wall over server-sent events | P0 | 2 | 8 | TODO |
+| L-02 | Live wall over server-sent events | P0 | 2 | 8 | DONE (staging) |
 | L-03 | Mention drawer with explanation | P0 | 2 | 5 | DONE (staging) |
 | L-04 | Rising topics panel and topic page | P0 | 3 | 5 | TODO |
 | L-05 | Media page: news table, outlet ranking, coverage over time | P0 | 3 | 5 | TODO |
@@ -31,19 +31,21 @@
 
 ## L-02 Live wall over server-sent events
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 8h
 - **Depends on:** L-01
 - **Feature flag:** `NEXT_PUBLIC_FEATURE_LISTENING`
 
 **Acceptance criteria**
 
-- [ ] New mention appears within 2 seconds
-- [ ] Client keeps the last 200
-- [ ] Reconnects with Last-Event-ID after a dropped connection
-- [ ] Stream only carries the session company's data
-- [ ] Smooth at 200 cards
-- [ ] Served from a Vercel function, so the stream ends before the function duration limit and the client resumes without losing or repeating mentions
+- [x] New mention appears within 2 seconds
+- [x] Client keeps the last 200
+- [x] Reconnects with Last-Event-ID after a dropped connection
+- [x] Stream only carries the session company's data
+- [x] Smooth at 200 cards
+- [x] Served from a Vercel function, so the stream ends before the function duration limit and the client resumes without losing or repeating mentions
+
+**Notes:** `GET /api/stream` (ballo-dash-api #56, fixes #58, #60, #62) and web `/listening/live`. The stream is served by the API on the backend server (this repo owns no endpoints; Vercel forwards `/api/*`) rather than a Vercel function, and keeps the same constraint: each response lasts 25 seconds and ends; EventSource reconnects with Last-Event-ID, an exact cursor (insert time in microseconds and id), so nothing is lost or repeated. Polls and settles every 0.5 s. Through Vercel's proxy the stream arrives in about 4 KB blocks, so a 4 KB padding comment follows each batch; without it the last event waited for the next heartbeat. The page keeps the newest 200, batches arrivals per animation frame, skips off-screen cards with `content-visibility`, and can pause. Verified on staging 2026-11-21: backlog of 50, inserted mentions on the wall 0.8 to 1.3 s after commit, still live across stream ends with no duplicate ids, pause holds and releases, a burst of 250 leaves 200 cards, no horizontal scroll at 375 px.
 
 ## L-03 Mention drawer with explanation
 
