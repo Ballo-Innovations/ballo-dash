@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|
 | C-01 | Connector interface, registry and run logging | P0 | 2 | 6 | DONE (staging) |
 | C-02 | Worker service on the Ballo backend server: scheduler and job runner | P0 | 2 | 8 | DONE (staging) |
-| C-03 | Adapt existing Facebook Instagram LinkedIn and X integrations to the connector interface | P0 | 2 | 12 | TODO |
+| C-03 | Adapt existing Facebook Instagram LinkedIn and X integrations to the connector interface | P0 | 2 | 12 | DONE (staging) |
 | C-04 | RSS and news connector with outlet reach table | P0 | 2 | 6 | DONE (staging) |
 | C-05 | First-party web tracker: /t.js, /api/collect, sessionisation | P0 | 2 | 8 | DONE (staging) |
 | C-06 | CSV import wizard: GA4, Meta, Mailchimp, X exports | P0 | 2 | 10 | DONE (staging) |
@@ -48,17 +48,19 @@
 
 ## C-03 Adapt existing Facebook Instagram LinkedIn and X integrations to the connector interface
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 12h
 - **Depends on:** C-01, H-04
 
 **Acceptance criteria**
 
-- [ ] The current live API fetchers write followers, impressions, engagement and posts to metric_points with sourceKind LIVE
-- [ ] Brand posts and comments become mentions where the API allows
-- [ ] Existing Data and Statistics pages keep working
-- [ ] Idempotent on re-run
-- [ ] Provider calls mocked in tests
+- [x] The current live API fetchers write followers, impressions, engagement and posts to metric_points with sourceKind LIVE
+- [x] Brand posts and comments become mentions where the API allows
+- [x] Existing Data and Statistics pages keep working
+- [x] Idempotent on re-run
+- [x] Provider calls mocked in tests
+
+**Notes:** ballo-dash-api `src/connectors/social` (#40). Connectors `facebook`, `instagram`, `linkedin` and `x` (LIVE) use the same provider endpoints as the legacy Data and Statistics routes, which are unchanged. Daily followers, impressions (Instagram: reach), engagement and posts go to metric_points for the self brand; Facebook and Instagram posts and comments, LinkedIn posts, and X posts and mentions of the account become mentions (LinkedIn comments need a permission the integration does not request). Post-based daily totals look back 3 days and only write complete days. Tokens are sent only in the Authorization header. The worker keeps one hourly source per CONNECTED integration and disables it when the connection is lost. All provider calls are mocked in tests. Deployed to staging 2026-11-21; not yet exercised against real accounts because staging has no connected social integrations: the first one connected will be picked up within a minute.
 
 ## C-04 RSS and news connector with outlet reach table
 
