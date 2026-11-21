@@ -26,7 +26,7 @@ describe("sidebar", () => {
       "reports",
       "social[data,statistics]",
       "imports",
-      "admin",
+      "admin[sources]",
     ]);
   });
 
@@ -48,6 +48,19 @@ describe("sidebar", () => {
     expect(
       ids(visibleMenu(menuItems, { role: "readonly", enabled: allOn })),
     ).not.toContain("admin");
+  });
+
+  it("shows the Admin group, with Sources, to admins and managers only", () => {
+    for (const role of ["ADMIN", "MANAGER"])
+      expect(ids(visibleMenu(menuItems, { role, enabled: allOn }))).toContain(
+        "admin[sources]",
+      );
+    for (const role of ["ANALYST", "MARKETER", "COMMS", "READONLY"])
+      expect(
+        ids(visibleMenu(menuItems, { role, enabled: allOn })).some((id) =>
+          id.startsWith("admin"),
+        ),
+      ).toBe(false);
   });
 
   it("shows Data imports to admins, managers and analysts only", () => {
