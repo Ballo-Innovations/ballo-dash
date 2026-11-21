@@ -1,0 +1,31 @@
+// Listening list (L-01)
+.listening-text {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.listening-card-clickable:hover {
+  border-color: var(--bs-primary);
+}
+
+// Selected sentiment chips use the semantic sentiment colours in both themes.
+.listening-chip-on {
+  border: 1px solid transparent;
+  &.listening-chip-neg {
+    color: var(--sentiment-neg-fg);
+    background: var(--sentiment-neg-bg);
+    border-color: var(--sentiment-neg-fg);
+  }
+  &.listening-chip-neu {
+    color: var(--sentiment-neu-fg);
+    background: var(--sentiment-neu-bg);
+    border-color: var(--sentiment-neu-fg);
+  }
+  &.listening-chip-pos {
+    color: var(--sentiment-pos-fg);
+    background: var(--sentiment-pos-bg);
+    border-color: var(--sentiment-pos-fg);
+  }
+}
