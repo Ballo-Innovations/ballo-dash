@@ -98,7 +98,7 @@ export function MentionDrawer({
       }
     >
       {!ready ? (
-        <div role="status" className="d-grid gap-2">
+        <div role="status" className="d-flex flex-column gap-2">
           <span className="visually-hidden">Loading mention</span>
           <Skeleton height={14} width="60%" />
           <Skeleton height={60} />
@@ -113,7 +113,7 @@ export function MentionDrawer({
           }}
         />
       ) : (
-        <div className="d-grid gap-3">
+        <div className="d-flex flex-column gap-3">
           <div className="d-flex flex-wrap align-items-center gap-2 small text-muted">
             <i
               className={`ph-duotone ${CHANNEL_ICONS[m.channel] ?? "ph-chat-circle"} f-18`}
