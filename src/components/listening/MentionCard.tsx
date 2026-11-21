@@ -23,6 +23,7 @@ export function MentionCard({
   const open = onOpen ? () => onOpen(mention) : undefined;
   return (
     <article
+      data-mention-id={mention.id}
       className={`card mb-2 listening-card${open ? " listening-card-clickable" : ""}`}
       aria-label={`${mention.sentiment === "NEG" ? "Negative" : mention.sentiment === "POS" ? "Positive" : "Neutral"} mention from ${who}`}
     >
