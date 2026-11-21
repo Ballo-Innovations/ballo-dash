@@ -192,3 +192,35 @@
 .live-dot.worker-down {
   background: var(--sentiment-neg-solid, #dc2626);
 }
+
+// Sentiment bars (I-07): diverging around a centre line.
+.sentiment-track {
+  position: relative;
+  height: 0.5rem;
+  border-radius: 1rem;
+  background: var(--bs-border-color);
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: -2px;
+    bottom: -2px;
+    width: 1px;
+    background: var(--bs-secondary-color);
+  }
+}
+.sentiment-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 1rem;
+  &.sentiment-bar-neg {
+    background: var(--sentiment-neg-solid, #dc2626);
+  }
+  &.sentiment-bar-neu {
+    background: var(--sentiment-neu-solid, #64748b);
+  }
+  &.sentiment-bar-pos {
+    background: var(--sentiment-pos-solid, #16a34a);
+  }
+}
