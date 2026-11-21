@@ -202,7 +202,7 @@ function ListeningPage() {
       ) : (
         <div style={{ opacity: loading ? 0.6 : 1 }} aria-busy={loading}>
           {data?.mentions.map((m) => (
-            <MentionCard key={m.id} mention={m} />
+            <MentionCard key={m.id} mention={m} onOpen={(x) => setOpen(x.id)} />
           ))}
         </div>
       )}
