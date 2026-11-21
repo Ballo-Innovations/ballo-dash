@@ -27,7 +27,8 @@ export function SentimentBars() {
     data?: SentimentSummary;
     error?: string;
   } | null>(null);
-  const [tab, setTab] = useState<TabKey>("byAspect");
+  // null: Aspect when the AI reading has produced aspects, otherwise Channel.
+  const [chosen, setTab] = useState<TabKey | null>(null);
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
@@ -45,6 +46,9 @@ export function SentimentBars() {
   }, [url, attempt]);
 
   const r = result && result.url === url ? result : null;
+  const tab: TabKey =
+    chosen ??
+    (r?.data && r.data.byAspect.length === 0 ? "byChannel" : "byAspect");
   const rows: Bucket[] = r?.data ? r.data[tab] : [];
   const label = (b: Bucket) =>
     tab === "byChannel" ? (CHANNEL_LABELS[b.key] ?? b.key) : b.key;
