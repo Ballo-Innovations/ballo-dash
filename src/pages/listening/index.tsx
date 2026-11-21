@@ -11,6 +11,7 @@ import BreadcrumbItem from "@common/BreadcrumbItem";
 import Layout from "@layout/index";
 import { withFeature } from "@/components/FeatureGate";
 import { FilterBar } from "@/components/listening/FilterBar";
+import { ListeningTabs } from "@/components/listening/ListeningTabs";
 import { MentionCard } from "@/components/listening/MentionCard";
 import { MentionDrawer } from "@/components/listening/MentionDrawer";
 import { EmptyState, ErrorState, SkeletonCard } from "@/components/ui";
@@ -131,6 +132,7 @@ function ListeningPage() {
         <title>Listening | Ballo Dash</title>
       </Head>
       <BreadcrumbItem mainTitle="Listening" subTitle="Mentions" />
+      <ListeningTabs />
       <FilterBar
         filters={filters}
         options={options}
