@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|
 | I-01 | Tier 1 lexicon sentiment | P0 | 2 | 8 | DONE (staging) |
 | I-02 | LLM client with cache and fallback | P0 | 2 | 6 | DONE (staging) |
-| I-03 | Tier 2 aspect sentiment | P0 | 2 | 5 | TODO |
+| I-03 | Tier 2 aspect sentiment | P0 | 2 | 5 | DONE (staging) |
 | I-04 | Trend detector | P0 | 3 | 6 | TODO |
 | I-05 | Crisis detector and recommended response templates | P0 | 3 | 8 | TODO |
 | I-06 | Alert narrative from the LLM | P1 | 3 | 3 | TODO |
@@ -48,16 +48,18 @@
 
 ## I-03 Tier 2 aspect sentiment
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 5h
 - **Depends on:** I-01, I-02
 
 **Acceptance criteria**
 
-- [ ] Runs for NEG mentions, confidence under 0.4 or high-reach authors
-- [ ] Returns label, aspects from the 9-item taxonomy and a summary
-- [ ] Result cached
-- [ ] Falls back to tier 1 with no error shown
+- [x] Runs for NEG mentions, confidence under 0.4 or high-reach authors
+- [x] Returns label, aspects from the 9-item taxonomy and a summary
+- [x] Result cached
+- [x] Falls back to tier 1 with no error shown
+
+**Notes:** ballo-dash-api `src/intelligence/aspects` (#46). Worker step: up to 10 recent (48h) mentions per tick that are NEG, under 0.4 confidence, or from authors with 10,000+ followers, verified, or 10,000+ reach. Structured output (JSON schema) gives label, aspects (9-item taxonomy, -1..1) and summary; cached in `ai_artifacts`. `mentions.aspects` is null until examined, `[]` when none or when tier 2 was unavailable. On staging 2026-11-21 (no API key): the worker examined 40 mentions in 90 seconds, all kept tier 1, no errors.
 
 ## I-04 Trend detector
 
