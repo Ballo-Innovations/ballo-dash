@@ -99,3 +99,26 @@
 .live-status-closed .live-dot {
   background: var(--sentiment-neg-solid, #dc2626);
 }
+
+// Media page (L-05): sentiment split per outlet.
+.media-split {
+  display: flex;
+  height: 0.5rem;
+  min-width: 5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--bs-border-color);
+  span {
+    display: block;
+    height: 100%;
+  }
+  .media-split-neg {
+    background: var(--sentiment-neg-solid, #dc2626);
+  }
+  .media-split-neu {
+    background: var(--sentiment-neu-solid, #94a3b8);
+  }
+  .media-split-pos {
+    background: var(--sentiment-pos-solid, #16a34a);
+  }
+}
