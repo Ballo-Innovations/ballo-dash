@@ -12,6 +12,7 @@ import Layout from "@layout/index";
 import { withFeature } from "@/components/FeatureGate";
 import { FilterBar } from "@/components/listening/FilterBar";
 import { MentionCard } from "@/components/listening/MentionCard";
+import { MentionDrawer } from "@/components/listening/MentionDrawer";
 import { EmptyState, ErrorState, SkeletonCard } from "@/components/ui";
 import { useFilters } from "@/hooks/useFilters";
 import { getJson } from "@/lib/api-client";
@@ -90,6 +91,27 @@ function ListeningPage() {
       );
     },
     [filters, router],
+  );
+
+  // The open mention is in the URL (?mention=<id>), so a drawer can be linked to.
+  const mentionParam = router.query.mention;
+  const openId =
+    typeof mentionParam === "string" && /^[0-9a-f-]{36}$/i.test(mentionParam)
+      ? mentionParam
+      : null;
+  const setOpen = useCallback(
+    (id: string | null) => {
+      const { mention: _drop, ...rest } = router.query;
+      void router.replace(
+        {
+          pathname: router.pathname,
+          query: id ? { ...rest, mention: id } : rest,
+        },
+        undefined,
+        { shallow: true, scroll: false },
+      );
+    },
+    [router],
   );
 
   const total = data?.total ?? 0;
@@ -214,6 +236,7 @@ function ListeningPage() {
           </button>
         </nav>
       )}
+      <MentionDrawer id={openId} onClose={() => setOpen(null)} />
     </>
   );
 }
