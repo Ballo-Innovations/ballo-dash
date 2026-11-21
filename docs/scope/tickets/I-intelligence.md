@@ -8,8 +8,8 @@
 | I-02 | LLM client with cache and fallback | P0 | 2 | 6 | DONE (staging) |
 | I-03 | Tier 2 aspect sentiment | P0 | 2 | 5 | DONE (staging) |
 | I-04 | Trend detector | P0 | 3 | 6 | DONE (staging) |
-| I-05 | Crisis detector and recommended response templates | P0 | 3 | 8 | TODO |
-| I-06 | Alert narrative from the LLM | P1 | 3 | 3 | TODO |
+| I-05 | Crisis detector and recommended response templates | P0 | 3 | 8 | DONE (staging) |
+| I-06 | Alert narrative from the LLM | P1 | 3 | 3 | DONE (staging) |
 | I-07 | Sentiment aggregates by aspect, channel, region and topic | P0 | 3 | 4 | TODO |
 
 ## I-01 Tier 1 lexicon sentiment
@@ -78,30 +78,34 @@
 
 ## I-05 Crisis detector and recommended response templates
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 3  **Estimate:** 8h
 - **Depends on:** I-01, C-02
 
 **Acceptance criteria**
 
-- [ ] Computes negative volume, z, velocity and negative reach per brand
-- [ ] WATCH, WARNING and CRISIS thresholds per kit spec
-- [ ] 60 minute cooldown per topic
-- [ ] Alert stores 5 evidence mention ids and a response template per aspect
-- [ ] Sandbox outage scenario raises CRISIS within 3 minutes
-- [ ] Unit tests on synthetic series
+- [x] Computes negative volume, z, velocity and negative reach per brand
+- [x] WATCH, WARNING and CRISIS thresholds per kit spec
+- [x] 60 minute cooldown per topic
+- [x] Alert stores 5 evidence mention ids and a response template per aspect
+- [x] Sandbox outage scenario raises CRISIS within 3 minutes
+- [x] Unit tests on synthetic series
+
+**Notes:** ballo-dash-api `src/intelligence/crisis` (#72, #76). Every minute per brand: negatives in the last hour against the same hour of day (and either side) over 7 days, 15 minute velocity, negative reach; thresholds per the kit, plus at least 5 negatives in the hour and 3 in the last 15 minutes before velocity counts. One alert per incident: a new alert within 60 minutes for the same brand and the same topic or aspect refreshes or escalates the open one. Evidence, response templates per aspect, audited creation and escalation. On staging the first outage test reached CRISIS only after 7.4 minutes and opened three alerts; #76 fixed the baseline, made the sandbox outage scenario match the kit (40 posts over 3 minutes, widely shared, realistic reshare rates) and merged alerts by aspect. A unit test over 10 seeds now reaches CRISIS within 3 minutes by the volume rule every time. Note: the spec's loud-post rule (verified or 10k+ author, score below -0.6, 20+ shares) can raise CRISIS on otherwise ordinary hours.
 
 ## I-06 Alert narrative from the LLM
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P1  **Phase:** 3  **Estimate:** 3h
 - **Depends on:** I-05, I-02
 
 **Acceptance criteria**
 
-- [ ] Two-sentence narrative cached per alert
-- [ ] Identical on reload
-- [ ] Template when the LLM is unavailable
+- [x] Two-sentence narrative cached per alert
+- [x] Identical on reload
+- [x] Template when the LLM is unavailable
+
+**Notes:** Part of the crisis job (#72): a two-sentence narrative from the LLM client, cached per alert, stored on the alert so it is identical on reload; the template narrative is written at creation and kept when the model is unavailable (staging has no key). Escalation refreshes the template narrative (#76).
 
 ## I-07 Sentiment aggregates by aspect, channel, region and topic
 

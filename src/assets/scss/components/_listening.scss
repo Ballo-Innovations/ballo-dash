@@ -141,3 +141,46 @@
     top: 5.5rem;
   }
 }
+
+// Alert banner and drawer (L-06)
+.alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  flex-wrap: wrap;
+  &.alert-banner-crisis {
+    color: var(--severity-crisis-fg, #fff);
+    background: var(--severity-crisis-bg, #b91c1c);
+  }
+  &.alert-banner-warning {
+    color: var(--severity-warning-fg, #7c2d12);
+    background: var(--severity-warning-bg, #ffedd5);
+    border-color: var(--severity-warning-fg, #7c2d12);
+  }
+  &.alert-banner-watch {
+    color: var(--severity-watch-fg, #713f12);
+    background: var(--severity-watch-bg, #fef9c3);
+    border-color: var(--severity-watch-fg, #713f12);
+  }
+}
+
+.alert-status-open {
+  color: var(--sentiment-neg-fg);
+  background: var(--sentiment-neg-bg);
+}
+.alert-status-acknowledged {
+  color: var(--sentiment-neu-fg);
+  background: var(--sentiment-neu-bg);
+}
+.alert-status-resolved {
+  color: var(--sentiment-pos-fg);
+  background: var(--sentiment-pos-bg);
+}
+
+.alert-timeline li {
+  padding: 0.25rem 0 0.25rem 0.75rem;
+  border-left: 2px solid var(--bs-border-color);
+}

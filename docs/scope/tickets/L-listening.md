@@ -9,7 +9,7 @@
 | L-03 | Mention drawer with explanation | P0 | 2 | 5 | DONE (staging) |
 | L-04 | Rising topics panel and topic page | P0 | 3 | 5 | DONE (staging) |
 | L-05 | Media page: news table, outlet ranking, coverage over time | P0 | 3 | 5 | DONE (staging) |
-| L-06 | Alerts: banner, list, drawer, acknowledge, assign, resolve | P0 | 3 | 8 | TODO |
+| L-06 | Alerts: banner, list, drawer, acknowledge, assign, resolve | P0 | 3 | 8 | DONE (staging) |
 | L-07 | Alert delivery by email | P1 | 5 | 5 | TODO |
 
 ## L-01 Mentions query service and list page with filters
@@ -91,17 +91,19 @@
 
 ## L-06 Alerts: banner, list, drawer, acknowledge, assign, resolve
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 3  **Estimate:** 8h
 - **Depends on:** I-05, F-03
 - **Feature flag:** `NEXT_PUBLIC_FEATURE_LISTENING`
 
 **Acceptance criteria**
 
-- [ ] Banner while an alert is OPEN and never auto-dismisses
-- [ ] Drawer shows severity, z, velocity, negative volume, reach, 24h sparkline, region, topic, 5 evidence mentions, editable recommended response and timeline
-- [ ] ADMIN, MANAGER and COMMS can change status, others cannot
-- [ ] Each change audited
+- [x] Banner while an alert is OPEN and never auto-dismisses
+- [x] Drawer shows severity, z, velocity, negative volume, reach, 24h sparkline, region, topic, 5 evidence mentions, editable recommended response and timeline
+- [x] ADMIN, MANAGER and COMMS can change status, others cannot
+- [x] Each change audited
+
+**Notes:** API `/api/alerts` list, detail (evidence, 24 h negatives per hour, timeline from the audit log), assignees, acknowledge / resolve / reopen / assign / edit response for ADMIN, MANAGER and COMMS, each audited (ballo-dash-api #74). Web: banner on every page while an alert is OPEN (no close button), `/listening/alerts` with status filter, drawer with severity, numbers, sparkline, region, topic, aspect, narrative, 5 evidence mentions (each opens the mention drawer), editable and copyable response, actions, assignee and timeline; bell items link to their alert. Verified on staging 2026-11-21 on a real CRISIS from the outage scenario: edit, assign and acknowledge recorded in the timeline, no horizontal scroll at 375 and 430 px.
 
 ## L-07 Alert delivery by email
 

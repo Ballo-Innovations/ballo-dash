@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 const TABS = [
   { href: "/listening", label: "Mentions" },
   { href: "/listening/live", label: "Live wall" },
+  { href: "/listening/alerts", label: "Alerts" },
 ];
 
 /** Switches between the Listening views, keeping the shared filters in the URL. */
