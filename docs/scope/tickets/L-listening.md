@@ -8,7 +8,7 @@
 | L-02 | Live wall over server-sent events | P0 | 2 | 8 | DONE (staging) |
 | L-03 | Mention drawer with explanation | P0 | 2 | 5 | DONE (staging) |
 | L-04 | Rising topics panel and topic page | P0 | 3 | 5 | TODO |
-| L-05 | Media page: news table, outlet ranking, coverage over time | P0 | 3 | 5 | TODO |
+| L-05 | Media page: news table, outlet ranking, coverage over time | P0 | 3 | 5 | DONE (staging) |
 | L-06 | Alerts: banner, list, drawer, acknowledge, assign, resolve | P0 | 3 | 8 | TODO |
 | L-07 | Alert delivery by email | P1 | 5 | 5 | TODO |
 
@@ -74,16 +74,18 @@
 
 ## L-05 Media page: news table, outlet ranking, coverage over time
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 3  **Estimate:** 5h
 - **Depends on:** C-04, L-01
 - **Feature flag:** `NEXT_PUBLIC_FEATURE_LISTENING`
 
 **Acceptance criteria**
 
-- [ ] News mentions by outlet with headline, date, sentiment, reach estimate and brand
-- [ ] Outlet ranking by reach
-- [ ] Coverage chart
+- [x] News mentions by outlet with headline, date, sentiment, reach estimate and brand
+- [x] Outlet ranking by reach
+- [x] Coverage chart
+
+**Notes:** API `GET /api/media/summary` (ballo-dash-api #64): totals, outlets ranked by summed reach estimate with sentiment split, articles per local day. Web `/media`: four KPIs, coverage chart (days without articles at 0), outlet ranking, article table (date, outlet, headline, sentiment, estimated reach, brand) paged, headline opens the mention drawer. Verified on staging 2026-11-21 with the live news feeds: 8 articles, 430K estimated reach, Lusaka Times then News Diggers; no horizontal page scroll at 375 to 1280 px in light and dark.
 
 ## L-06 Alerts: banner, list, drawer, acknowledge, assign, resolve
 
