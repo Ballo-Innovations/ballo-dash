@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|
 | L-01 | Mentions query service and list page with filters | P0 | 2 | 6 | DONE (staging) |
 | L-02 | Live wall over server-sent events | P0 | 2 | 8 | TODO |
-| L-03 | Mention drawer with explanation | P0 | 2 | 5 | TODO |
+| L-03 | Mention drawer with explanation | P0 | 2 | 5 | DONE (staging) |
 | L-04 | Rising topics panel and topic page | P0 | 3 | 5 | TODO |
 | L-05 | Media page: news table, outlet ranking, coverage over time | P0 | 3 | 5 | TODO |
 | L-06 | Alerts: banner, list, drawer, acknowledge, assign, resolve | P0 | 3 | 8 | TODO |
@@ -47,14 +47,16 @@
 
 ## L-03 Mention drawer with explanation
 
-- **Status:** TODO
+- **Status:** DONE (staging)
 - **Priority:** P0  **Phase:** 2  **Estimate:** 5h
 - **Depends on:** L-01, I-01
 - **Feature flag:** `NEXT_PUBLIC_FEATURE_LISTENING`
 
 **Acceptance criteria**
 
-- [ ] Shows full text with matched terms highlighted, score, label, confidence, aspects, AI summary when present, source chip and link to the original
+- [x] Shows full text with matched terms highlighted, score, label, confidence, aspects, AI summary when present, source chip and link to the original
+
+**Notes:** API `GET /api/mentions/:id` (ballo-dash-api #50) adds matched terms, aspects and the tier 2 summary from `ai_artifacts`. Web: clicking a mention opens the drawer, linkable as `?mention=<id>`; matched terms are highlighted in the sentiment's colour (a negated or boosted label falls back to its last word). While testing on staging, simulated mentions turned out to carry the brand name as their matched term; fixed in ballo-dash-api #54 and the 27,180 stored rows corrected. Verified on staging 2026-11-21: highlights, label, score, confidence, reload keeps the drawer, Escape closes it, a news article shows its outlet and link, 375 px dark.
 
 ## L-04 Rising topics panel and topic page
 
