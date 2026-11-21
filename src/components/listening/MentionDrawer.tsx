@@ -124,7 +124,7 @@ export function MentionDrawer({
             <SourceChip kind={m.sourceKind} />
           </div>
 
-          <section aria-labelledby="mention-text">
+          <div role="region" aria-labelledby="mention-text">
             <h6 id="mention-text" className="visually-hidden">
               Text
             </h6>
@@ -143,9 +143,9 @@ export function MentionDrawer({
                 ),
               )}
             </p>
-          </section>
+          </div>
 
-          <section aria-labelledby="mention-sentiment">
+          <div role="region" aria-labelledby="mention-sentiment">
             <h6 id="mention-sentiment" className="mb-2">
               Sentiment
             </h6>
@@ -165,10 +165,10 @@ export function MentionDrawer({
                 {m.matchedTerms.length ? m.matchedTerms.join(", ") : "None"}
               </dd>
             </dl>
-          </section>
+          </div>
 
           {(m.summary || (m.aspects && m.aspects.length > 0)) && (
-            <section aria-labelledby="mention-ai">
+            <div role="region" aria-labelledby="mention-ai">
               <h6 id="mention-ai" className="mb-2">
                 AI reading
               </h6>
@@ -191,10 +191,10 @@ export function MentionDrawer({
                   ))}
                 </ul>
               )}
-            </section>
+            </div>
           )}
 
-          <section aria-labelledby="mention-about">
+          <div role="region" aria-labelledby="mention-about">
             <h6 id="mention-about" className="mb-2">
               About
             </h6>
@@ -234,7 +234,7 @@ export function MentionDrawer({
                 </>
               )}
             </dl>
-          </section>
+          </div>
         </div>
       )}
     </Drawer>
